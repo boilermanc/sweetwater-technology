@@ -70,7 +70,7 @@ const ShanesRetirementFundCard: React.FC<ShanesRetirementFundCardProps> = ({
     >
       {/* Outer glow on hover */}
       <motion.div
-        className="absolute -inset-2 rounded-[2.5rem] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+        className="absolute -inset-2 rounded-2xl sm:rounded-[2.5rem] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
         style={{
           background:
             "radial-gradient(ellipse at center, rgba(255, 221, 210, 0.6) 0%, transparent 70%)",
@@ -79,7 +79,7 @@ const ShanesRetirementFundCard: React.FC<ShanesRetirementFundCardProps> = ({
 
       {/* Main card */}
       <div
-        className="relative flex h-full flex-col overflow-hidden rounded-[2rem] border border-[#FFDDD2]"
+        className="relative flex h-full flex-col overflow-hidden rounded-2xl sm:rounded-[2rem] border border-[#FFDDD2]"
         style={{
           background:
             "linear-gradient(165deg, #EDF6F9 0%, #FFFFFF 35%, #FFDDD2 100%)",
@@ -128,7 +128,7 @@ const ShanesRetirementFundCard: React.FC<ShanesRetirementFundCardProps> = ({
           <motion.img
             src={app.image}
             alt={app.title}
-            className="h-52 w-full object-cover"
+            className="h-40 sm:h-52 w-full object-cover"
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           />
@@ -151,10 +151,10 @@ const ShanesRetirementFundCard: React.FC<ShanesRetirementFundCardProps> = ({
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex flex-1 flex-col px-6 pb-6 pt-5">
+        <div className="relative z-10 flex flex-1 flex-col px-4 sm:px-6 pb-4 sm:pb-6 pt-4 sm:pt-5">
           {/* Title */}
           <h3
-            className="text-xl sm:text-2xl font-black tracking-tight text-[#006D77] leading-tight mb-2"
+            className="text-lg sm:text-2xl font-black tracking-tight text-[#006D77] leading-tight mb-2"
             style={{ fontFamily: "'Fraunces', serif" }}
           >
             {app.title}

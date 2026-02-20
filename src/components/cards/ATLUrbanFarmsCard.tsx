@@ -35,7 +35,7 @@ const ATLUrbanFarmsCard: React.FC<ATLUrbanFarmsCardProps> = ({
     >
       {/* Hover glow — emerald bloom behind the card */}
       <div
-        className="absolute -inset-3 rounded-[3rem] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
+        className="absolute -inset-3 rounded-2xl sm:rounded-[3rem] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
         style={{
           background:
             "radial-gradient(ellipse at center, rgba(16,185,129,0.15) 0%, transparent 70%)",
@@ -44,7 +44,7 @@ const ATLUrbanFarmsCard: React.FC<ATLUrbanFarmsCardProps> = ({
 
       {/* Card shell */}
       <div
-        className="relative flex h-full flex-col overflow-hidden rounded-[2.5rem] border border-emerald-100/60 bg-white transition-shadow duration-400"
+        className="relative flex h-full flex-col overflow-hidden rounded-2xl sm:rounded-[2.5rem] border border-emerald-100/60 bg-white transition-shadow duration-400"
         style={{
           boxShadow:
             "0 4px 24px -4px rgba(16,185,129,0.08), 0 1px 3px rgba(0,0,0,0.04)",
@@ -90,7 +90,7 @@ const ATLUrbanFarmsCard: React.FC<ATLUrbanFarmsCardProps> = ({
           <motion.img
             src={app.image}
             alt={app.title}
-            className="h-52 w-full object-cover"
+            className="h-40 sm:h-52 w-full object-cover"
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           />
@@ -129,14 +129,14 @@ const ATLUrbanFarmsCard: React.FC<ATLUrbanFarmsCardProps> = ({
         </div>
 
         {/* Content area */}
-        <div className="flex flex-1 flex-col px-6 pb-6 pt-5">
+        <div className="flex flex-1 flex-col px-4 sm:px-6 pb-4 sm:pb-6 pt-4 sm:pt-5">
           {/* Title */}
-          <h3 className="text-xl font-extrabold tracking-tight text-gray-900">
+          <h3 className="text-lg sm:text-xl font-extrabold tracking-tight text-gray-900">
             {app.title}
           </h3>
 
           {/* Description */}
-          <p className="mt-2 text-[15px] leading-relaxed text-gray-500">
+          <p className="mt-2 text-sm sm:text-[15px] leading-relaxed text-gray-500">
             {app.description}
           </p>
 
@@ -156,7 +156,7 @@ const ATLUrbanFarmsCard: React.FC<ATLUrbanFarmsCardProps> = ({
           <div className="flex-1" />
 
           {/* Divider */}
-          <div className="my-5 h-px bg-gray-100" />
+          <div className="my-4 sm:my-5 h-px bg-gray-100" />
 
           {/* Actions */}
           <div className="flex items-center gap-3">

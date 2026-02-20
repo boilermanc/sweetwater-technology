@@ -33,7 +33,7 @@ const OnceUponADrawingCard: React.FC<OnceUponADrawingCardProps> = ({
     >
       {/* Glow layer — visible on hover */}
       <div
-        className="absolute -inset-3 rounded-[2.5rem] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
+        className="absolute -inset-3 rounded-2xl sm:rounded-[2.5rem] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
         style={{
           background:
             "radial-gradient(ellipse at center, rgba(98,146,158,0.3) 0%, rgba(212,165,116,0.15) 50%, transparent 80%)",
@@ -42,7 +42,7 @@ const OnceUponADrawingCard: React.FC<OnceUponADrawingCardProps> = ({
 
       {/* Card body */}
       <div
-        className="relative overflow-hidden rounded-[2rem] border-2 transition-all duration-500 group-hover:border-[#62929e]/60"
+        className="relative overflow-hidden rounded-2xl sm:rounded-[2rem] border-2 transition-all duration-500 group-hover:border-[#62929e]/60"
         style={{
           borderColor: "#c6c5b9",
           background:
@@ -88,7 +88,7 @@ const OnceUponADrawingCard: React.FC<OnceUponADrawingCardProps> = ({
           <motion.img
             src={app.image}
             alt={app.title}
-            className="h-52 w-full object-cover object-top"
+            className="h-40 sm:h-52 w-full object-cover object-top"
             whileHover={{ scale: 1.04 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           />
@@ -128,10 +128,10 @@ const OnceUponADrawingCard: React.FC<OnceUponADrawingCardProps> = ({
         </div>
 
         {/* Content area */}
-        <div className="relative px-6 pb-6 pt-2">
+        <div className="relative px-4 sm:px-6 pb-4 sm:pb-6 pt-2">
           {/* Title */}
           <h3
-            className="mb-1.5 text-xl font-black tracking-tight"
+            className="mb-1.5 text-lg sm:text-xl font-black tracking-tight"
             style={{ color: "#393d3f" }}
           >
             {app.title}
@@ -161,7 +161,7 @@ const OnceUponADrawingCard: React.FC<OnceUponADrawingCardProps> = ({
           </p>
 
           {/* Tags */}
-          <div className="mb-5 flex flex-wrap gap-1.5">
+          <div className="mb-4 sm:mb-5 flex flex-wrap gap-1.5">
             {app.tags.map((tag) => (
               <span
                 key={tag}

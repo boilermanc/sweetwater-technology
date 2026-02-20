@@ -33,7 +33,7 @@ export const AppCard: React.FC<AppCardProps> = ({ app, index, onClick }) => {
             transition: { duration: 0.6, ease: "easeOut" }
           }
         }}
-        className={`absolute inset-0 bg-gradient-to-tr ${app.color} rounded-[2.5rem] blur-xl opacity-0 transition-opacity duration-500`}
+        className={`absolute inset-0 bg-gradient-to-tr ${app.color} rounded-2xl sm:rounded-[2.5rem] blur-xl opacity-0 transition-opacity duration-500`}
       />
 
       <motion.div
@@ -41,9 +41,9 @@ export const AppCard: React.FC<AppCardProps> = ({ app, index, onClick }) => {
           hover: { y: -12 }
         }}
         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-        className="relative bg-white border border-slate-100 rounded-[2rem] overflow-hidden shadow-sm group-hover:shadow-2xl transition-all duration-500 flex flex-col h-full"
+        className="relative bg-white border border-slate-100 rounded-2xl sm:rounded-[2rem] overflow-hidden shadow-sm group-hover:shadow-2xl transition-all duration-500 flex flex-col h-full"
       >
-        <div className="aspect-[4/3] overflow-hidden relative">
+        <div className="aspect-[16/10] sm:aspect-[4/3] overflow-hidden relative">
           <motion.img
             src={app.image}
             alt={app.title}
@@ -59,23 +59,23 @@ export const AppCard: React.FC<AppCardProps> = ({ app, index, onClick }) => {
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         </div>
 
-        <div className="p-8 flex flex-col flex-1">
-          <div className="flex items-center justify-between mb-4">
+        <div className="p-5 sm:p-8 flex flex-col flex-1">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
             <span className="text-blue-600 font-bold text-xs uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full">
               {app.category}
             </span>
             <Layers className="text-slate-300 w-5 h-5 group-hover:text-blue-500 transition-colors" />
           </div>
 
-          <h3 className="text-2xl font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
+          <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
             {app.title}
           </h3>
 
-          <p className="text-slate-500 line-clamp-2 leading-relaxed mb-6 font-medium">
+          <p className="text-sm sm:text-base text-slate-500 line-clamp-2 leading-relaxed mb-4 sm:mb-6 font-medium">
             {app.description}
           </p>
 
-          <div className="flex flex-wrap gap-2 mb-8">
+          <div className="flex flex-wrap gap-2 mb-5 sm:mb-8">
             {app.tags.slice(0, 3).map(tag => (
               <span key={tag} className="text-[10px] font-bold text-slate-400 border border-slate-200 rounded-lg px-2 py-1">
                 {tag}

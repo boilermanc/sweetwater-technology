@@ -38,7 +38,7 @@ export default function RekkrdCard({ app, index, onClick }: RekkrdCardProps) {
         ))}
       </div>
 
-      <div className="relative h-52 overflow-hidden">
+      <div className="relative h-40 sm:h-52 overflow-hidden">
         <motion.img
           src={app.image}
           alt={app.title}
@@ -83,13 +83,13 @@ export default function RekkrdCard({ app, index, onClick }: RekkrdCardProps) {
         </div>
       </div>
 
-      <div className="relative z-10 px-5 pb-5 pt-3">
+      <div className="relative z-10 px-4 sm:px-5 pb-4 sm:pb-5 pt-3">
         <div className="mb-2 flex items-center gap-2">
-          <Disc3 size={16} className="text-[#dd6e42] opacity-70 group-hover:opacity-100 transition-opacity duration-300" />
-          <h3 className="text-lg font-bold tracking-tight text-[#e8e2d6]">{app.title}</h3>
+          <Disc3 size={16} className="text-[#dd6e42] opacity-70 group-hover:opacity-100 transition-opacity duration-300 flex-shrink-0" />
+          <h3 className="text-base sm:text-lg font-bold tracking-tight text-[#e8e2d6]">{app.title}</h3>
         </div>
-        <p className="mb-4 text-sm leading-relaxed text-[#7d9199]">{app.description}</p>
-        <div className="mb-4 flex flex-wrap gap-1.5">
+        <p className="mb-3 sm:mb-4 text-sm leading-relaxed text-[#7d9199]">{app.description}</p>
+        <div className="mb-3 sm:mb-4 flex flex-wrap gap-1.5">
           {app.tags.map((tag) => (
             <span
               key={tag}
@@ -105,7 +105,7 @@ export default function RekkrdCard({ app, index, onClick }: RekkrdCardProps) {
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-1.5 rounded-full border border-[#dd6e42]/30 bg-[#dd6e42]/10 px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-[#dd6e42] backdrop-blur-sm transition-all duration-300 hover:border-[#dd6e42]/60 hover:bg-[#dd6e42]/20 hover:shadow-[0_0_15px_rgba(221,110,66,0.15)]"
+            className="inline-flex items-center gap-1.5 rounded-full border border-[#dd6e42]/30 bg-[#dd6e42]/10 px-3.5 py-2 sm:py-1.5 text-[10px] font-semibold uppercase tracking-widest text-[#dd6e42] backdrop-blur-sm transition-all duration-300 hover:border-[#dd6e42]/60 hover:bg-[#dd6e42]/20 hover:shadow-[0_0_15px_rgba(221,110,66,0.15)]"
           >
             <ExternalLink size={11} />
             Demo
@@ -113,7 +113,7 @@ export default function RekkrdCard({ app, index, onClick }: RekkrdCardProps) {
           <motion.button
             whileHover={{ x: 3 }}
             transition={{ duration: 0.2 }}
-            className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-[#c0d6df]/50 transition-colors duration-300 group-hover:text-[#c0d6df]/80"
+            className="inline-flex items-center gap-1.5 py-2 sm:py-0 text-[10px] font-semibold uppercase tracking-widest text-[#c0d6df]/50 transition-colors duration-300 group-hover:text-[#c0d6df]/80"
             onClick={onClick}
           >
             <Music2 size={11} />

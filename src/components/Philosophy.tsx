@@ -25,7 +25,7 @@ export const Philosophy: React.FC = () => {
   ];
 
   return (
-    <section id="philosophy" className="relative py-32 overflow-hidden scroll-mt-20">
+    <section id="philosophy" className="relative py-16 sm:py-32 overflow-hidden scroll-mt-20">
       <div className="absolute inset-0 -z-10 pointer-events-none opacity-[0.5]">
         {[...Array(6)].map((_, i) => (
           <motion.div
@@ -46,8 +46,8 @@ export const Philosophy: React.FC = () => {
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-16 items-center">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -55,22 +55,22 @@ export const Philosophy: React.FC = () => {
             viewport={{ once: true }}
           >
             <span className="text-blue-600 font-bold text-xs uppercase tracking-[0.3em] mb-4 block">The Liquid Philosophy</span>
-            <h2 className="text-5xl md:text-7xl font-black text-slate-900 leading-tight mb-8">
+            <h2 className="text-3xl sm:text-5xl md:text-7xl font-black text-slate-900 leading-tight mb-6 sm:mb-8">
               Soft as water, <br />
               <span className="italic text-slate-400 font-light">hard as crystal.</span>
             </h2>
-            <p className="text-xl text-slate-600 leading-relaxed mb-8 max-w-xl font-medium">
+            <p className="text-base sm:text-xl text-slate-600 leading-relaxed mb-6 sm:mb-8 max-w-xl font-medium">
               We believe technology shouldn't be a rigid wall you have to climb. It should be the fluid current that carries you forward.
               At Sweetwater, we don't just build apps; we engineer digital ecosystems that flow, adapt, and respond with biological grace.
             </p>
-            <div className="flex gap-12">
+            <div className="flex gap-8 sm:gap-12">
               <div>
-                <div className="text-4xl font-black text-blue-600 mb-1">99.9%</div>
-                <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Fluidity Score</div>
+                <div className="text-3xl sm:text-4xl font-black text-blue-600 mb-1">99.9%</div>
+                <div className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">Fluidity Score</div>
               </div>
               <div>
-                <div className="text-4xl font-black text-indigo-600 mb-1">2.4ms</div>
-                <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Stream Latency</div>
+                <div className="text-3xl sm:text-4xl font-black text-indigo-600 mb-1">2.4ms</div>
+                <div className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">Stream Latency</div>
               </div>
             </div>
           </motion.div>
@@ -84,16 +84,16 @@ export const Philosophy: React.FC = () => {
                 whileHover={{ y: -5, scale: 1.02 }}
                 transition={{ delay: pillar.delay, duration: 0.5 }}
                 viewport={{ once: true }}
-                className="group p-8 rounded-[2.5rem] bg-white/70 backdrop-blur-md border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-50 transition-all cursor-default relative overflow-hidden"
+                className="group p-5 sm:p-8 rounded-2xl sm:rounded-[2.5rem] bg-white/70 backdrop-blur-md border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-50 transition-all cursor-default relative overflow-hidden"
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
 
-                <div className="flex items-start gap-6 relative z-10">
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 group-hover:bg-white group-hover:border-blue-100 transition-colors">
+                <div className="flex items-start gap-4 sm:gap-6 relative z-10">
+                  <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-100 group-hover:bg-white group-hover:border-blue-100 transition-colors flex-shrink-0">
                     {pillar.icon}
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">{pillar.title}</h3>
+                    <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-1 sm:mb-2 group-hover:text-blue-600 transition-colors">{pillar.title}</h3>
                     <p className="text-slate-500 leading-relaxed text-sm font-medium">{pillar.desc}</p>
                   </div>
                 </div>

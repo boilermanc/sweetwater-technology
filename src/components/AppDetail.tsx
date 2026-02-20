@@ -24,7 +24,7 @@ export const AppDetail: React.FC<AppDetailProps> = ({ app, onClose }) => {
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-        className="relative w-full max-w-5xl bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-slate-100 flex flex-col md:flex-row h-full max-h-[85vh]"
+        className="relative w-full max-w-5xl bg-white rounded-2xl sm:rounded-[3rem] shadow-2xl overflow-hidden border border-slate-100 flex flex-col md:flex-row h-full max-h-[85vh]"
       >
         <button
           onClick={onClose}
@@ -47,9 +47,9 @@ export const AppDetail: React.FC<AppDetailProps> = ({ app, onClose }) => {
               style={{ background: `linear-gradient(to top right, ${app.color}, ${app.color}88)` }}
             />
           )}
-          <div className="absolute bottom-12 left-12 right-12">
-             <span className="text-white/60 font-bold text-xs uppercase tracking-[0.2em] mb-4 block">Project Profile</span>
-             <h2 className="text-5xl md:text-6xl font-black text-white tracking-tighter mb-4">{app.title}</h2>
+          <div className="absolute bottom-6 left-6 right-6 sm:bottom-12 sm:left-12 sm:right-12">
+             <span className="text-white/60 font-bold text-xs uppercase tracking-[0.2em] mb-2 sm:mb-4 block">Project Profile</span>
+             <h2 className="text-2xl sm:text-5xl md:text-6xl font-black text-white tracking-tighter mb-2 sm:mb-4">{app.title}</h2>
              <div className="flex gap-4">
                 <span className="px-4 py-2 rounded-xl bg-white/10 backdrop-blur-md text-white text-xs font-bold border border-white/20">
                   {app.category}
@@ -58,11 +58,11 @@ export const AppDetail: React.FC<AppDetailProps> = ({ app, onClose }) => {
           </div>
         </div>
 
-        <div className="md:w-1/2 p-8 md:p-16 overflow-y-auto">
-          <div className="space-y-10">
+        <div className="md:w-1/2 p-5 sm:p-8 md:p-16 overflow-y-auto">
+          <div className="space-y-6 sm:space-y-10">
             <div>
               <h3 className="text-xs font-black text-blue-600 uppercase tracking-widest mb-4">The Vision</h3>
-              <p className="text-xl md:text-2xl text-slate-800 leading-relaxed font-semibold">
+              <p className="text-base sm:text-xl md:text-2xl text-slate-800 leading-relaxed font-semibold">
                 {app.longDescription}
               </p>
             </div>

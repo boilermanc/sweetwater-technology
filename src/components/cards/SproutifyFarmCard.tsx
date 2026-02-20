@@ -76,7 +76,7 @@ const SproutifyFarmCard: React.FC<SproutifyFarmCardProps> = ({
         {/* Image section */}
         <div className="relative overflow-hidden">
           <motion.div
-            className="relative h-52 w-full overflow-hidden"
+            className="relative h-40 sm:h-52 w-full overflow-hidden"
             whileHover={{ scale: 1.03 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
@@ -112,9 +112,9 @@ const SproutifyFarmCard: React.FC<SproutifyFarmCardProps> = ({
         </div>
 
         {/* Content section */}
-        <div className="flex flex-1 flex-col px-5 pb-5 pt-1">
+        <div className="flex flex-1 flex-col px-4 sm:px-5 pb-4 sm:pb-5 pt-1">
           {/* Title */}
-          <h3 className="mb-2 text-xl font-bold tracking-tight text-white">
+          <h3 className="mb-2 text-lg sm:text-xl font-bold tracking-tight text-white">
             {app.title}
           </h3>
 
@@ -127,7 +127,7 @@ const SproutifyFarmCard: React.FC<SproutifyFarmCardProps> = ({
           </p>
 
           {/* Mini stat indicators — evoke the data-driven dashboard feel */}
-          <div className="mb-4 flex gap-3">
+          <div className="mb-3 sm:mb-4 flex flex-wrap gap-2 sm:gap-3">
             {[
               { icon: Droplets, label: "Nutrients" },
               { icon: BarChart3, label: "Analytics" },

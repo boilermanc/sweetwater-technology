@@ -49,7 +49,7 @@ const FaqSection: React.FC = () => {
   return (
     <div className="space-y-4">
       <div className="mb-8">
-        <h2 className="text-3xl font-black text-slate-900 mb-2">
+        <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mb-2">
           Frequently Asked Questions
         </h2>
         <p className="text-slate-500 font-medium">
@@ -81,7 +81,7 @@ const FaqSection: React.FC = () => {
                 aria-expanded={isOpen}
                 aria-controls={panelId}
                 onClick={() => setOpenIndex(isOpen ? null : idx)}
-                className="w-full flex items-center justify-between px-6 py-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 rounded-2xl"
+                className="w-full flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 rounded-2xl"
               >
                 <div className="space-y-1">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600">
@@ -115,7 +115,7 @@ const FaqSection: React.FC = () => {
                   isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                 }`}
               >
-                <div className="px-6 pb-6 text-slate-600 leading-relaxed border-t border-blue-50 pt-4 mt-2">
+                <div className="px-4 sm:px-6 pb-5 sm:pb-6 text-sm sm:text-base text-slate-600 leading-relaxed border-t border-blue-50 pt-4 mt-2">
                   {faq.answer}
                 </div>
               </div>
@@ -164,7 +164,7 @@ const ContactForm: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-blue-50/50 border border-blue-100 p-12 rounded-[2rem] text-center space-y-4"
+        className="bg-blue-50/50 border border-blue-100 p-6 sm:p-12 rounded-2xl sm:rounded-[2rem] text-center space-y-4"
       >
         <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-200">
           <CheckCircle className="w-8 h-8" />
@@ -189,9 +189,9 @@ const ContactForm: React.FC = () => {
   }
 
   return (
-    <div className="bg-white/80 backdrop-blur-xl p-8 md:p-10 rounded-[2rem] border border-slate-100 shadow-2xl">
+    <div className="bg-white/80 backdrop-blur-xl p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-[2rem] border border-slate-100 shadow-2xl">
       <div className="mb-8">
-        <h2 className="text-3xl font-black text-slate-900 mb-2">
+        <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mb-2">
           Send us a Message
         </h2>
         <p className="text-slate-500 font-medium">
@@ -300,7 +300,7 @@ const ContactForm: React.FC = () => {
 
 export const Contact: React.FC = () => {
   return (
-    <section id="contact" className="relative py-32 px-6 scroll-mt-20 overflow-hidden">
+    <section id="contact" className="relative py-16 sm:py-32 px-4 sm:px-6 scroll-mt-20 overflow-hidden">
       {/* Background decoration */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 pointer-events-none">
         {[...Array(3)].map((_, i) => (
@@ -313,7 +313,7 @@ export const Contact: React.FC = () => {
         ))}
       </div>
 
-      <div className="max-w-7xl mx-auto relative z-10 space-y-16">
+      <div className="max-w-7xl mx-auto relative z-10 space-y-10 sm:space-y-16">
         {/* Hero */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -324,25 +324,25 @@ export const Contact: React.FC = () => {
           <span className="text-blue-600 font-bold text-xs uppercase tracking-[0.3em] mb-4 block">
             Get in Touch
           </span>
-          <h2 className="text-5xl md:text-7xl font-black text-slate-900 leading-tight">
+          <h2 className="text-3xl sm:text-5xl md:text-7xl font-black text-slate-900 leading-tight">
             Let's build{' '}
             <br className="hidden md:block" />
-            <span className="italic text-slate-400 font-light text-4xl md:text-6xl">something together.</span>
+            <span className="italic text-slate-400 font-light text-2xl sm:text-4xl md:text-6xl">something together.</span>
           </h2>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed font-medium">
+          <p className="text-base sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed font-medium">
             Whether you're launching an MVP, scaling an existing product, or need an AI-powered feature — our team is ready to help you flow.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 pt-4">
             <a
               href="#faqs"
-              className="bg-white border border-slate-200 text-slate-900 px-8 py-3.5 rounded-full font-bold shadow-sm hover:shadow-md hover:border-blue-200 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+              className="bg-white border border-slate-200 text-slate-900 px-6 sm:px-8 py-3 sm:py-3.5 rounded-full font-bold text-sm sm:text-base shadow-sm hover:shadow-md hover:border-blue-200 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
             >
               Browse FAQs
             </a>
             <a
               href="#contact-form"
-              className="bg-slate-900 text-white px-8 py-3.5 rounded-full font-bold shadow-2xl shadow-slate-300/50 hover:bg-blue-600 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+              className="bg-slate-900 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-full font-bold text-sm sm:text-base shadow-2xl shadow-slate-300/50 hover:bg-blue-600 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
             >
               Contact Us
             </a>
@@ -355,7 +355,7 @@ export const Contact: React.FC = () => {
           <div id="faqs" className="scroll-mt-32">
             <FaqSection />
 
-            <div className="mt-12 p-8 bg-blue-50/30 border border-dashed border-blue-100 rounded-[2rem] text-slate-400 text-center">
+            <div className="mt-8 sm:mt-12 p-5 sm:p-8 bg-blue-50/30 border border-dashed border-blue-100 rounded-2xl sm:rounded-[2rem] text-slate-400 text-center">
               <p className="text-sm italic font-medium">
                 "The best technology disappears into the experience it enables."
               </p>

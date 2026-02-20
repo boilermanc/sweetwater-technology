@@ -69,7 +69,7 @@ const SproutifyMicroCard: React.FC<SproutifyMicroCardProps> = ({
         {/* Image area */}
         <div className="relative overflow-hidden">
           <motion.div
-            className="relative h-52 w-full overflow-hidden"
+            className="relative h-40 sm:h-52 w-full overflow-hidden"
             variants={{
               hover: { scale: 1.02 },
             }}
@@ -108,10 +108,10 @@ const SproutifyMicroCard: React.FC<SproutifyMicroCardProps> = ({
         </div>
 
         {/* Content area */}
-        <div className="relative z-10 flex flex-1 flex-col px-5 pb-5 pt-2">
+        <div className="relative z-10 flex flex-1 flex-col px-4 sm:px-5 pb-4 sm:pb-5 pt-2">
           {/* Title */}
           <h3
-            className="mb-1.5 text-lg font-bold leading-tight tracking-tight"
+            className="mb-1.5 text-base sm:text-lg font-bold leading-tight tracking-tight"
             style={{ color: "#F0F4F8" }}
           >
             {app.title}

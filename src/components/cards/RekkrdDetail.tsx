@@ -23,7 +23,7 @@ export const RekkrdDetail: React.FC<RekkrdDetailProps> = ({ app, onClose }) => {
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-        className="relative w-full max-w-5xl bg-[rgb(26,37,40)] rounded-[2rem] shadow-2xl overflow-hidden border border-white/[0.06] flex flex-col md:flex-row h-full max-h-[85vh]"
+        className="relative w-full max-w-5xl bg-[rgb(26,37,40)] rounded-2xl sm:rounded-[2rem] shadow-2xl overflow-hidden border border-white/[0.06] flex flex-col md:flex-row h-full max-h-[85vh]"
       >
         <button
           onClick={onClose}
@@ -43,9 +43,9 @@ export const RekkrdDetail: React.FC<RekkrdDetailProps> = ({ app, onClose }) => {
             className="absolute inset-x-0 bottom-0 h-48 pointer-events-none"
             style={{ background: 'linear-gradient(to top, rgb(20,30,33) 0%, transparent 100%)' }}
           />
-          <div className="absolute bottom-8 left-8 right-8 z-10">
-            <span className="text-[#7d9199] font-bold text-xs uppercase tracking-[0.2em] mb-4 block">Product Preview</span>
-            <h2 className="text-5xl md:text-6xl font-black text-[#e8e2d6] tracking-tighter mb-4">{app.title}</h2>
+          <div className="absolute bottom-5 left-5 right-5 sm:bottom-8 sm:left-8 sm:right-8 z-10">
+            <span className="text-[#7d9199] font-bold text-xs uppercase tracking-[0.2em] mb-2 sm:mb-4 block">Product Preview</span>
+            <h2 className="text-2xl sm:text-5xl md:text-6xl font-black text-[#e8e2d6] tracking-tighter mb-2 sm:mb-4">{app.title}</h2>
             <div className="flex gap-3">
               <span className="px-4 py-2 rounded-xl bg-[#dd6e42]/15 backdrop-blur-md text-[#dd6e42] text-xs font-bold border border-[#dd6e42]/20">
                 {app.category}
@@ -54,11 +54,11 @@ export const RekkrdDetail: React.FC<RekkrdDetailProps> = ({ app, onClose }) => {
           </div>
         </div>
 
-        <div className="md:w-1/2 p-8 md:p-12 overflow-y-auto">
-          <div className="space-y-8">
+        <div className="md:w-1/2 p-5 sm:p-8 md:p-12 overflow-y-auto">
+          <div className="space-y-6 sm:space-y-8">
             <div>
               <h3 className="text-xs font-black text-[#dd6e42] uppercase tracking-widest mb-4">The Vision</h3>
-              <p className="text-lg md:text-xl text-[#c0d6df] leading-relaxed font-medium">
+              <p className="text-base sm:text-lg md:text-xl text-[#c0d6df] leading-relaxed font-medium">
                 {app.longDescription}
               </p>
             </div>

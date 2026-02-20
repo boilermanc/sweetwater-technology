@@ -40,7 +40,7 @@ const App: React.FC = () => {
         <Hero />
         <Philosophy />
 
-        <div id="portfolio" className="relative py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-24">
+        <div id="portfolio" className="relative py-12 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-24">
           <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden">
              <motion.div
                animate={{ rotate: [0, 360] }}
@@ -53,12 +53,12 @@ const App: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-12 relative z-10"
+            className="mb-8 sm:mb-12 relative z-10"
           >
-            <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3 sm:mb-4">
               Our Ecosystem
             </h2>
-            <p className="text-xl text-slate-600 max-w-2xl">
+            <p className="text-base sm:text-xl text-slate-600 max-w-2xl">
               Fluid, powerful, and intentionally designed. Explore the suite of applications defining the next era of digital interaction.
             </p>
           </motion.div>
@@ -69,16 +69,16 @@ const App: React.FC = () => {
         <Contact />
       </main>
 
-      <footer className="relative z-10 py-12 px-6 border-t border-slate-100 bg-white/50 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+      <footer className="relative z-10 py-8 sm:py-12 px-4 sm:px-6 border-t border-slate-100 bg-white/50 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600" />
-            <span className="text-xl tracking-tight text-slate-900">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex-shrink-0" />
+            <span className="text-lg sm:text-xl tracking-tight text-slate-900">
               <span className="font-bold">Sweetwater</span>
-              <span style={{ fontFamily: "'Satisfy', cursive" }} className="ml-1 text-2xl font-semibold"><span className="text-blue-600">T</span>echnology</span>
+              <span style={{ fontFamily: "'Satisfy', cursive" }} className="ml-1 text-xl sm:text-2xl font-semibold"><span className="text-blue-600">T</span>echnology</span>
             </span>
           </div>
-          <div className="text-slate-500 text-sm">
+          <div className="text-slate-500 text-xs sm:text-sm text-center">
             © {new Date().getFullYear()} Sweetwater Technology. All rights reserved.
           </div>
         </div>

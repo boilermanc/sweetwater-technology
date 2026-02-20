@@ -71,7 +71,7 @@ const SproutifyCard: React.FC<SproutifyCardProps> = ({ app, index, onClick }) =>
 
         {/* Image section */}
         <div className="relative overflow-hidden">
-          <div className="relative h-52 w-full overflow-hidden">
+          <div className="relative h-40 sm:h-52 w-full overflow-hidden">
             <img
               src={app.image}
               alt={`${app.title} preview`}
@@ -97,10 +97,10 @@ const SproutifyCard: React.FC<SproutifyCardProps> = ({ app, index, onClick }) =>
         </div>
 
         {/* Content section */}
-        <div className="relative flex flex-1 flex-col px-5 pb-5 pt-4">
+        <div className="relative flex flex-1 flex-col px-4 sm:px-5 pb-4 sm:pb-5 pt-3 sm:pt-4">
           {/* Title */}
           <h3
-            className="text-xl font-semibold tracking-tight text-white"
+            className="text-lg sm:text-xl font-semibold tracking-tight text-white"
             style={{ fontFamily: "'Outfit', sans-serif" }}
           >
             {app.title}
@@ -130,7 +130,7 @@ const SproutifyCard: React.FC<SproutifyCardProps> = ({ app, index, onClick }) =>
           <div className="flex-1" />
 
           {/* Divider — organic line */}
-          <div className="my-4 h-px w-full bg-gradient-to-r from-transparent via-[#899786]/25 to-transparent" />
+          <div className="my-3 sm:my-4 h-px w-full bg-gradient-to-r from-transparent via-[#899786]/25 to-transparent" />
 
           {/* Actions row */}
           <div className="flex items-center justify-between">

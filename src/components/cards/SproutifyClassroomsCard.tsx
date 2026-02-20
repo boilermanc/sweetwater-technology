@@ -85,7 +85,7 @@ const SproutifyClassroomsCard: React.FC<SproutifyClassroomsCardProps> = ({
             <motion.img
               src={app.image}
               alt={`${app.title} preview`}
-              className="h-52 w-full object-cover"
+              className="h-40 sm:h-52 w-full object-cover"
               whileHover={{ scale: 1.03 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
             />
@@ -101,9 +101,9 @@ const SproutifyClassroomsCard: React.FC<SproutifyClassroomsCardProps> = ({
         </div>
 
         {/* ── Body ── */}
-        <div className="flex flex-1 flex-col px-5 pt-4 pb-5">
+        <div className="flex flex-1 flex-col px-4 sm:px-5 pt-3 sm:pt-4 pb-4 sm:pb-5">
           {/* Title */}
-          <h3 className="text-lg font-bold tracking-tight text-gray-900">
+          <h3 className="text-base sm:text-lg font-bold tracking-tight text-gray-900">
             {app.title}
           </h3>
 

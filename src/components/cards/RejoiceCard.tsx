@@ -110,7 +110,7 @@ export default function RejoiceCard({
             <img
               src={app.image}
               alt={app.title}
-              className="w-full h-52 object-cover"
+              className="w-full h-40 sm:h-52 object-cover"
             />
 
             {/* Warm gradient overlay on image */}
@@ -136,7 +136,7 @@ export default function RejoiceCard({
         </div>
 
         {/* ── Content Section ── */}
-        <div className="relative flex flex-1 flex-col p-5 pt-4">
+        <div className="relative flex flex-1 flex-col p-4 sm:p-5 pt-3 sm:pt-4">
           {/* Category pill */}
           <div className="flex items-center gap-2 mb-2">
             <span
@@ -159,7 +159,7 @@ export default function RejoiceCard({
 
           {/* Title */}
           <h3
-            className="text-xl font-bold mb-1.5 tracking-tight"
+            className="text-lg sm:text-xl font-bold mb-1.5 tracking-tight"
             style={{ color: COLORS.textPrimary }}
           >
             {app.title}
@@ -174,7 +174,7 @@ export default function RejoiceCard({
           </p>
 
           {/* Feature highlights row — key Rejoice concepts */}
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
             {[
               { icon: Heart, label: "Prayer", color: COLORS.mint },
               { icon: BookOpen, label: "Scripture", color: COLORS.gold },
