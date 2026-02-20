@@ -13,7 +13,7 @@ export const Hero: React.FC = () => {
     })), []);
 
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden pt-20">
+    <section className="relative min-h-[70vh] md:min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden pt-20">
       <div className="absolute inset-0 -z-10 bg-transparent">
         <motion.div
           animate={{
@@ -89,7 +89,7 @@ export const Hero: React.FC = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.8 }}
-          className="text-6xl md:text-8xl lg:text-9xl font-black text-slate-900 leading-[0.9] tracking-tighter mb-8 drop-shadow-sm"
+          className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-black text-slate-900 leading-[0.9] tracking-tighter mb-6 md:mb-8 drop-shadow-sm"
         >
           Software that <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-500 to-sky-400">
@@ -101,7 +101,7 @@ export const Hero: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.8 }}
-          className="text-xl md:text-2xl text-slate-600 max-w-2xl mx-auto mb-12 font-medium bg-white/10 backdrop-blur-[2px] rounded-2xl py-2 px-4 inline-block"
+          className="text-base md:text-2xl text-slate-600 max-w-2xl mx-auto mb-8 md:mb-12 font-medium bg-white/10 backdrop-blur-[2px] rounded-2xl py-2 px-4 inline-block"
         >
           Sweetwater Technology builds the liquid foundations of high-performance digital infrastructure.
         </motion.p>
@@ -116,7 +116,7 @@ export const Hero: React.FC = () => {
             href="#portfolio"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
-            className="px-8 py-4 rounded-full bg-slate-900 text-white font-bold text-lg shadow-2xl shadow-slate-300/50 hover:bg-blue-600 transition-all flex items-center gap-2"
+            className="px-6 py-3 md:px-8 md:py-4 rounded-full bg-slate-900 text-white font-bold text-base md:text-lg shadow-2xl shadow-slate-300/50 hover:bg-blue-600 transition-all flex items-center gap-2"
           >
             Explore the Suite
           </motion.a>

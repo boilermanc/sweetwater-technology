@@ -5,16 +5,20 @@ import { Hero } from './components/Hero';
 import { Philosophy } from './components/Philosophy';
 import { AppGrid } from './components/AppGrid';
 import { Contact } from './components/Contact';
-import { Sage } from './components/Sage';
 import { AnimatedBackground } from './components/AnimatedBackground';
 import { AppDetail } from './components/AppDetail';
-import type { AppProject, BackgroundTexture } from './types';
-import { Sparkles } from 'lucide-react';
+import { RekkrdDetail } from './components/cards/RekkrdDetail';
+import type { AppProject } from './types';
 
 const App: React.FC = () => {
   const [selectedApp, setSelectedApp] = useState<AppProject | null>(null);
-  const [showSage, setShowSage] = useState(false);
-  const [activeTexture, setActiveTexture] = useState<BackgroundTexture>('flow');
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    if (window.location.hash) {
+      history.replaceState(null, '', window.location.pathname);
+    }
+  }, []);
 
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
@@ -28,13 +32,9 @@ const App: React.FC = () => {
 
   return (
     <div className="relative min-h-screen selection:bg-blue-100 selection:text-blue-800 transition-colors duration-700">
-      <AnimatedBackground texture={activeTexture} />
+      <AnimatedBackground texture="flow" />
 
-      <Header
-        onOpenAI={() => setShowSage(true)}
-        activeTexture={activeTexture}
-        onTextureChange={setActiveTexture}
-      />
+      <Header />
 
       <main className="relative z-10">
         <Hero />
@@ -69,28 +69,14 @@ const App: React.FC = () => {
         <Contact />
       </main>
 
-      <motion.button
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        whileHover={{ scale: 1.1, y: -5 }}
-        whileTap={{ scale: 0.9 }}
-        onClick={() => setShowSage(true)}
-        aria-label="Open Conduit Sage"
-        className="fixed bottom-8 right-8 z-[65] w-16 h-16 rounded-2xl bg-slate-900 text-white shadow-2xl shadow-blue-500/20 flex items-center justify-center group overflow-hidden"
-      >
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-          className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity"
-        />
-        <Sparkles className="w-7 h-7 relative z-10" />
-      </motion.button>
-
       <footer className="relative z-10 py-12 px-6 border-t border-slate-100 bg-white/50 backdrop-blur-md">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600" />
-            <span className="font-bold text-xl tracking-tight text-slate-900">Sweetwater</span>
+            <span className="text-xl tracking-tight text-slate-900">
+              <span className="font-bold">Sweetwater</span>
+              <span style={{ fontFamily: "'Satisfy', cursive" }} className="ml-1 text-2xl font-semibold"><span className="text-blue-600">T</span>echnology</span>
+            </span>
           </div>
           <div className="text-slate-500 text-sm">
             © {new Date().getFullYear()} Sweetwater Technology. All rights reserved.
@@ -100,11 +86,13 @@ const App: React.FC = () => {
 
       <AnimatePresence>
         {selectedApp && (
-          <AppDetail app={selectedApp} onClose={() => setSelectedApp(null)} />
+          selectedApp.id === 'rekkrd' ? (
+            <RekkrdDetail app={selectedApp} onClose={() => setSelectedApp(null)} />
+          ) : (
+            <AppDetail app={selectedApp} onClose={() => setSelectedApp(null)} />
+          )
         )}
       </AnimatePresence>
-
-      <Sage isOpen={showSage} onClose={() => setShowSage(false)} />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { X, ExternalLink, Globe, Cpu, Users } from 'lucide-react';
+import { X, ExternalLink } from 'lucide-react';
 import type { AppProject } from '../types';
 
 interface AppDetailProps {
@@ -28,7 +28,7 @@ export const AppDetail: React.FC<AppDetailProps> = ({ app, onClose }) => {
       >
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 z-10 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 backdrop-blur-md flex items-center justify-center text-slate-900 md:text-white transition-colors"
+          className="absolute top-6 right-6 z-20 w-10 h-10 rounded-full bg-slate-900/60 hover:bg-slate-900/80 backdrop-blur-md flex items-center justify-center text-white transition-colors shadow-lg"
         >
           <X className="w-6 h-6" />
         </button>
@@ -39,7 +39,14 @@ export const AppDetail: React.FC<AppDetailProps> = ({ app, onClose }) => {
             alt={app.title}
             className="w-full h-full object-cover opacity-80"
           />
-          <div className={`absolute inset-0 bg-gradient-to-tr ${app.color} mix-blend-multiply opacity-60`} />
+          {app.color.startsWith('from-') ? (
+            <div className={`absolute inset-0 bg-gradient-to-tr ${app.color} mix-blend-multiply opacity-60`} />
+          ) : (
+            <div
+              className="absolute inset-0 mix-blend-multiply opacity-60"
+              style={{ background: `linear-gradient(to top right, ${app.color}, ${app.color}88)` }}
+            />
+          )}
           <div className="absolute bottom-12 left-12 right-12">
              <span className="text-white/60 font-bold text-xs uppercase tracking-[0.2em] mb-4 block">Project Profile</span>
              <h2 className="text-5xl md:text-6xl font-black text-white tracking-tighter mb-4">{app.title}</h2>
@@ -60,29 +67,30 @@ export const AppDetail: React.FC<AppDetailProps> = ({ app, onClose }) => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="p-6 rounded-3xl bg-slate-50 border border-slate-100">
-                <Globe className="text-blue-500 w-6 h-6 mb-4" />
-                <h4 className="font-bold text-slate-900 mb-1">Architecture</h4>
-                <p className="text-sm text-slate-500">Cloud-Native, High Availability, Distributed Compute.</p>
-              </div>
-              <div className="p-6 rounded-3xl bg-slate-50 border border-slate-100">
-                <Cpu className="text-indigo-500 w-6 h-6 mb-4" />
-                <h4 className="font-bold text-slate-900 mb-1">Tech Stack</h4>
-                <p className="text-sm text-slate-500">React, Rust, WebAssembly, Edge Runtime.</p>
-              </div>
-              <div className="p-6 rounded-3xl bg-slate-50 border border-slate-100">
-                <Users className="text-sky-500 w-6 h-6 mb-4" />
-                <h4 className="font-bold text-slate-900 mb-1">Target Base</h4>
-                <p className="text-sm text-slate-500">Enterprise Scale, Modern Teams, Solo Pros.</p>
+            <div>
+              <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Tech Stack</h3>
+              <div className="flex flex-wrap gap-2">
+                {app.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-100 text-sm font-semibold text-slate-700"
+                  >
+                    {tag}
+                  </span>
+                ))}
               </div>
             </div>
 
             <div className="pt-6">
-              <button className="w-full py-5 rounded-2xl bg-blue-600 text-white font-bold text-lg shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all flex items-center justify-center gap-3">
+              <a
+                href={app.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-5 rounded-2xl bg-slate-900 text-white font-bold text-lg shadow-xl shadow-slate-200 hover:bg-slate-800 transition-all flex items-center justify-center gap-3"
+              >
                 Launch Application
                 <ExternalLink className="w-5 h-5" />
-              </button>
+              </a>
             </div>
           </div>
         </div>
