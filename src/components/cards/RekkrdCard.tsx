@@ -1,4 +1,3 @@
-import React from "react";
 import { motion } from "framer-motion";
 import { ExternalLink, Disc3, Music2 } from "lucide-react";
 import type { AppProject } from "../../types";
@@ -23,6 +22,16 @@ export default function RekkrdCard({ app, index, onClick }: RekkrdCardProps) {
       transition={{ duration: 0.6, delay: index * 0.1, ease: "easeOut" }}
       whileHover={{ y: -6 }}
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      aria-label={`View ${app.title} details`}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onClick();
+        }
+      }}
       className="group relative cursor-pointer overflow-hidden rounded-2xl border border-white/[0.06] bg-[rgb(26,37,40)] shadow-lg"
     >
       <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-[0.03] group-hover:opacity-[0.06] transition-opacity duration-700">
@@ -42,6 +51,8 @@ export default function RekkrdCard({ app, index, onClick }: RekkrdCardProps) {
         <motion.img
           src={app.image}
           alt={app.title}
+          loading="lazy"
+          decoding="async"
           className="h-full w-full object-cover"
           whileHover={{ scale: 1.08 }}
           transition={{ duration: 0.7, ease: "easeOut" }}

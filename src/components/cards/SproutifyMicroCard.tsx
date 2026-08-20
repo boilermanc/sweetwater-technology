@@ -25,6 +25,16 @@ const SproutifyMicroCard: React.FC<SproutifyMicroCardProps> = ({
       }}
       whileHover="hover"
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      aria-label={`View ${app.title} details`}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onClick();
+        }
+      }}
       className="group relative h-full cursor-pointer"
     >
       <motion.div
@@ -78,6 +88,8 @@ const SproutifyMicroCard: React.FC<SproutifyMicroCardProps> = ({
             <img
               src={app.image}
               alt={`${app.title} preview`}
+              loading="lazy"
+              decoding="async"
               className="h-full w-full object-cover"
             />
             {/* Gradient overlay fading into the dark card body */}

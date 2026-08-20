@@ -36,10 +36,10 @@ export const PROJECTS: AppProject[] = [
   },
   {
     id: 'sproutify',
-    title: 'Sproutify',
+    title: 'Sproutify Home',
     category: 'Mobile App',
     description: 'The ultimate companion app for aeroponic tower growers — AI-powered planning, community engagement, and comprehensive plant management.',
-    longDescription: 'Sproutify helps aeroponic tower gardeners grow smarter with an AI-powered planning assistant (Sage), a catalog of 100+ plants with community ratings, and support for 20+ tower brands. Track costs, identify pests, share harvests with the community, and level up through gamified achievements — all from one beautifully designed app.',
+    longDescription: 'Sproutify Home helps aeroponic tower gardeners grow smarter with an AI-powered planning assistant (Sage), a catalog of 100+ plants with community ratings, and support for 20+ tower brands. Track costs, identify pests, share harvests with the community, and level up through gamified achievements — all from one beautifully designed app.',
     image: '/images/home_2987394.PNG',
     tags: ['Flutter', 'Supabase', 'AI', 'RevenueCat', 'Dart'],
     link: 'https://www.sproutify.app/sproutify-home.html',
@@ -47,13 +47,13 @@ export const PROJECTS: AppProject[] = [
   },
   {
     id: 'sproutify-classrooms',
-    title: 'Sproutify Classrooms',
+    title: 'Sproutify School',
     category: 'EdTech',
     description: 'Aeroponic garden management tools for educators and students to explore sustainable agriculture together.',
-    longDescription: 'Sproutify Classrooms is a comprehensive web application for managing classroom hydroponic tower gardens. Teachers track plant growth, monitor environmental data like pH and EC, log harvests and waste, and engage students through gamified learning with leaderboards and achievements. It scales from individual classrooms to entire school districts with role-based administration.',
+    longDescription: 'Sproutify School is a comprehensive web application for managing classroom hydroponic tower gardens. Teachers track plant growth, monitor environmental data like pH and EC, log harvests and waste, and engage students through gamified learning with leaderboards and achievements. It scales from individual classrooms to entire school districts with role-based administration.',
     image: '/images/file_00000000ebf871fd9be2d9a59b6f5f0d.png',
     tags: ['React', 'TypeScript', 'Supabase', 'Stripe', 'Tailwind CSS', 'Vite'],
-    link: 'https://school.sproutify.app/',
+    link: 'https://www.sproutify.app/sproutify-school.html',
     color: '#279B51'
   },
   {
@@ -99,5 +99,16 @@ export const PROJECTS: AppProject[] = [
     tags: ['React', 'TypeScript', 'Supabase', 'Stripe', 'ShipEngine', 'Framer Motion', 'TailwindCSS', 'Gemini AI'],
     link: 'https://atlurbanfarms.com',
     color: '#10B981'
+  },
+  {
+    id: 'lanewise',
+    title: 'LaneWise',
+    category: 'Logistics AI',
+    description: 'A quoting copilot for freight brokers that turns inbound spot-quote emails into review-ready drafts with live market rates.',
+    longDescription: 'LaneWise watches a freight broker\'s connected inbox for spot-quote requests, extracts the lane and load details, checks a live market rate, and prepares a transparent all-in quote with every assumption shown. The broker reviews, adjusts, and sends the response themselves — LaneWise never sends email automatically.',
+    image: '/images/lanewise-icon.png',
+    tags: ['React', 'TypeScript', 'Supabase', 'Email Automation', 'Rate Intelligence', 'Electron'],
+    link: 'https://lanewise.io',
+    color: '#f4d35e'
   }
 ];

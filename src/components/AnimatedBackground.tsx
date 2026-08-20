@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { BackgroundTexture } from '../types';
 
@@ -6,13 +6,13 @@ interface AnimatedBackgroundProps {
   texture: BackgroundTexture;
 }
 
+const LIQUID_DROPLETS = Array.from({ length: 20 }, (_, i) => ({
+  duration: 2 + ((i * 37) % 30) / 10,
+  delay: ((i * 17) % 50) / 10,
+  left: (i * 47) % 100,
+}));
+
 export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({ texture }) => {
-  const liquidDroplets = useMemo(() =>
-    [...Array(20)].map(() => ({
-      duration: 2 + Math.random() * 3,
-      delay: Math.random() * 5,
-      left: Math.random() * 100,
-    })), []);
   return (
     <div className="fixed inset-0 -z-30 overflow-hidden pointer-events-none bg-slate-50">
       <motion.div
@@ -32,7 +32,11 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({ texture 
             animate={{ opacity: 0.1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.8 }}
-            className="absolute inset-0 mix-blend-multiply bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"
+            className="absolute inset-0 mix-blend-multiply"
+            style={{
+              backgroundImage: 'radial-gradient(circle, rgba(15, 23, 42, 0.45) 0.5px, transparent 0.75px)',
+              backgroundSize: '4px 4px',
+            }}
           />
         )}
 
@@ -89,7 +93,7 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({ texture 
             className="absolute inset-0"
           >
             <div className="absolute inset-0 z-0">
-              {liquidDroplets.map((d, i) => (
+              {LIQUID_DROPLETS.map((d, i) => (
                 <motion.div
                   key={i}
                   initial={{ y: -20, opacity: 0 }}
@@ -155,7 +159,13 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({ texture 
         )}
       </AnimatePresence>
 
-      <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+      <div
+        className="absolute inset-0 opacity-[0.04] pointer-events-none"
+        style={{
+          backgroundImage: 'radial-gradient(circle, rgba(15, 23, 42, 0.4) 0.5px, transparent 0.75px)',
+          backgroundSize: '4px 4px',
+        }}
+      />
     </div>
   );
 };

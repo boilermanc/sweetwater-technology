@@ -28,6 +28,16 @@ const SproutifyClassroomsCard: React.FC<SproutifyClassroomsCardProps> = ({
         transition: { duration: 0.35, ease: "easeOut" },
       }}
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      aria-label={`View ${app.title} details`}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onClick();
+        }
+      }}
       className="group relative h-full cursor-pointer"
     >
       {/* Ambient glow on hover */}
@@ -85,6 +95,8 @@ const SproutifyClassroomsCard: React.FC<SproutifyClassroomsCardProps> = ({
             <motion.img
               src={app.image}
               alt={`${app.title} preview`}
+              loading="lazy"
+              decoding="async"
               className="h-40 sm:h-52 w-full object-cover"
               whileHover={{ scale: 1.03 }}
               transition={{ duration: 0.5, ease: "easeOut" }}

@@ -22,6 +22,16 @@ export const AppCard: React.FC<AppCardProps> = ({ app, index, onClick }) => {
       viewport={{ once: true }}
       whileHover="hover"
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      aria-label={`View ${app.title} details`}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onClick();
+        }
+      }}
       className="group relative cursor-pointer"
     >
       <motion.div
@@ -47,6 +57,8 @@ export const AppCard: React.FC<AppCardProps> = ({ app, index, onClick }) => {
           <motion.img
             src={app.image}
             alt={app.title}
+            loading="lazy"
+            decoding="async"
             variants={{
               hover: {
                 scale: 1.15,

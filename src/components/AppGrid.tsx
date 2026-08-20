@@ -11,6 +11,7 @@ import SproutifyFarmCard from './cards/SproutifyFarmCard';
 import ShanesRetirementFundCard from './cards/ShanesRetirementFundCard';
 import SproutifyMicroCard from './cards/SproutifyMicroCard';
 import ATLUrbanFarmsCard from './cards/ATLUrbanFarmsCard';
+import LanewiseCard from './cards/LanewiseCard';
 
 interface AppGridProps {
   onSelectApp: (app: AppProject) => void;
@@ -78,6 +79,13 @@ export const AppGrid: React.FC<AppGridProps> = ({ onSelectApp }) => {
           />
         ) : app.id === 'atl-urban-farms' ? (
           <ATLUrbanFarmsCard
+            key={app.id}
+            app={app}
+            index={index}
+            onClick={() => onSelectApp(app)}
+          />
+        ) : app.id === 'lanewise' ? (
+          <LanewiseCard
             key={app.id}
             app={app}
             index={index}

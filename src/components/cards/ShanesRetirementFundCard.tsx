@@ -65,6 +65,16 @@ const ShanesRetirementFundCard: React.FC<ShanesRetirementFundCardProps> = ({
       whileHover={{ y: -10, scale: 1.02 }}
       whileTap={{ scale: 0.97 }}
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      aria-label={`View ${app.title} details`}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onClick();
+        }
+      }}
       className="relative h-full cursor-pointer group w-full"
       style={{ perspective: "1000px" }}
     >
@@ -128,6 +138,8 @@ const ShanesRetirementFundCard: React.FC<ShanesRetirementFundCardProps> = ({
           <motion.img
             src={app.image}
             alt={app.title}
+            loading="lazy"
+            decoding="async"
             className="h-40 sm:h-52 w-full object-cover"
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}

@@ -28,6 +28,16 @@ const OnceUponADrawingCard: React.FC<OnceUponADrawingCardProps> = ({
         transition: { duration: 0.35, ease: "easeOut" },
       }}
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      aria-label={`View ${app.title} details`}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onClick();
+        }
+      }}
       className="group relative cursor-pointer"
       style={{ perspective: "1200px" }}
     >
@@ -88,6 +98,8 @@ const OnceUponADrawingCard: React.FC<OnceUponADrawingCardProps> = ({
           <motion.img
             src={app.image}
             alt={app.title}
+            loading="lazy"
+            decoding="async"
             className="h-40 sm:h-52 w-full object-cover object-top"
             whileHover={{ scale: 1.04 }}
             transition={{ duration: 0.6, ease: "easeOut" }}

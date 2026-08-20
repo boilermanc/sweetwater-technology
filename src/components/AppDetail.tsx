@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { X, ExternalLink } from 'lucide-react';
 import type { AppProject } from '../types';
@@ -9,6 +9,12 @@ interface AppDetailProps {
 }
 
 export const AppDetail: React.FC<AppDetailProps> = ({ app, onClose }) => {
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    dialogRef.current?.focus();
+  }, []);
+
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 md:p-8">
       <motion.div
@@ -20,6 +26,11 @@ export const AppDetail: React.FC<AppDetailProps> = ({ app, onClose }) => {
       />
 
       <motion.div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={`app-detail-title-${app.id}`}
+        tabIndex={-1}
         layoutId={`card-${app.id}`}
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -27,6 +38,8 @@ export const AppDetail: React.FC<AppDetailProps> = ({ app, onClose }) => {
         className="relative w-full max-w-5xl bg-white rounded-2xl sm:rounded-[3rem] shadow-2xl overflow-hidden border border-slate-100 flex flex-col md:flex-row h-full max-h-[85vh]"
       >
         <button
+          type="button"
+          aria-label="Close project details"
           onClick={onClose}
           className="absolute top-6 right-6 z-20 w-10 h-10 rounded-full bg-slate-900/60 hover:bg-slate-900/80 backdrop-blur-md flex items-center justify-center text-white transition-colors shadow-lg"
         >
@@ -37,9 +50,11 @@ export const AppDetail: React.FC<AppDetailProps> = ({ app, onClose }) => {
           <img
             src={app.image}
             alt={app.title}
-            className="w-full h-full object-cover opacity-80"
+            loading="lazy"
+            decoding="async"
+            className={`w-full h-full ${app.id === 'lanewise' ? 'object-contain p-16 opacity-100' : 'object-cover opacity-80'}`}
           />
-          {app.color.startsWith('from-') ? (
+          {app.id === 'lanewise' ? null : app.color.startsWith('from-') ? (
             <div className={`absolute inset-0 bg-gradient-to-tr ${app.color} mix-blend-multiply opacity-60`} />
           ) : (
             <div
@@ -49,7 +64,7 @@ export const AppDetail: React.FC<AppDetailProps> = ({ app, onClose }) => {
           )}
           <div className="absolute bottom-6 left-6 right-6 sm:bottom-12 sm:left-12 sm:right-12">
              <span className="text-white/60 font-bold text-xs uppercase tracking-[0.2em] mb-2 sm:mb-4 block">Project Profile</span>
-             <h2 className="text-2xl sm:text-5xl md:text-6xl font-black text-white tracking-tighter mb-2 sm:mb-4">{app.title}</h2>
+             <h2 id={`app-detail-title-${app.id}`} className="text-2xl sm:text-5xl md:text-6xl font-black text-white tracking-tighter mb-2 sm:mb-4">{app.title}</h2>
              <div className="flex gap-4">
                 <span className="px-4 py-2 rounded-xl bg-white/10 backdrop-blur-md text-white text-xs font-bold border border-white/20">
                   {app.category}

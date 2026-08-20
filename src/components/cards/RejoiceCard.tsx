@@ -1,4 +1,3 @@
-import React from "react";
 import { motion } from "framer-motion";
 import {
   Heart,
@@ -52,6 +51,16 @@ export default function RejoiceCard({
       }}
       whileHover={{ y: -6, transition: { duration: 0.35, ease: "easeOut" } }}
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      aria-label={`View ${app.title} details`}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onClick();
+        }
+      }}
       className="group relative h-full cursor-pointer"
     >
       <div
@@ -110,6 +119,8 @@ export default function RejoiceCard({
             <img
               src={app.image}
               alt={app.title}
+              loading="lazy"
+              decoding="async"
               className="w-full h-40 sm:h-52 object-cover"
             />
 

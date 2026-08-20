@@ -10,4 +10,9 @@ export interface AppProject {
   color: string;
 }
 
+export interface ChatMessage {
+  role: 'assistant' | 'user';
+  content: string;
+}
+
 export type BackgroundTexture = 'grain' | 'grid' | 'flow' | 'liquid';

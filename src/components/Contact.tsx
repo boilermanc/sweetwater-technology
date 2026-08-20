@@ -131,6 +131,7 @@ const ContactForm: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [website, setWebsite] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -140,6 +141,10 @@ const ContactForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (website) {
+      setSubmitted(true);
+      return;
+    }
     setSending(true);
     setError(null);
     try {
@@ -200,6 +205,18 @@ const ContactForm: React.FC = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="absolute -left-[10000px] h-px w-px overflow-hidden" aria-hidden="true">
+          <label htmlFor="contact-website">Website</label>
+          <input
+            id="contact-website"
+            name="website"
+            type="text"
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+          />
+        </div>
         <div className="grid md:grid-cols-2 gap-5">
           <div className="space-y-2">
             <label htmlFor="contact-name" className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
@@ -209,6 +226,7 @@ const ContactForm: React.FC = () => {
               id="contact-name"
               required
               type="text"
+              maxLength={120}
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-3.5 text-slate-900 font-medium focus:outline-none focus:ring-4 focus:ring-blue-50 focus:bg-white focus:border-blue-400 transition-all placeholder:text-slate-300"
@@ -223,6 +241,7 @@ const ContactForm: React.FC = () => {
               id="contact-email"
               required
               type="email"
+              maxLength={254}
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-3.5 text-slate-900 font-medium focus:outline-none focus:ring-4 focus:ring-blue-50 focus:bg-white focus:border-blue-400 transition-all placeholder:text-slate-300"
@@ -257,6 +276,7 @@ const ContactForm: React.FC = () => {
             id="contact-message"
             required
             rows={5}
+            maxLength={5000}
             value={formData.message}
             onChange={(e) => setFormData({ ...formData, message: e.target.value })}
             className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-3.5 text-slate-900 font-medium focus:outline-none focus:ring-4 focus:ring-blue-50 focus:bg-white focus:border-blue-400 transition-all resize-none placeholder:text-slate-300"

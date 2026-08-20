@@ -9,16 +9,10 @@ import { AnimatedBackground } from './components/AnimatedBackground';
 import { AppDetail } from './components/AppDetail';
 import { RekkrdDetail } from './components/cards/RekkrdDetail';
 import type { AppProject } from './types';
+import { SweetwaterMark } from './components/SweetwaterMark';
 
 const App: React.FC = () => {
   const [selectedApp, setSelectedApp] = useState<AppProject | null>(null);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    if (window.location.hash) {
-      history.replaceState(null, '', window.location.pathname);
-    }
-  }, []);
 
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
@@ -72,7 +66,7 @@ const App: React.FC = () => {
       <footer className="relative z-10 py-8 sm:py-12 px-4 sm:px-6 border-t border-slate-100 bg-white/50 backdrop-blur-md">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex-shrink-0" />
+            <SweetwaterMark animated className="w-7 h-7 sm:w-8 sm:h-8 flex-shrink-0" />
             <span className="text-lg sm:text-xl tracking-tight text-slate-900">
               <span className="font-bold">Sweetwater</span>
               <span style={{ fontFamily: "'Satisfy', cursive" }} className="ml-1 text-xl sm:text-2xl font-semibold"><span className="text-blue-600">T</span>echnology</span>

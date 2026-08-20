@@ -35,6 +35,16 @@ const SproutifyFarmCard: React.FC<SproutifyFarmCardProps> = ({
         background: "linear-gradient(165deg, #0d2818 0%, #0a1f14 50%, #071a0f 100%)",
       }}
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      aria-label={`View ${app.title} details`}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onClick();
+        }
+      }}
     >
       {/* Ambient glow on hover */}
       <motion.div
@@ -83,6 +93,8 @@ const SproutifyFarmCard: React.FC<SproutifyFarmCardProps> = ({
             <img
               src={app.image}
               alt={app.title}
+              loading="lazy"
+              decoding="async"
               className="h-full w-full object-cover"
             />
             {/* Bottom gradient fade into card body */}

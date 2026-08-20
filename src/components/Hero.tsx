@@ -1,19 +1,18 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
 
-export const Hero: React.FC = () => {
-  const particles = useMemo(() =>
-    [...Array(12)].map(() => ({
-      x: Math.random() * 100 - 50,
-      duration: 10 + Math.random() * 12,
-      delay: Math.random() * 5,
-      left: Math.random() * 100,
-      top: Math.random() * 100,
-    })), []);
+const HERO_PARTICLES = Array.from({ length: 12 }, (_, i) => ({
+  x: ((i * 41) % 100) - 50,
+  duration: 10 + ((i * 29) % 120) / 10,
+  delay: ((i * 23) % 50) / 10,
+  left: (i * 37) % 100,
+  top: (i * 61) % 100,
+}));
 
+export const Hero: React.FC = () => {
   return (
-    <section className="relative min-h-[70vh] md:min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden pt-20">
+    <section id="top" className="relative min-h-[70vh] md:min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden pt-20 scroll-mt-24">
       <div className="absolute inset-0 -z-10 bg-transparent">
         <motion.div
           animate={{
@@ -52,7 +51,7 @@ export const Hero: React.FC = () => {
           </svg>
         </div>
 
-        {particles.map((p, i) => (
+        {HERO_PARTICLES.map((p, i) => (
           <motion.div
             key={i}
             animate={{

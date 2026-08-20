@@ -25,6 +25,16 @@ const SproutifyCard: React.FC<SproutifyCardProps> = ({ app, index, onClick }) =>
       }}
       className="group relative h-full cursor-pointer"
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      aria-label={`View ${app.title} details`}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onClick();
+        }
+      }}
     >
       {/* Ambient glow on hover — golden sunlight from below */}
       <motion.div
@@ -75,6 +85,8 @@ const SproutifyCard: React.FC<SproutifyCardProps> = ({ app, index, onClick }) =>
             <img
               src={app.image}
               alt={`${app.title} preview`}
+              loading="lazy"
+              decoding="async"
               className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
             />
             {/* Vignette overlay on image */}

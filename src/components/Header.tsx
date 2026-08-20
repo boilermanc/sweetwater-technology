@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Menu } from 'lucide-react';
+import { SweetwaterMark } from './SweetwaterMark';
 
 const NAV_LINKS = [
   { href: '#philosophy', label: 'Philosophy' },
@@ -18,23 +19,20 @@ export const Header: React.FC = () => {
         animate={{ y: 0 }}
         className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between backdrop-blur-xl bg-white/70 border-b border-white/20 gap-2"
       >
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <motion.div
-            whileHover={{ rotate: 180 }}
-            transition={{ type: 'spring', damping: 10 }}
-            className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 shadow-lg shadow-blue-200 flex items-center justify-center text-white flex-shrink-0"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 sm:w-6 sm:h-6">
-              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </motion.div>
+        <a
+          href="#top"
+          aria-label="Sweetwater Technology home"
+          className="flex items-center gap-2 sm:gap-3 min-w-0"
+        >
+          <SweetwaterMark
+            animated
+            className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 drop-shadow-md"
+          />
           <span className="text-lg sm:text-2xl tracking-tighter text-slate-900 truncate">
             <span className="font-extrabold">SWEETWATER</span>
             <span style={{ fontFamily: "'Satisfy', cursive" }} className="ml-1 text-xl sm:text-3xl font-semibold"><span className="text-blue-600">T</span>echnology</span>
           </span>
-        </div>
+        </a>
 
         <nav className="hidden lg:flex items-center gap-8">
           {NAV_LINKS.map((link) => (
