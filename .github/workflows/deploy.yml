@@ -99,13 +99,35 @@ jobs:
           set -euo pipefail
           sudo apt-get install -y lftp
           IONOS_SWEETWATER_PATH="$(printf '%s' "$IONOS_SWEETWATER_PATH" | tr -d '[:space:]')"
-          echo "Uploading dist/ to ${IONOS_SWEETWATER_PATH}/ on ${IONOS_HOST}:${IONOS_PORT}"
+          REMOTE_PATH=""
+          for candidate in \
+            "$IONOS_SWEETWATER_PATH" \
+            /httpdocs \
+            httpdocs \
+            /sweetwater.technology/httpdocs \
+            sweetwater.technology/httpdocs \
+            /var/www/vhosts/sweetwater.technology/httpdocs; do
+            if lftp -c "set sftp:auto-confirm yes; \
+              set cmd:fail-exit yes; \
+              open -u \"$IONOS_USERNAME\",\"$IONOS_PASSWORD\" -p \"$IONOS_PORT\" sftp://$IONOS_HOST; \
+              cls \"$candidate\"" >/dev/null 2>&1; then
+              REMOTE_PATH="$candidate"
+              break
+            fi
+          done
+
+          if [ -z "$REMOTE_PATH" ]; then
+            echo "::error::Could not locate the Sweetwater document root in the SFTP account."
+            exit 1
+          fi
+
+          echo "Uploading dist/ to ${REMOTE_PATH}/ on ${IONOS_HOST}:${IONOS_PORT}"
           lftp -c "set sftp:auto-confirm yes; \
             set cmd:fail-exit yes; \
             set xfer:clobber yes; \
             open -u \"$IONOS_USERNAME\",\"$IONOS_PASSWORD\" -p \"$IONOS_PORT\" sftp://$IONOS_HOST; \
-            mirror -R --verbose --parallel=4 ./dist/ \"$IONOS_SWEETWATER_PATH/\"; \
-            cls -l \"$IONOS_SWEETWATER_PATH/\""
+            mirror -R --verbose --parallel=4 ./dist/ \"$REMOTE_PATH/\"; \
+            cls -l \"$REMOTE_PATH/\""
 
       - name: Verify live deployment
         run: |
