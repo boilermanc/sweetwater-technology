@@ -81,7 +81,7 @@ export const Hero: React.FC = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="inline-block mb-6 px-4 py-1.5 rounded-full border border-blue-200 bg-white/40 backdrop-blur-md text-blue-700 text-xs font-bold uppercase tracking-widest shadow-sm"
         >
-          The Future of Fluid Technology
+          Custom software from Atlanta, Georgia
         </motion.div>
 
         <motion.h1
@@ -90,9 +90,9 @@ export const Hero: React.FC = () => {
           transition={{ delay: 0.2, duration: 0.8 }}
           className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-black text-slate-900 leading-[0.9] tracking-tighter mb-6 md:mb-8 drop-shadow-sm"
         >
-          Software that <br />
+          Custom web apps and <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-500 to-sky-400">
-            flows like water.
+            AI workflow automation.
           </span>
         </motion.h1>
 
@@ -102,7 +102,7 @@ export const Hero: React.FC = () => {
           transition={{ delay: 0.4, duration: 0.8 }}
           className="text-base md:text-2xl text-slate-600 max-w-2xl mx-auto mb-8 md:mb-12 font-medium bg-white/10 backdrop-blur-[2px] rounded-2xl py-2 px-4 inline-block"
         >
-          Sweetwater Technology builds the liquid foundations of high-performance digital infrastructure.
+          Software that flows like water. Sweetwater Technology builds web, mobile, and AI-powered products around the way each business operates.
         </motion.p>
 
         <motion.div

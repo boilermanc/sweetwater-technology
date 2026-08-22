@@ -88,6 +88,8 @@ const SproutifyMicroCard: React.FC<SproutifyMicroCardProps> = ({
             <img
               src={app.image}
               alt={`${app.title} preview`}
+              width={app.imageWidth}
+              height={app.imageHeight}
               loading="lazy"
               decoding="async"
               className="h-full w-full object-cover"

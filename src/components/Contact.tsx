@@ -1,47 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Send, MapPin, Mail, Phone, CheckCircle, Loader2 } from 'lucide-react';
+import { FAQS } from '../content';
 
-interface FAQItem {
-  category: string;
-  question: string;
-  answer: string;
-}
-
-const FAQS: FAQItem[] = [
-  {
-    category: 'Working With Us',
-    question: 'What kind of projects do you build?',
-    answer:
-      'We build full-stack web apps, mobile apps (React Native, Flutter), AI-powered features, e-commerce platforms, and SaaS products. From early-stage MVPs to production-scale systems — if it flows through code, we build it.',
-  },
-  {
-    category: 'Process',
-    question: 'How does a typical engagement start?',
-    answer:
-      "It starts with a conversation. Tell us what you're building and where you're stuck. We'll scope the work, propose an approach, and move fast once aligned. No bloated discovery phases — just clarity and momentum.",
-  },
-  {
-    category: 'Technology',
-    question: "What's your tech stack?",
-    answer:
-      'React, TypeScript, Tailwind CSS, Supabase, and Framer Motion are our core. We also work with React Native, Expo, Flutter, Stripe, ShipEngine, and Google Gemini AI depending on the project.',
-  },
-  {
-    category: 'Pricing',
-    question: 'How do you structure pricing?',
-    answer:
-      'We offer project-based pricing for defined scopes and monthly retainers for ongoing development. Every engagement starts with a clear proposal — no surprises, no scope creep without conversation.',
-  },
-  {
-    category: 'Timeline',
-    question: 'How quickly can you deliver?',
-    answer:
-      'MVPs typically ship in weeks, not months. We move fast because we use battle-tested patterns and tooling across every project. Timelines depend on scope, but speed is part of our DNA.',
-  },
-];
-
-const SUPPORT_EMAIL = 'team@sproutify.app';
+const SUPPORT_EMAIL = 'team@sweetwater.technology';
 
 const FaqSection: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
@@ -403,8 +365,8 @@ export const Contact: React.FC = () => {
                 },
                 {
                   icon: <Phone className="w-5 h-5" />,
-                  title: 'Response Time',
-                  detail: 'Under 24 hours',
+                  title: 'Phone',
+                  detail: '+1 (678) 521-1798',
                   iconClass: 'bg-sky-50 text-sky-600',
                 },
               ] as const).map((item, i) => (

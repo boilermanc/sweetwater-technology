@@ -43,7 +43,13 @@ export const Philosophy: React.FC = () => {
           />
         ))}
         <div className="absolute inset-0 bg-gradient-to-b from-white via-blue-50/20 to-white" />
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+        <div
+          className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(15, 23, 42, 0.45) 0.5px, transparent 0.75px)',
+            backgroundSize: '4px 4px',
+          }}
+        />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -63,16 +69,9 @@ export const Philosophy: React.FC = () => {
               We believe technology shouldn't be a rigid wall you have to climb. It should be the fluid current that carries you forward.
               At Sweetwater, we don't just build apps; we engineer digital ecosystems that flow, adapt, and respond with biological grace.
             </p>
-            <div className="flex gap-8 sm:gap-12">
-              <div>
-                <div className="text-3xl sm:text-4xl font-black text-blue-600 mb-1">99.9%</div>
-                <div className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">Fluidity Score</div>
-              </div>
-              <div>
-                <div className="text-3xl sm:text-4xl font-black text-indigo-600 mb-1">2.4ms</div>
-                <div className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">Stream Latency</div>
-              </div>
-            </div>
+            <p className="max-w-xl border-l-4 border-blue-500 pl-5 text-sm font-semibold leading-relaxed text-slate-500">
+              Sweetwater Technology designs custom software around each client&apos;s workflow, users, and growth plan.
+            </p>
           </motion.div>
 
           <div className="grid gap-6">

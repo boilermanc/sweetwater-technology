@@ -4,9 +4,10 @@ import { X, Menu } from 'lucide-react';
 import { SweetwaterMark } from './SweetwaterMark';
 
 const NAV_LINKS = [
-  { href: '#philosophy', label: 'Philosophy' },
-  { href: '#portfolio', label: 'Apps' },
-  { href: '#contact', label: 'Connect' },
+  { href: '/services', label: 'Services' },
+  { href: '/work', label: 'Work' },
+  { href: '/news', label: 'News' },
+  { href: '/#contact', label: 'Connect' },
 ];
 
 export const Header: React.FC = () => {
@@ -20,7 +21,7 @@ export const Header: React.FC = () => {
         className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between backdrop-blur-xl bg-white/70 border-b border-white/20 gap-2"
       >
         <a
-          href="#top"
+          href="/"
           aria-label="Sweetwater Technology home"
           className="flex items-center gap-2 sm:gap-3 min-w-0"
         >

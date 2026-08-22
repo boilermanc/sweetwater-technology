@@ -85,6 +85,8 @@ const SproutifyCard: React.FC<SproutifyCardProps> = ({ app, index, onClick }) =>
             <img
               src={app.image}
               alt={`${app.title} preview`}
+              width={app.imageWidth}
+              height={app.imageHeight}
               loading="lazy"
               decoding="async"
               className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"

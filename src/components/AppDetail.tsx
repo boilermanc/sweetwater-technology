@@ -50,6 +50,8 @@ export const AppDetail: React.FC<AppDetailProps> = ({ app, onClose }) => {
           <img
             src={app.image}
             alt={app.title}
+            width={app.imageWidth}
+            height={app.imageHeight}
             loading="lazy"
             decoding="async"
             className={`w-full h-full ${app.id === 'lanewise' ? 'object-contain p-16 opacity-100' : 'object-cover opacity-80'}`}

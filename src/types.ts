@@ -5,6 +5,8 @@ export interface AppProject {
   description: string;
   longDescription: string;
   image: string;
+  imageWidth: number;
+  imageHeight: number;
   tags: string[];
   link: string;
   color: string;

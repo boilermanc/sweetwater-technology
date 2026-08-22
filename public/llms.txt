@@ -1,0 +1,26 @@
+# Sweetwater Technology
+
+> Sweetwater Technology builds custom web applications, AI-driven workflow automation, and digital products for businesses. The company is based in Atlanta, Georgia and was founded by Clint Crowe.
+
+## Services
+
+- [Custom web application development](https://sweetwater.technology/services/custom-web-applications)
+- [AI workflow automation](https://sweetwater.technology/services/ai-workflow-automation)
+- [Mobile app development](https://sweetwater.technology/services/mobile-app-development)
+
+## Products
+
+- [Rekkrd product profile](https://sweetwater.technology/work/rekkrd): AI-native music collection software
+- [LaneWise product profile](https://sweetwater.technology/work/lanewise): A quoting copilot for freight brokers
+- [ATL Urban Farms product profile](https://sweetwater.technology/work/atl-urban-farms): Specialized live-plant e-commerce
+
+## News
+
+- [Sweetwater Technology newsroom](https://sweetwater.technology/news)
+- [Rekkrd launches on the Apple App Store](https://sweetwater.technology/news/rekkrd-launches-on-apple-app-store)
+
+## Contact
+
+- [Contact Sweetwater Technology](https://sweetwater.technology/#contact)
+- Email: team@sweetwater.technology
+- Phone: +1-678-521-1798

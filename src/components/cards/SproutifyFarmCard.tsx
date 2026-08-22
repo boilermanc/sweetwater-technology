@@ -93,6 +93,8 @@ const SproutifyFarmCard: React.FC<SproutifyFarmCardProps> = ({
             <img
               src={app.image}
               alt={app.title}
+              width={app.imageWidth}
+              height={app.imageHeight}
               loading="lazy"
               decoding="async"
               className="h-full w-full object-cover"

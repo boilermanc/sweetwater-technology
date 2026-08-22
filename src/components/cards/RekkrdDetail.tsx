@@ -49,6 +49,8 @@ export const RekkrdDetail: React.FC<RekkrdDetailProps> = ({ app, onClose }) => {
           <img
             src={app.image}
             alt={app.title}
+            width={app.imageWidth}
+            height={app.imageHeight}
             loading="lazy"
             decoding="async"
             className="w-full h-full object-cover opacity-80"
