@@ -81,18 +81,18 @@ export const Hero: React.FC = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="inline-block mb-6 px-4 py-1.5 rounded-full border border-blue-200 bg-white/40 backdrop-blur-md text-blue-700 text-xs font-bold uppercase tracking-widest shadow-sm"
         >
-          Custom software from Atlanta, Georgia
+          The Future of Fluid Technology
         </motion.div>
 
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.8 }}
-          className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-black text-slate-900 leading-[0.9] tracking-tighter mb-6 md:mb-8 drop-shadow-sm"
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 leading-[0.95] tracking-tighter mb-6 md:mb-8 drop-shadow-sm"
         >
-          Custom web apps and <br />
+          Software that <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-500 to-sky-400">
-            AI workflow automation.
+            flows like water.
           </span>
         </motion.h1>
 
@@ -102,7 +102,7 @@ export const Hero: React.FC = () => {
           transition={{ delay: 0.4, duration: 0.8 }}
           className="text-base md:text-2xl text-slate-600 max-w-2xl mx-auto mb-8 md:mb-12 font-medium bg-white/10 backdrop-blur-[2px] rounded-2xl py-2 px-4 inline-block"
         >
-          Software that flows like water. Sweetwater Technology builds web, mobile, and AI-powered products around the way each business operates.
+          Sweetwater Technology builds custom web applications, mobile products, and AI workflow automation from Atlanta, Georgia.
         </motion.p>
 
         <motion.div
