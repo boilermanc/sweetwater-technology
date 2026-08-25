@@ -75,8 +75,8 @@ export const NewsDetail: React.FC<{ article: NewsArticle }> = ({ article }) => (
       <img
         src={article.image}
         alt={article.imageAlt}
-        width="1299"
-        height="822"
+        width={article.imageWidth}
+        height={article.imageHeight}
         decoding="async"
         fetchPriority="high"
         className="mt-10 w-full rounded-3xl border border-slate-200 bg-white object-cover shadow-lg"
@@ -103,8 +103,8 @@ export const NewsDetail: React.FC<{ article: NewsArticle }> = ({ article }) => (
         ))}
       </div>
       {article.links && (
-        <aside aria-label="Rekkrd links" className="mt-12 rounded-3xl bg-slate-900 p-6 text-white sm:p-8">
-          <h2 className="text-xl font-black">Get Rekkrd</h2>
+        <aside aria-label="Related links" className="mt-12 rounded-3xl bg-slate-900 p-6 text-white sm:p-8">
+          <h2 className="text-xl font-black">Learn more</h2>
           <div className="mt-5 flex flex-col gap-3 sm:flex-row">
             {article.links.map((link) => (
               <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer" className="rounded-full bg-white px-5 py-3 text-center text-sm font-bold text-slate-900 hover:bg-blue-50">

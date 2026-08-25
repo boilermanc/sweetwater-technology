@@ -12,6 +12,8 @@ export interface PageSeo {
   type: 'website' | 'article';
   jsonLd: object[];
   image?: string;
+  imageWidth?: number;
+  imageHeight?: number;
   robots?: string;
 }
 
@@ -208,6 +210,8 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
         canonical,
         type: 'article',
         image: `${SITE_URL}${article.image}`,
+        imageWidth: article.imageWidth,
+        imageHeight: article.imageHeight,
         jsonLd: [
           organization,
           {
@@ -272,8 +276,8 @@ ${seo.robots ? `    <meta name="robots" content="${seo.robots}" />\n` : ''}    <
     <meta property="og:title" content="${escapeAttribute(seo.title)}" />
     <meta property="og:description" content="${escapeAttribute(seo.description)}" />
     <meta property="og:image" content="${seo.image ?? SOCIAL_IMAGE}" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    <meta property="og:image:width" content="${seo.imageWidth ?? 1200}" />
+    <meta property="og:image:height" content="${seo.imageHeight ?? 630}" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${escapeAttribute(seo.title)}" />
     <meta name="twitter:description" content="${escapeAttribute(seo.description)}" />

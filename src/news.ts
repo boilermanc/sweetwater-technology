@@ -7,6 +7,8 @@ export interface NewsArticle {
   author: string;
   image: string;
   imageAlt: string;
+  imageWidth: number;
+  imageHeight: number;
   body: Array<{
     heading?: string;
     paragraphs?: string[];
@@ -26,6 +28,69 @@ export interface NewsArticle {
 // prerendered route, metadata, NewsArticle JSON-LD, breadcrumbs, and a sitemap URL.
 export const NEWS_ARTICLES: NewsArticle[] = [
   {
+    slug: 'openai-team-visits-sweetwater-urban-farms',
+    title: 'Sweetwater Technology Welcomes OpenAI Team Members to Sweetwater Urban Farms',
+    description:
+      'The greenhouse visit highlighted Sweetwater Technology\'s work in aeroponics, connected devices, AI-powered software, and real-world automation.',
+    publishedAt: '2026-08-25T14:00:00-04:00',
+    updatedAt: '2026-08-25T14:00:00-04:00',
+    author: 'Clint Crowe',
+    image: '/images/openai-greenhouse-visit.jpg',
+    imageAlt: 'OpenAI team members meet with Clint and Sheree Crowe inside the Sweetwater Urban Farms greenhouse',
+    imageWidth: 575,
+    imageHeight: 587,
+    body: [
+      {
+        paragraphs: [
+          'ATLANTA, Georgia — August 25, 2026 — Sweetwater Technology recently welcomed members of the OpenAI team to Sweetwater Urban Farms for a conversation about how software, connected devices, and artificial intelligence can support practical work across agriculture and other industries.',
+          'Clint and Sheree Crowe hosted the visit inside the greenhouse, where they shared Sweetwater Urban Farms\' aeroponic growing operation and its work supplying seedlings to homes and schools. They also demonstrated how Sweetwater Technology turns operational needs and ideas into applications, connected systems, automation, and AI-powered products.',
+        ],
+        quote: {
+          text: 'What better place to talk about technology than right in the middle of the greenhouse?',
+          attribution: 'Clint Crowe, founder of Sweetwater Technology',
+        },
+      },
+      {
+        heading: 'Technology built around real-world operations',
+        paragraphs: [
+          'The discussion extended beyond farming to the broader challenge of connecting hardware and software, automating day-to-day operations, and applying AI to concrete problems. Sweetwater Technology develops working products across several industries, using the farm as both an operating business and a practical environment for technology development.',
+          'Crowe thanked Kevin D. and Harry Spitzer for visiting the greenhouse and for their interest in the Sweetwater story and the products the company is building.',
+        ],
+      },
+      {
+        heading: 'ChatGPT Pro Community and OpenAI DevDay',
+        paragraphs: [
+          'Sweetwater Technology has also been invited into the ChatGPT Pro Community, creating opportunities to learn from and collaborate with other people developing innovative uses of AI.',
+          'The Sweetwater team plans to travel to San Francisco at the end of September for OpenAI DevDay. The company looks forward to building relationships, learning from the wider developer community, and exploring how new AI capabilities can support future products.',
+        ],
+      },
+      {
+        heading: 'About Sweetwater Technology',
+        paragraphs: [
+          'Sweetwater Technology builds focused consumer and business software, connected systems, and AI-powered workflow tools from Atlanta, Georgia. Its portfolio spans agriculture, logistics, education, creative tools, and music technology.',
+        ],
+      },
+      {
+        heading: 'About Sweetwater Urban Farms',
+        paragraphs: [
+          'Sweetwater Urban Farms is an aeroponic greenhouse operation that grows plants and supplies seedlings for homes and schools. The farm also provides a real-world setting for developing and testing technology that connects growing operations, devices, data, and automation.',
+        ],
+      },
+      {
+        heading: 'Media contact',
+        paragraphs: [
+          'Clint Crowe, Sweetwater Technology — team@sweetwater.technology',
+        ],
+      },
+    ],
+    links: [
+      {
+        label: 'Read the original announcement on LinkedIn',
+        url: 'https://www.linkedin.com/posts/clintcrowe_openai-chatgpt-chatgptpro-activity-7498055071998382081-19Xc',
+      },
+    ],
+  },
+  {
     slug: 'rekkrd-launches-on-apple-app-store',
     title: 'Sweetwater Technology Launches Rekkrd on the Apple App Store',
     description:
@@ -35,6 +100,8 @@ export const NEWS_ARTICLES: NewsArticle[] = [
     author: 'Clint Crowe',
     image: '/images/optimized/rekkrd-product.webp',
     imageAlt: 'Rekkrd vinyl collection application displayed beside a turntable',
+    imageWidth: 1299,
+    imageHeight: 822,
     body: [
       {
         paragraphs: [
