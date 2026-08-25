@@ -154,6 +154,59 @@ export const NEWS_ARTICLES: NewsArticle[] = [
       { label: 'Use Rekkrd on the web', url: 'https://rekkrd.com' },
     ],
   },
+  {
+    slug: 'sweetwater-technology-launches-lanewise',
+    title: 'Sweetwater Technology Launches LaneWise, a Quoting Copilot for Freight Brokers',
+    description:
+      'LaneWise helps freight brokers turn inbound spot-quote emails into ready-to-send drafts without ever sending on their behalf.',
+    publishedAt: '2026-06-23T09:00:00-04:00',
+    updatedAt: '2026-06-23T09:00:00-04:00',
+    author: 'Clint Crowe',
+    image: '/images/optimized/lanewise.webp',
+    imageAlt: 'LaneWise logo with three yellow lane markers on a dark background',
+    imageWidth: 512,
+    imageHeight: 512,
+    body: [
+      {
+        paragraphs: [
+          'ATLANTA, Georgia — June 23, 2026 — Sweetwater Technology today announced the launch of LaneWise, a new software product built for freight brokers who spend their day quoting spot freight over email.',
+          'LaneWise reads a broker\'s inbound quote-request emails, pulls a live market rate through the broker\'s own DAT or Truckstop account, and drafts a ready-to-send reply — showing its work along the way. Every draft includes an Assumptions block that discloses exactly what LaneWise inferred, and any special requirement — hazmat, liftgate, team service, and similar — always generates an explicit line for the broker to confirm before anything goes out.',
+        ],
+        quote: {
+          text: 'The idea isn\'t to make brokers faster typists. It\'s to get them a quote that\'s as right as they\'d do it themselves, in a fraction of the time — and the broker is always the one who decides what actually gets sent.',
+          attribution: 'Clint Crowe, founder of LaneWise',
+        },
+      },
+      {
+        heading: 'Drafts only, by design',
+        paragraphs: [
+          'That last point is central to how LaneWise is built. The product creates drafts only — it holds no permission to send email on a broker\'s behalf, at any setting, under any configuration.',
+          'Brokers connect their own mailbox and their own DAT or Truckstop credentials; LaneWise never centralizes or resells rate data.',
+        ],
+      },
+      {
+        heading: 'Availability',
+        paragraphs: [
+          'LaneWise is currently onboarding early brokerage partners. More information is available at lanewise.io.',
+        ],
+      },
+      {
+        heading: 'About Sweetwater Technology',
+        paragraphs: [
+          'Sweetwater Technology builds software for teams doing high-volume, detail-sensitive work — starting with freight brokerage. LaneWise is its first product.',
+        ],
+      },
+      {
+        heading: 'Media contact',
+        paragraphs: [
+          'Clint Crowe — clint@lanewise.io',
+        ],
+      },
+    ],
+    links: [
+      { label: 'Learn more about LaneWise', url: 'https://lanewise.io' },
+    ],
+  },
 ];
 
 export const findNewsArticle = (slug: string) =>
