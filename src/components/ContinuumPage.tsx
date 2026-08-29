@@ -46,6 +46,9 @@ const invariants = [
   ['07', 'Revocation is precise', 'Continuum distinguishes local effect, downstream request, acknowledgement, uncertainty, and data already disclosed.'],
   ['08', 'Responsibility follows control', 'Builders, operators, integrators, and services remain accountable for the controls and representations they actually own.'],
   ['09', 'Boundaries exist before failure', 'Authority provenance is preventive infrastructure—not merely a record used to reconstruct blame afterward.'],
+  ['10', 'The destination comes first', 'The person or originating application identifies where work continues before Continuum evaluates the transfer. Continuum does not choose a worker from an agent pool.'],
+  ['11', 'Continuity is projected, not shared', 'Each named recipient receives a separate purpose-limited view. Agents do not share direct access to one mutable conversation or project store.'],
+  ['12', 'Runtime output remains proposed', 'Evidence, proposals, and proposed changes pass through an acceptance transition. State changes never silently trigger another runtime.'],
 ];
 
 const semanticObjects = [
@@ -79,10 +82,18 @@ const revocationStates = [
 const productProof = [
   ['01', 'Begin a real project', 'One person starts a proposal-first planning or evaluation project with explicit goals and exclusions.'],
   ['02', 'Form governed project state', 'Continuum separates constraints, preferences, prior decisions, evidence, unresolved questions, and permitted work.'],
-  ['03', 'Delegate a narrow task', 'One compatible agent receives only the necessary subset under an active, expiring delegation.'],
-  ['04', 'Continue elsewhere', 'A second compatible interface understands the same typed project state without receiving a transcript dump.'],
-  ['05', 'Return a proposal', 'The person receives evidence, limitations, assumptions, and rationale—with no commitment authority attached.'],
+  ['03', 'Name the recipient', 'The person chooses where work continues before Continuum evaluates disclosure or delegation.'],
+  ['04', 'Project, do not share', 'The named runtime receives a recipient-bound project view—not a transcript dump or direct access to shared canonical state.'],
+  ['05', 'Return proposed work', 'Evidence, limitations, assumptions, rationale, and proposed changes return through a separate acceptance boundary.'],
   ['06', 'Inspect and stop', 'The person can correct state, narrow access, expire the project, or revoke remaining authority.'],
+];
+
+const transferFlow = [
+  { number: '01', title: 'Name the destination', detail: 'The person or originating application chooses the receiving runtime first.', icon: UserRound, tone: 'border-blue-200 bg-blue-50 text-blue-950' },
+  { number: '02', title: 'Evaluate the transfer', detail: 'Governance checks disclosure, purpose, use limits, and delegation for that named recipient.', icon: ShieldCheck, tone: 'border-slate-300 bg-white text-slate-950' },
+  { number: '03', title: 'Create a projection', detail: 'Continuum produces a separate minimum-necessary project view bound to one recipient.', icon: Eye, tone: 'border-violet-200 bg-violet-50 text-violet-950' },
+  { number: '04', title: 'Delegate fresh authority', detail: 'The runtime receives no inherited authority and must obtain its own bounded grant.', icon: KeyRound, tone: 'border-cyan-200 bg-cyan-50 text-cyan-950' },
+  { number: '05', title: 'Return proposed state', detail: 'Output remains evidence, a proposal, or a proposed change until separately accepted.', icon: GitBranch, tone: 'border-emerald-200 bg-emerald-50 text-emerald-950' },
 ];
 
 const SectionIntro: React.FC<{ eyebrow: string; title: string; body: string; dark?: boolean }> = ({ eyebrow, title, body, dark }) => (
@@ -177,7 +188,7 @@ export const ContinuumPage: React.FC = () => (
 
     <section className="px-4 py-20 sm:px-6 sm:py-28">
       <div className="mx-auto max-w-7xl">
-        <SectionIntro eyebrow="The normative core" title="Nine rules an implementation cannot violate." body="Interfaces and deployment models may change. These invariants define whether an implementation remains faithful to governed continuity." />
+        <SectionIntro eyebrow="The normative core" title="Twelve rules an implementation cannot violate." body="Interfaces and deployment models may change. These invariants define whether an implementation remains faithful to governed continuity." />
         <div className="mt-14 grid gap-px overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-200 md:grid-cols-2 lg:grid-cols-3">
           {invariants.map(([number, title, detail]) => <article key={number} className="bg-white p-7 sm:p-8">
             <p className="text-xs font-black tracking-[0.3em] text-blue-600">{number}</p>
@@ -208,6 +219,28 @@ export const ContinuumPage: React.FC = () => (
               <article className="flex items-center justify-center rounded-2xl border border-dashed border-rose-300 bg-rose-50 p-4 text-center text-sm font-black text-rose-700">Commitment authority: none</article>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section className="border-y border-slate-200 bg-slate-950 px-4 py-20 text-white sm:px-6 sm:py-28">
+      <div className="mx-auto max-w-7xl">
+        <SectionIntro eyebrow="Governed transfer" title="A handoff without a router or shared agent memory." body="Continuum governs a transfer to a destination the person has already chosen. It does not select the best worker, expose one common context store to every agent, or let an agent result silently trigger the next handoff." dark />
+        <ol className="mt-14 grid gap-4 lg:grid-cols-5">
+          {transferFlow.map((item, index) => {
+            const Icon = item.icon;
+            return <li key={item.number} className={`relative rounded-[1.75rem] border p-6 ${item.tone}`}>
+              <div className="flex items-center justify-between"><span className="text-xs font-black tracking-[0.28em] opacity-60">{item.number}</span><Icon aria-hidden="true" className="h-6 w-6" /></div>
+              <h3 className="mt-10 text-2xl font-black leading-tight tracking-tight">{item.title}</h3>
+              <p className="mt-4 text-sm leading-relaxed opacity-75">{item.detail}</p>
+              {index < transferFlow.length - 1 && <ArrowRight aria-hidden="true" className="absolute -right-3 top-1/2 z-10 hidden h-6 w-6 -translate-y-1/2 rounded-full bg-slate-950 p-1 text-slate-400 lg:block" />}
+            </li>;
+          })}
+        </ol>
+        <div className="mt-8 grid gap-px overflow-hidden rounded-[1.75rem] border border-white/15 bg-white/15 md:grid-cols-3">
+          <div className="bg-slate-900 p-6"><p className="text-xs font-black uppercase tracking-[0.24em] text-blue-300">No auto-selection</p><p className="mt-3 text-sm leading-relaxed text-slate-300">Compatibility can be validated, but Continuum does not choose or silently substitute a runtime.</p></div>
+          <div className="bg-slate-900 p-6"><p className="text-xs font-black uppercase tracking-[0.24em] text-violet-300">No common context</p><p className="mt-3 text-sm leading-relaxed text-slate-300">Each recipient gets its own scoped projection and cannot directly read canonical project state.</p></div>
+          <div className="bg-slate-900 p-6"><p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-300">No auto-merge or handoff</p><p className="mt-3 text-sm leading-relaxed text-slate-300">A separate acceptance transition governs state, and every onward transfer begins with a newly named destination.</p></div>
         </div>
       </div>
     </section>
