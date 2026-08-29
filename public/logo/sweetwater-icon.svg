@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">Sweetwater</title>
+  <desc id="desc">A blue circular mark with a flowing waterline</desc>
+  <defs>
+    <clipPath id="waterline-clip"><circle cx="48" cy="48" r="36"/></clipPath>
+  </defs>
+  <circle cx="48" cy="48" r="46.5" fill="#2563eb"/>
+  <circle cx="48" cy="48" r="36" fill="#eef2ff"/>
+  <path clip-path="url(#waterline-clip)" d="M4 57 C24 45 40 45 58 57 C77 70 91 72 104 65 V90 H4 Z" fill="#2563eb"/>
+</svg>

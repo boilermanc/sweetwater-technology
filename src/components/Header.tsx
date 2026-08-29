@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Menu } from 'lucide-react';
-import { SweetwaterMark } from './SweetwaterMark';
+import { SweetwaterLogo } from './SweetwaterLogo';
 
 const NAV_LINKS = [
   { href: '/continuum', label: 'Continuum' },
@@ -26,14 +26,11 @@ export const Header: React.FC = () => {
           aria-label="Sweetwater Technology home"
           className="flex items-center gap-2 sm:gap-3 min-w-0"
         >
-          <SweetwaterMark
+          <SweetwaterLogo
             animated
-            className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 drop-shadow-md"
+            markClassName="h-9 w-9 sm:h-10 sm:w-10 drop-shadow-md"
+            className="scale-90 origin-left sm:scale-100"
           />
-          <span className="text-lg sm:text-2xl tracking-tighter text-slate-900 truncate">
-            <span className="font-extrabold">SWEETWATER</span>
-            <span style={{ fontFamily: "'Satisfy', cursive" }} className="ml-1 text-xl sm:text-3xl font-semibold"><span className="text-blue-600">T</span>echnology</span>
-          </span>
         </a>
 
         <nav className="hidden lg:flex items-center gap-8">
