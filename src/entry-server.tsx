@@ -8,6 +8,7 @@ import { SERVICES, WORK_PROFILES } from './marketing';
 export const prerenderRoutes = PRERENDER_ROUTES;
 export const sitemapEntries = [
   { path: '/', priority: '1.0' },
+  { path: '/continuum', priority: '0.9' },
   { path: '/services', priority: '0.9' },
   ...SERVICES.map((service) => ({ path: `/services/${service.slug}`, priority: '0.9' })),
   { path: '/work', priority: '0.8' },

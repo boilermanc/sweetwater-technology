@@ -4,6 +4,7 @@ import { X, Menu } from 'lucide-react';
 import { SweetwaterMark } from './SweetwaterMark';
 
 const NAV_LINKS = [
+  { href: '/continuum', label: 'Continuum' },
   { href: '/services', label: 'Services' },
   { href: '/work', label: 'Work' },
   { href: '/news', label: 'News' },

@@ -96,6 +96,29 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
     };
   }
 
+  if (path === '/continuum') {
+    const canonical = `${SITE_URL}/continuum`;
+    return {
+      title: 'Sweetwater Continuum | Governed Personal Continuity for AI',
+      description:
+        'Sweetwater Continuum is the governed personal continuity layer for an agentic world—carrying context forward without turning it into standing authority.',
+      canonical,
+      type: 'website',
+      jsonLd: [
+        organization,
+        {
+          '@context': 'https://schema.org',
+          '@type': 'TechArticle',
+          headline: 'Sweetwater Continuum: Governed Personal Continuity for an Agentic World',
+          description: 'The working thesis for a personal continuity and delegation layer across AI agents and services.',
+          author: { '@id': `${SITE_URL}/#organization` },
+          publisher: { '@id': `${SITE_URL}/#organization` },
+          mainEntityOfPage: canonical,
+        },
+      ],
+    };
+  }
+
   if (path === '/news') {
     return {
       title: 'Company & Product News | Sweetwater Technology',
@@ -252,6 +275,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
 
 export const PRERENDER_ROUTES = [
   '/',
+  '/continuum',
   '/services',
   ...SERVICES.map((service) => `/services/${service.slug}`),
   '/work',

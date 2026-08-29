@@ -13,6 +13,7 @@ import { findNewsArticle } from './news';
 import { normalizePath } from './seo';
 import { ServiceDetail, ServicesIndex, WorkDetail, WorkIndex } from './components/MarketingPages';
 import { findService, findWorkProfile, SERVICES } from './marketing';
+import { ContinuumPage } from './components/ContinuumPage';
 
 const AppDetail = lazy(() => import('./components/AppDetail').then((module) => ({ default: module.AppDetail })));
 const RekkrdDetail = lazy(() => import('./components/cards/RekkrdDetail').then((module) => ({ default: module.RekkrdDetail })));
@@ -101,6 +102,8 @@ const App: React.FC<AppProps> = ({ path }) => {
 
           <Contact />
         </main>
+      ) : currentPath === '/continuum' ? (
+        <ContinuumPage />
       ) : currentPath === '/services' ? (
         <ServicesIndex />
       ) : service ? (
