@@ -14,6 +14,9 @@ import { normalizePath } from './seo';
 import { ServiceDetail, ServicesIndex, WorkDetail, WorkIndex } from './components/MarketingPages';
 import { findService, findWorkProfile, SERVICES } from './marketing';
 import { ContinuumPage } from './components/ContinuumPage';
+import { CardLanding } from './pages/CardLanding';
+import { CardTestPage } from './pages/CardTestPage';
+import { SageEmailPreview } from './pages/SageEmailPreview';
 
 const AppDetail = lazy(() => import('./components/AppDetail').then((module) => ({ default: module.AppDetail })));
 const RekkrdDetail = lazy(() => import('./components/cards/RekkrdDetail').then((module) => ({ default: module.RekkrdDetail })));
@@ -44,6 +47,18 @@ const App: React.FC<AppProps> = ({ path }) => {
     window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
   }, []);
+
+  if (currentPath === '/card/test') {
+    return <CardTestPage />;
+  }
+
+  if (currentPath === '/card/email-preview') {
+    return <SageEmailPreview />;
+  }
+
+  if (currentPath === '/card') {
+    return <CardLanding />;
+  }
 
   return (
     <div className="relative min-h-screen selection:bg-blue-100 selection:text-blue-800 transition-colors duration-700">

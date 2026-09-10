@@ -96,6 +96,39 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
     };
   }
 
+  if (path === '/card') {
+    return {
+      title: 'Meet Sweetwater Technology',
+      description: 'Explore live software products and tell Sage what kind of business problem you are solving.',
+      canonical: `${SITE_URL}/card`,
+      type: 'website',
+      jsonLd: [organization],
+      robots: 'noindex, follow',
+    };
+  }
+
+  if (path === '/card/test') {
+    return {
+      title: 'Card Landing Test Hub | Sweetwater Technology',
+      description: 'Internal links for checking each Sweetwater card landing-page experience.',
+      canonical: `${SITE_URL}/card/test`,
+      type: 'website',
+      jsonLd: [],
+      robots: 'noindex, nofollow',
+    };
+  }
+
+  if (path === '/card/email-preview') {
+    return {
+      title: 'Sage Follow-up Email Mockup | Sweetwater Technology',
+      description: 'Internal design preview of the personalized Sage follow-up email.',
+      canonical: `${SITE_URL}/card/email-preview`,
+      type: 'website',
+      jsonLd: [],
+      robots: 'noindex, nofollow',
+    };
+  }
+
   if (path === '/continuum') {
     const canonical = `${SITE_URL}/continuum`;
     return {
@@ -275,6 +308,9 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
 
 export const PRERENDER_ROUTES = [
   '/',
+  '/card',
+  '/card/test',
+  '/card/email-preview',
   '/continuum',
   '/services',
   ...SERVICES.map((service) => `/services/${service.slug}`),

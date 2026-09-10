@@ -1,0 +1,59 @@
+// Paste this into the n8n "Build Follow-up Email" Code node.
+const source = $('Normalize Sage Reply').first().json;
+const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
+})[character]);
+
+const products = {
+  agtech: {
+    name: 'Sproutify',
+    tagline: 'Practical software for growers.',
+    description: 'Track growing work, harvests, tasks, and the records that keep farm, school, microgreen, and home operations moving.',
+    url: 'https://www.sproutify.app/',
+    summary: 'You are exploring practical software for farming, growing, or agriculture.',
+  },
+  inspection: {
+    name: 'SpectIQ',
+    tagline: 'Priced. Signed. Paid. Booked.',
+    description: 'Keep the customer, property, estimate, agreement, payment, appointment, and next action connected in one deal record.',
+    url: 'https://spectiq.app',
+    summary: 'You are looking for a smoother home-inspection workflow with fewer manual handoffs.',
+  },
+  freight: {
+    name: 'LaneWise',
+    tagline: 'Inbound quotes, drafted for you.',
+    description: 'Turn inbound freight requests into review-ready quote drafts while the broker stays in control of every send.',
+    url: 'https://lanewise.io',
+    summary: 'You are looking for a faster, clearer way to handle inbound freight quotes.',
+  },
+  mobile: {
+    name: 'Sweetwater mobile products',
+    tagline: 'Focused apps people want to use.',
+    description: 'Rejoice, Rekkrd, and Sproutify Home show three different mobile products built around useful, repeatable experiences.',
+    url: 'https://sweetwater.technology/card',
+    summary: 'You are exploring a polished mobile product built around a focused customer need.',
+  },
+  custom: {
+    name: 'Custom software',
+    tagline: 'Software that flows like water.',
+    description: 'Sweetwater Technology builds web apps, mobile products, and thoughtful automation around the way your business actually works.',
+    url: 'https://sweetwater.technology/contact',
+    summary: 'You are exploring a custom product or workflow that does not fit an off-the-shelf tool.',
+  },
+};
+
+const product = products[source.segment] ?? products.custom;
+const firstName = escapeHtml(String(source.capture?.name ?? 'there').trim().split(/\s+/)[0] || 'there');
+const substackBlock = source.consent?.substack === true
+  ? `<tr><td style="padding:28px 36px 0;border-top:1px solid #e2e8f0"><p style="margin:0 0 8px;color:#64748b;font-size:11px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase">Sweetwater Technology posts</p><h2 style="margin:0 0 8px;color:#0f172a;font-size:20px;line-height:1.3">Keep up with what we're building.</h2><p style="margin:0 0 18px;color:#475569;font-size:14px;line-height:1.65">Finish your free subscription directly with Substack.</p><a href="https://sweetwatertechnology.substack.com/" style="color:#2e5ce6;font-size:14px;font-weight:700;text-decoration:none">Visit Sweetwater Technology on Substack &rarr;</a></td></tr>`
+  : '';
+
+const html = `<!doctype html><html><body style="margin:0;padding:0;background:#eef3fb;font-family:Arial,Helvetica,sans-serif;color:#0f172a"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#eef3fb"><tr><td align="center" style="padding:24px 12px"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;background:#fff;border:1px solid #d8e1ef;border-radius:18px;overflow:hidden"><tr><td style="height:6px;background:#2e5ce6"></td></tr><tr><td style="padding:34px 36px;background:#f8faff;border-bottom:1px solid #dce5f4"><p style="margin:0;color:#2e5ce6;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase">Sweetwater Technology &middot; Your Sage recap</p><h1 style="margin:18px 0 12px;color:#0f172a;font-size:32px;line-height:1.15">${firstName}, here's what Sage pulled together.</h1><p style="margin:0;color:#475569;font-size:16px;line-height:1.65">Thanks for taking a minute to tell us what you're working on. Based on your answers, this is the clearest place to start.</p></td></tr><tr><td style="padding:32px 36px"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td style="padding:20px;background:#f4f7ff;border:1px solid #d9e3fa;border-radius:14px"><p style="margin:0 0 8px;color:#2e5ce6;font-size:11px;font-weight:800;letter-spacing:1.7px;text-transform:uppercase">What you told Sage</p><p style="margin:0;color:#334155;font-size:16px;line-height:1.65">${escapeHtml(product.summary)}</p></td></tr><tr><td style="padding-top:28px"><p style="margin:0 0 10px;color:#64748b;font-size:11px;font-weight:800;letter-spacing:1.7px;text-transform:uppercase">Best match</p><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:1px solid #e2e8f0;border-radius:14px"><tr><td style="padding:22px;background:#f8fafc;border-bottom:1px solid #e2e8f0"><h2 style="margin:0 0 8px;color:#0f172a;font-size:24px">${escapeHtml(product.name)}</h2><p style="margin:0;color:#334155;font-size:17px;font-weight:700">${escapeHtml(product.tagline)}</p></td></tr><tr><td style="padding:22px"><p style="margin:0 0 20px;color:#475569;font-size:15px;line-height:1.7">${escapeHtml(product.description)}</p><a href="${escapeHtml(product.url)}" style="display:inline-block;padding:13px 18px;background:#2e5ce6;border-radius:10px;color:#fff;font-size:14px;font-weight:700;text-decoration:none">Explore ${escapeHtml(product.name)} &rarr;</a></td></tr></table></td></tr><tr><td style="padding-top:28px"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f7ff;border:1px solid #d9e3fa;border-radius:14px"><tr><td style="padding:22px"><p style="margin:0 0 8px;color:#2e5ce6;font-size:11px;font-weight:800;letter-spacing:1.7px;text-transform:uppercase">Want to talk it through?</p><h2 style="margin:0 0 10px;color:#0f172a;font-size:22px">Reply directly to Clint.</h2><p style="margin:0 0 18px;color:#475569;font-size:14px;line-height:1.65">Share the workflow that is slowing your team down, and we'll figure out the most useful next step together.</p><a href="mailto:clint@sweetwater.technology" style="display:inline-block;margin:0 10px 10px 0;padding:13px 18px;background:#2e5ce6;border-radius:10px;color:#fff;font-size:14px;font-weight:700;text-decoration:none">Reply to Clint</a><a href="tel:+16785211798" style="display:inline-block;padding:12px 18px;background:#fff;border:1px solid #bfd0f4;border-radius:10px;color:#334155;font-size:14px;font-weight:700;text-decoration:none">(678) 521-1798</a></td></tr></table></td></tr></table></td></tr>${substackBlock}<tr><td align="center" style="padding:24px 36px;background:#f8fafc;border-top:1px solid #e2e8f0"><p style="margin:0 0 6px;color:#64748b;font-size:12px;line-height:1.5">You received this email because you asked Sage to send your Sweetwater Technology recap.</p><p style="margin:0;color:#475569;font-size:12px;font-weight:700">Sweetwater Technology &middot; Atlanta, Georgia</p></td></tr></table></td></tr></table></body></html>`;
+
+return [{
+  json: {
+    ...source,
+    subject: `${firstName}, here's the workflow Sage recommended`,
+    html,
+  },
+}];

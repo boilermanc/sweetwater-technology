@@ -66,7 +66,7 @@ export const AppCard: React.FC<AppCardProps> = ({ app, index, onClick }) => {
                 transition: { duration: 0.6, ease: "easeOut" }
               }
             }}
-            className="w-full h-full object-cover origin-center"
+            className={`h-full w-full origin-center ${app.id === 'spectiq' ? 'bg-[#f6f3ee] object-contain' : 'object-cover'}`}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         </div>

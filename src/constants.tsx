@@ -130,5 +130,18 @@ export const PROJECTS: AppProject[] = [
     tags: ['React', 'TypeScript', 'Supabase', 'Email Automation', 'Rate Intelligence', 'Electron'],
     link: 'https://lanewise.io',
     color: '#f4d35e'
+  },
+  {
+    id: 'spectiq',
+    title: 'SpectIQ',
+    category: 'Home Inspection Software',
+    description: 'Turn new inquiries into priced, signed, paid, and scheduled inspections through one connected workflow.',
+    longDescription: 'SpectIQ is a mobile-friendly operations platform for home inspection companies. It keeps estimates, agreements, payments, scheduling, customer follow-through, and the team’s next action connected in one deal record — with automation that preserves company rules and staff judgment.',
+    image: '/images/optimized/spectiq-card.svg',
+    imageWidth: 1200,
+    imageHeight: 630,
+    tags: ['React', 'TypeScript', 'Supabase', 'Stripe', 'AI Automation'],
+    link: 'https://spectiq.app',
+    color: '#dc6d32'
   }
 ];

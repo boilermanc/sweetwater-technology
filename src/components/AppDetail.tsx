@@ -54,9 +54,9 @@ export const AppDetail: React.FC<AppDetailProps> = ({ app, onClose }) => {
             height={app.imageHeight}
             loading="lazy"
             decoding="async"
-            className={`w-full h-full ${app.id === 'lanewise' ? 'object-contain p-16 opacity-100' : 'object-cover opacity-80'}`}
+            className={`w-full h-full ${app.id === 'lanewise' ? 'object-contain p-16 opacity-100' : app.id === 'spectiq' ? 'bg-[#f6f3ee] object-contain opacity-100' : 'object-cover opacity-80'}`}
           />
-          {app.id === 'lanewise' ? null : app.color.startsWith('from-') ? (
+          {app.id === 'lanewise' || app.id === 'spectiq' ? null : app.color.startsWith('from-') ? (
             <div className={`absolute inset-0 bg-gradient-to-tr ${app.color} mix-blend-multiply opacity-60`} />
           ) : (
             <div

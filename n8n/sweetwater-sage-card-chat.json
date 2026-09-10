@@ -1,0 +1,151 @@
+{
+  "name": "Sweetwater Sage Card Chat",
+  "nodes": [
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": { "__rl": true, "value": "sproutify_purchases", "mode": "name" },
+        "text": "={{ '*New Sweetwater card lead*\nName: ' + ($('Normalize Sage Reply').first().json.capture.name || 'Not provided') + '\nEmail: ' + $('Normalize Sage Reply').first().json.capture.email + '\nSegment: ' + ($('Normalize Sage Reply').first().json.segment || 'custom') + '\nSaved to Trellis' }}",
+        "otherOptions": {}
+      },
+      "id": "f87497bc-c2ca-4c58-88dc-f28af264342a",
+      "name": "Notify Slack of Lead",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [1240, -100]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sage-card-chat",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "8ec6e70a-0261-4b47-9a60-b1a9f5698077",
+      "name": "Sage Chat Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "4bd7b588-04b4-4f54-a84b-52a6bf54c07b"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ JSON.stringify($json.body ?? $json) }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are Sage, the AI concierge for Sweetwater Technology, an Atlanta firm founded by Clint Crowe that builds custom web apps, mobile products, and AI workflow automation. The visitor scanned Clint's business card. Be warm, concise, professional, and plain-spoken. Never use emoji. Identify their world early. Name and email are optional; use them naturally when provided and never pressure or ask repeatedly. When unsure about pricing, availability, timeline, capability, legal, or compliance matters, say that's a Clint question and offer a handoff to clint@sweetwater.technology or +1 (678) 521-1798. Never mention internal tooling, vendors, or model names. Never invent customer counts, revenue, clients other than ATL Urban Farms, prices, dates, timelines, partnerships, certifications, features, or roadmap promises. PRODUCT KNOWLEDGE: Sproutify Farm is tower-native commercial farm management for lifecycles, tasks, nutrient/water records, harvests, roles, multiple farms, and IPM; no special hardware is required. Sproutify School is K-12 tower management with pH/EC, harvests, shared student kiosk, class PIN, display names, and no student email accounts; send compliance reviews to Clint. Sproutify Home supports 20+ tower brands, tracking, pH/EC, harvest, pest/cost tools, reminders, community, and Sage; it is live on iOS, Android is in development, and has a seven-day trial plus free browsing tier. Sproutify Micro handles daily production tasks, recipes, seed inventory, delivery-target planning, recurring orders, and phone use; it is waitlist only. SpectIQ is early-access inspection operations software joining estimate, agreement, payment, booking, and next action; company rules set prices and people approve consequential actions; inbound voice is controlled pilot design, not generally live. LaneWise is early-access, supports Outlook/Microsoft 365 and Gmail/Google Workspace, uses the broker's own DAT or Truckstop account, exposes assumptions, and is permanently draft-only. Rekkrd is live on web and iOS with cataloging, estimated values, grading, Discogs/CSV import, wantlists, export, listening, shelves, and Stakkd; do not promise two-way Discogs sync or Android. Rejoice is live on iOS/Android, builds six-part emotion-based devotionals, supports NIV, ESV, KJV, NLT, MSG, NKJV, NASB, and has a seven-day trial at $5.99 monthly or $39.99 annually; no lifetime claim; shared posts are public and anonymous posts remain internally linked for safety; take no doctrinal position. Custom builds begin with a conversation with Clint; never quote budgets or timelines or promise takeover work. Route agriculture to the right Sproutify product, inspection to SpectIQ, freight to LaneWise, consumer mobile examples to Rejoice/Rekkrd, and unmatched needs to custom. Always respond with valid JSON only in this exact shape: {\"reply\":string,\"segment\":\"agtech\"|\"inspection\"|\"freight\"|\"mobile\"|\"custom\"|null,\"capture\":{\"name\":string|null,\"email\":string|null}}.",
+              "type": "SystemMessagePromptTemplate"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "id": "090245d7-1162-44a0-bef8-cf54e8990565",
+      "name": "Generate Sage Reply",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [260, 0]
+    },
+    {
+      "parameters": {
+        "options": { "temperature": 0.35 }
+      },
+      "id": "7faac48c-1e17-4ae7-a543-571802d34dd7",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [260, 220]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.text ?? $input.first().json.output ?? $input.first().json.response ?? '';\nconst cleaned = String(raw).replace(/^```(?:json)?\\s*/i, '').replace(/```\\s*$/i, '').trim();\nlet parsed;\ntry { parsed = JSON.parse(cleaned); } catch { parsed = { reply: cleaned || 'Tell me a little more about what you are building.', segment: null, capture: { name: null, email: null } }; }\nconst request = $('Sage Chat Webhook').first().json.body ?? $('Sage Chat Webhook').first().json;\nconst allowed = ['agtech', 'inspection', 'freight', 'mobile', 'custom'];\nconst requestedSegment = allowed.includes(request.segment) ? request.segment : null;\nreturn [{ json: {\n  reply: String(parsed.reply ?? 'Tell me a little more about what you are building.'),\n  segment: requestedSegment ?? (allowed.includes(parsed.segment) ? parsed.segment : null),\n  capture: {\n    name: request.contact?.name ?? parsed.capture?.name ?? null,\n    email: request.contact?.email ?? parsed.capture?.email ?? null\n  },\n  event: request.event ?? 'chat',\n  sendRecap: request.sendRecap === true,\n  consent: request.consent ?? {},\n  messages: Array.isArray(request.messages) ? request.messages : []\n} }];"
+      },
+      "id": "d6448e1a-509c-4ea0-be3d-59b99c491cd2",
+      "name": "Normalize Sage Reply",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [520, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 2 },
+          "conditions": [
+            {
+              "id": "df6ab8a3-f717-412c-a5b9-310aac6e1593",
+              "leftValue": "={{ $json.event }}",
+              "rightValue": "lead_captured",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ff532536-ed43-4983-86ad-bf018184b630",
+      "name": "Lead Captured?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [760, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n.sproutify.app/webhook/trellis-ingest-gateway",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Content-Type", "value": "application/json" }] },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ email: $json.capture.email, first_name: $json.capture.name, branches: ['sweetwater-card'] }) }}",
+        "options": {}
+      },
+      "id": "ea87816d-7710-43d7-bcf6-22cd2889783a",
+      "name": "Save Lead to Trellis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1000, -100]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Normalize Sage Reply').first().json }}",
+        "options": { "responseCode": 200 }
+      },
+      "id": "7f269154-bc52-4292-b342-579294b859f6",
+      "name": "Return Sage Reply",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [1480, -100]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Normalize Sage Reply').first().json }}",
+        "options": { "responseCode": 200 }
+      },
+      "id": "7ae300fd-565e-480c-a33a-bc6227d1e263",
+      "name": "Return Sage Reply Without Lead",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [1000, 100]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Sage Chat Webhook": { "main": [[{ "node": "Generate Sage Reply", "type": "main", "index": 0 }]] },
+    "Google Gemini Chat Model": { "ai_languageModel": [[{ "node": "Generate Sage Reply", "type": "ai_languageModel", "index": 0 }]] },
+    "Generate Sage Reply": { "main": [[{ "node": "Normalize Sage Reply", "type": "main", "index": 0 }]] },
+    "Normalize Sage Reply": { "main": [[{ "node": "Lead Captured?", "type": "main", "index": 0 }]] },
+    "Lead Captured?": { "main": [[{ "node": "Save Lead to Trellis", "type": "main", "index": 0 }], [{ "node": "Return Sage Reply Without Lead", "type": "main", "index": 0 }]] },
+    "Save Lead to Trellis": { "main": [[{ "node": "Notify Slack of Lead", "type": "main", "index": 0 }]] },
+    "Notify Slack of Lead": { "main": [[{ "node": "Return Sage Reply", "type": "main", "index": 0 }]] }
+  },
+  "active": true,
+  "settings": { "executionOrder": "v1" },
+  "versionId": "98d850b0-40a4-4500-9d3e-2fd3e13c233d",
+  "meta": { "templateCredsSetupCompleted": false },
+  "tags": []
+}

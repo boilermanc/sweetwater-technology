@@ -1,0 +1,65 @@
+{
+  "name": "Sweetwater Card Scan",
+  "nodes": [
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": { "__rl": true, "value": "sproutify_purchases", "mode": "name" },
+        "text": "={{ 'Card scanned — batch ' + ($json.batch || 'unassigned') + ($json.referrer ? '\nReferrer: ' + $json.referrer : '') + '\nTime: ' + $json.scanned_at }}",
+        "otherOptions": {}
+      },
+      "id": "85ca8ac8-c021-4eeb-9b07-067bcfc2201d",
+      "name": "Notify Slack of Scan",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [480, 0]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "card-scan",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "231c64b3-3020-4c1d-a72d-1b22b9c92f11",
+      "name": "Card Scan Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "54c3cd29-7982-4eb2-b809-170025c85329"
+    },
+    {
+      "parameters": {
+        "jsCode": "const request = $input.first().json;\nconst body = request.body ?? request;\nconst headers = request.headers ?? {};\nconst forwarded = headers['x-forwarded-for'] ?? headers['X-Forwarded-For'];\nreturn [{\n  json: {\n    event: 'sweetwater_card_scan',\n    source: 'sweetwater-card',\n    batch: body.batch ?? null,\n    scanned_at: body.ts ? new Date(body.ts).toISOString() : new Date().toISOString(),\n    received_at: new Date().toISOString(),\n    referrer: body.referrer ?? null,\n    user_agent: body.ua ?? headers['user-agent'] ?? null,\n    ip: typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : null\n  }\n}];"
+      },
+      "id": "bc21d851-a62c-45d6-9b3c-a0d2a7171003",
+      "name": "Normalize Scan Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true } }}",
+        "options": { "responseCode": 200 }
+      },
+      "id": "bd2665bf-1666-4ebd-9289-d3cc6d6035fa",
+      "name": "Acknowledge Scan",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [720, 0]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Card Scan Webhook": { "main": [[{ "node": "Normalize Scan Event", "type": "main", "index": 0 }]] },
+    "Normalize Scan Event": { "main": [[{ "node": "Notify Slack of Scan", "type": "main", "index": 0 }]] },
+    "Notify Slack of Scan": { "main": [[{ "node": "Acknowledge Scan", "type": "main", "index": 0 }]] }
+  },
+  "active": true,
+  "settings": { "executionOrder": "v1" },
+  "versionId": "8bbcf9f0-b50e-44a3-a4dc-8c427e2915bb",
+  "meta": { "templateCredsSetupCompleted": true },
+  "tags": []
+}
