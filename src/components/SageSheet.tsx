@@ -65,13 +65,15 @@ export function SageSheet({ segment, setSegment, openSignal = 0 }: SageSheetProp
   ) => {
     setSending(true);
     try {
+      const query = new URLSearchParams(window.location.search);
       const response = await fetch(CHAT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionId: getSessionId(),
-          batch: new URLSearchParams(window.location.search).get('b'),
-          testMode: new URLSearchParams(window.location.search).get('test') === '1',
+          batch: query.get('b'),
+          source: query.get('src') ?? (query.has('b') ? 'business-card' : 'direct'),
+          testMode: query.get('test') === '1',
           event: options.event ?? 'chat',
           sendRecap: options.sendRecap ?? false,
           segment: nextSegment,

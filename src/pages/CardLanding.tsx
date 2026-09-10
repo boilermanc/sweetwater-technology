@@ -73,10 +73,17 @@ export function CardLanding() {
   const order = useMemo(() => active.portfolioOrder, [active]);
 
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get('test') === '1') return;
+    const query = new URLSearchParams(window.location.search);
+    if (query.get('test') === '1') return;
     void fetch('https://n8n.sproutify.app/webhook/card-scan', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ batch: new URLSearchParams(window.location.search).get('b'), ts: Date.now(), referrer: document.referrer, ua: navigator.userAgent }),
+      body: JSON.stringify({
+        batch: query.get('b'),
+        source: query.get('src') ?? (query.has('b') ? 'business-card' : 'direct'),
+        ts: Date.now(),
+        referrer: document.referrer,
+        ua: navigator.userAgent,
+      }),
     }).catch(() => undefined);
   }, []);
 

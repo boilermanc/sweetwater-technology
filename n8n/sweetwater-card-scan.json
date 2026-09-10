@@ -5,7 +5,7 @@
       "parameters": {
         "select": "channel",
         "channelId": { "__rl": true, "value": "sproutify_purchases", "mode": "name" },
-        "text": "={{ 'Card scanned — batch ' + ($json.batch || 'unassigned') + ($json.referrer ? '\nReferrer: ' + $json.referrer : '') + '\nTime: ' + $json.scanned_at }}",
+        "text": "={{ 'Card landing scanned' + '\nSource: ' + ($json.source || 'direct') + '\nBatch: ' + ($json.batch || 'unassigned') + ($json.referrer ? '\nReferrer: ' + $json.referrer : '') + '\nTime: ' + $json.scanned_at }}",
         "otherOptions": {}
       },
       "id": "85ca8ac8-c021-4eeb-9b07-067bcfc2201d",
@@ -30,7 +30,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const request = $input.first().json;\nconst body = request.body ?? request;\nconst headers = request.headers ?? {};\nconst forwarded = headers['x-forwarded-for'] ?? headers['X-Forwarded-For'];\nreturn [{\n  json: {\n    event: 'sweetwater_card_scan',\n    source: 'sweetwater-card',\n    batch: body.batch ?? null,\n    scanned_at: body.ts ? new Date(body.ts).toISOString() : new Date().toISOString(),\n    received_at: new Date().toISOString(),\n    referrer: body.referrer ?? null,\n    user_agent: body.ua ?? headers['user-agent'] ?? null,\n    ip: typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : null\n  }\n}];"
+        "jsCode": "const request = $input.first().json;\nconst body = request.body ?? request;\nconst headers = request.headers ?? {};\nconst forwarded = headers['x-forwarded-for'] ?? headers['X-Forwarded-For'];\nreturn [{\n  json: {\n    event: 'sweetwater_card_scan',\n    source: body.source ?? 'direct',\n    batch: body.batch ?? null,\n    scanned_at: body.ts ? new Date(body.ts).toISOString() : new Date().toISOString(),\n    received_at: new Date().toISOString(),\n    referrer: body.referrer ?? null,\n    user_agent: body.ua ?? headers['user-agent'] ?? null,\n    ip: typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : null\n  }\n}];"
       },
       "id": "bc21d851-a62c-45d6-9b3c-a0d2a7171003",
       "name": "Normalize Scan Event",
