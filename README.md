@@ -27,3 +27,19 @@ Verified news articles live in `src/news.ts`. Adding an article there creates it
 Service and product-profile content lives in `src/marketing.ts`. Those entries generate `/services/:slug` and `/work/:slug` routes with Service, FAQ, SoftwareApplication, and breadcrumb structured data where applicable.
 
 The contact form posts to the configured n8n webhook in `src/components/Contact.tsx`. Verify that endpoint and its server-side spam controls before changing the form contract.
+# QR codes
+
+Print and campaign QR codes are stored in `public/qr` as both scalable SVG and high-resolution PNG files.
+
+Generate another tracked QR code with:
+
+```sh
+npm run qr -- <name> <full-url>
+```
+
+For example:
+
+```sh
+npm run qr -- box-02 https://sweetwater.technology/card?b=2
+npm run qr -- substack https://sweetwater.technology/card?src=substack
+```
