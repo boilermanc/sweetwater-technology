@@ -1,20 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowUp, ArrowUpRight, Droplets, Loader2, Mail, MessageCircle, Phone, Rss, UserRound, X } from 'lucide-react';
+import { ArrowUp, Droplets, Loader2, Mail, MessageCircle, Phone, UserRound, X } from 'lucide-react';
 import { SEGMENTS, SEGMENT_ORDER, isSegmentId, type SegmentId } from '../data/segments';
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string };
-type ConversationStage = 'name' | 'email' | 'segment' | 'recap' | 'substack' | 'chat';
+type ConversationStage = 'source_interest' | 'sproutify_product' | 'name' | 'email' | 'segment' | 'recap' | 'mailing_list' | 'chat';
 type SageEvent = 'lead_captured' | 'preferences_complete' | 'chat';
+export type SproutifyInterest = 'home' | 'farm' | 'school' | 'ipm' | 'contact';
+export type YouTubeInterest = 'custom-app' | 'automation' | 'sproutify' | 'portfolio' | 'contact';
+export type VisitorInterest = SproutifyInterest | YouTubeInterest;
+export type VisitorSource = 'sproutify' | 'youtube' | 'substack';
 
 interface SageSheetProps {
   segment: SegmentId;
   setSegment: (segment: SegmentId) => void;
+  onInterestReady?: (interest: VisitorInterest, source: VisitorSource) => void;
   openSignal?: number;
 }
 
 const CHAT_URL = 'https://n8n.sproutify.app/webhook/sage-card-chat';
-const SUBSTACK_URL = 'https://sweetwatertechnology.substack.com/';
 const FAILURE_REPLY = "I hit a ripple — the site below has everything, or reach Clint directly at clint@sweetwater.technology.";
 
 const getSessionId = () => {
@@ -26,15 +30,41 @@ const getSessionId = () => {
   return created;
 };
 
-export function SageSheet({ segment, setSegment, openSignal = 0 }: SageSheetProps) {
+const SPROUTIFY_OPTIONS: { id: SproutifyInterest; label: string }[] = [
+  { id: 'home', label: 'Sproutify Home' },
+  { id: 'farm', label: 'Sproutify Farm' },
+  { id: 'school', label: 'Sproutify School' },
+  { id: 'ipm', label: 'Sproutify IPM' },
+  { id: 'contact', label: 'Connect with someone' },
+];
+
+const YOUTUBE_OPTIONS: { id: YouTubeInterest; label: string }[] = [
+  { id: 'custom-app', label: 'Build an app for my business' },
+  { id: 'automation', label: 'Automate repetitive work' },
+  { id: 'sproutify', label: 'Explore Sproutify' },
+  { id: 'portfolio', label: 'See the products' },
+  { id: 'contact', label: 'Connect with Clint' },
+];
+
+const SUBSTACK_OPTIONS: { id: YouTubeInterest; label: string }[] = [
+  { id: 'portfolio', label: 'See what Sweetwater is building' },
+  { id: 'sproutify', label: 'Explore Sproutify' },
+  { id: 'custom-app', label: 'Talk about a custom app' },
+  { id: 'automation', label: 'Automate a workflow' },
+  { id: 'contact', label: 'Connect with Clint' },
+];
+
+export function SageSheet({ segment, setSegment, onInterestReady, openSignal = 0 }: SageSheetProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [contact, setContact] = useState({ name: '', email: '' });
   const [stage, setStage] = useState<ConversationStage>('name');
+  const [sproutifyInterest, setSproutifyInterest] = useState<SproutifyInterest | null>(null);
+  const [youtubeInterest, setYoutubeInterest] = useState<YouTubeInterest | null>(null);
+  const [entrySource, setEntrySource] = useState<VisitorSource | null>(null);
   const [hasSelectedSegment, setHasSelectedSegment] = useState(false);
   const [showContactActions, setShowContactActions] = useState(false);
   const [recapOptIn, setRecapOptIn] = useState<boolean | null>(null);
-  const [substackOptIn, setSubstackOptIn] = useState<boolean | null>(null);
-  const [showSubstackAction, setShowSubstackAction] = useState(false);
+  const [mailingListOptIn, setMailingListOptIn] = useState<boolean | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'assistant',
@@ -46,6 +76,36 @@ export function SageSheet({ segment, setSegment, openSignal = 0 }: SageSheetProp
   const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const source = new URLSearchParams(window.location.search).get('src');
+    if (source === 'sproutify') {
+      setEntrySource('sproutify');
+      setStage('sproutify_product');
+      setMessages([
+        {
+          role: 'assistant',
+          content: 'Welcome from Sproutify. What are you interested in?',
+        },
+      ]);
+    } else if (source === 'youtube') {
+      setEntrySource('youtube');
+      setStage('source_interest');
+      setMessages([
+        {
+          role: 'assistant',
+          content: 'Welcome from YouTube. What would you like to explore?',
+        },
+      ]);
+    } else if (source === 'substack') {
+      setEntrySource('substack');
+      setStage('source_interest');
+      setMessages([
+        {
+          role: 'assistant',
+          content: 'Welcome from Substack. What would you like to explore next?',
+        },
+      ]);
+    }
+
     const timer = window.setTimeout(() => setIsOpen(true), 600);
     return () => window.clearTimeout(timer);
   }, []);
@@ -61,7 +121,7 @@ export function SageSheet({ segment, setSegment, openSignal = 0 }: SageSheetProp
   const requestReply = async (
     nextMessages: ChatMessage[],
     nextSegment: SegmentId | null,
-    options: { event?: SageEvent; recap?: boolean | null; substack?: boolean | null; sendRecap?: boolean } = {},
+    options: { event?: SageEvent; recap?: boolean | null; mailingList?: boolean | null; sendRecap?: boolean; sendWelcome?: boolean; contact?: { name: string; email: string }; interest?: VisitorInterest | null } = {},
   ) => {
     setSending(true);
     try {
@@ -76,12 +136,13 @@ export function SageSheet({ segment, setSegment, openSignal = 0 }: SageSheetProp
           testMode: query.get('test') === '1',
           event: options.event ?? 'chat',
           sendRecap: options.sendRecap ?? false,
+          sendWelcome: options.sendWelcome ?? false,
           segment: nextSegment,
-          contact,
+          interest: options.interest ?? sproutifyInterest ?? youtubeInterest,
+          contact: options.contact ?? contact,
           consent: {
             recapEmail: options.recap ?? recapOptIn,
-            substack: options.substack ?? substackOptIn,
-            publication: SUBSTACK_URL,
+            mailingList: options.mailingList ?? mailingListOptIn,
           },
           messages: nextMessages,
         }),
@@ -137,19 +198,39 @@ export function SageSheet({ segment, setSegment, openSignal = 0 }: SageSheetProp
       emailInput.value = clean;
       if (!emailInput.checkValidity()) return;
 
+      const nextContact = { ...contact, email: clean };
+      const selectedInterest = sproutifyInterest ?? youtubeInterest;
+      const destination = selectedInterest === 'contact'
+        ? 'someone from Sweetwater Technology'
+        : SPROUTIFY_OPTIONS.find(({ id }) => id === sproutifyInterest)?.label
+          ?? YOUTUBE_OPTIONS.find(({ id }) => id === youtubeInterest)?.label;
       const next = [
         ...messages,
         { role: 'user', content: clean } as ChatMessage,
         {
           role: 'assistant',
-          content: `Perfect, ${contact.name.split(/\s+/)[0]}. What world are you coming from? I’ll bring the most relevant work to the top.`,
+          content: selectedInterest
+            ? selectedInterest === 'contact'
+              ? `Thanks, ${contact.name.split(/\s+/)[0]}. Here are the best ways to connect directly. Would you also like occasional Sweetwater Technology updates and new posts? You can unsubscribe anytime.`
+              : `Perfect, ${contact.name.split(/\s+/)[0]}. I’m setting the page up around ${destination}. Would you also like occasional Sweetwater Technology updates and new posts? You can unsubscribe anytime.`
+            : `Perfect, ${contact.name.split(/\s+/)[0]}. What world are you coming from? I’ll bring the most relevant work to the top.`,
         } as ChatMessage,
       ];
-      setContact((current) => ({ ...current, email: clean }));
+      setContact(nextContact);
       setMessages(next);
       setInput('');
-      setStage('segment');
-      void requestReply(next, null, { event: 'lead_captured' });
+      if (selectedInterest) {
+        setStage('mailing_list');
+        onInterestReady?.(selectedInterest, sproutifyInterest ? 'sproutify' : entrySource === 'substack' ? 'substack' : 'youtube');
+        if (selectedInterest === 'contact') {
+          setShowContactActions(true);
+        }
+        const nextSegment = sproutifyInterest && sproutifyInterest !== 'contact' ? 'agtech' : 'custom';
+        void requestReply(next, nextSegment, { event: 'lead_captured', contact: nextContact, interest: selectedInterest });
+      } else {
+        setStage('segment');
+        void requestReply(next, null, { event: 'lead_captured', contact: nextContact });
+      }
       return;
     }
 
@@ -159,6 +240,38 @@ export function SageSheet({ segment, setSegment, openSignal = 0 }: SageSheetProp
       return;
     }
     send(clean);
+  };
+
+  const selectSproutifyInterest = (interest: SproutifyInterest, label: string) => {
+    if (sending) return;
+    setSproutifyInterest(interest);
+    setMessages((current) => [
+      ...current,
+      { role: 'user', content: label },
+      { role: 'assistant', content: `Great. Before we continue, what should I call you?` },
+    ]);
+    setStage('name');
+  };
+
+  const selectYoutubeInterest = (interest: YouTubeInterest, label: string) => {
+    if (sending) return;
+    if (interest === 'sproutify') {
+      setYoutubeInterest(interest);
+      setMessages((current) => [
+        ...current,
+        { role: 'user', content: label },
+        { role: 'assistant', content: 'Which part of Sproutify are you interested in?' },
+      ]);
+      setStage('sproutify_product');
+      return;
+    }
+    setYoutubeInterest(interest);
+    setMessages((current) => [
+      ...current,
+      { role: 'user', content: label },
+      { role: 'assistant', content: 'Great. Before I tailor the page, what should I call you?' },
+    ]);
+    setStage('name');
   };
 
   const askRecap = (content: string, selectedSegment: SegmentId | null = null) => {
@@ -185,33 +298,37 @@ export function SageSheet({ segment, setSegment, openSignal = 0 }: SageSheetProp
     setMessages((current) => [
       ...current,
       { role: 'user', content: wantsRecap ? 'Yes, email me a recap.' : 'No email recap, thanks.' },
-      { role: 'assistant', content: 'Would you like to receive Sweetwater Technology’s new posts?' },
+      { role: 'assistant', content: 'Would you like to receive occasional Sweetwater Technology updates and new posts? You can unsubscribe anytime.' },
     ]);
-    setStage('substack');
+    setStage('mailing_list');
   };
 
-  const respondToSubstack = (wantsSubscription: boolean) => {
+  const respondToMailingList = (wantsSubscription: boolean) => {
     if (sending) return;
     const next = [
       ...messages,
-      { role: 'user', content: wantsSubscription ? 'Yes, send me the new posts.' : 'No thanks.' } as ChatMessage,
+      { role: 'user', content: wantsSubscription ? 'Yes, add me to the Sweetwater mailing list.' : 'No thanks.' } as ChatMessage,
       {
         role: 'assistant',
         content: wantsSubscription
-          ? 'Great — use the button below to confirm your free subscription directly with Substack.'
-          : 'No problem. You can always subscribe later if you change your mind.',
+          ? 'You’re on the list. We’ll only send occasional Sweetwater Technology updates, and you can unsubscribe anytime.'
+          : 'No problem. We’ll only use your email for the follow-up you requested.',
       } as ChatMessage,
     ];
-    setSubstackOptIn(wantsSubscription);
-    setShowSubstackAction(wantsSubscription);
+    setMailingListOptIn(wantsSubscription);
     setMessages(next);
     setStage('chat');
     void requestReply(next, segment, {
       event: 'preferences_complete',
       recap: recapOptIn,
-      substack: wantsSubscription,
+      mailingList: wantsSubscription,
       sendRecap: recapOptIn === true,
+      sendWelcome: wantsSubscription,
+      interest: sproutifyInterest ?? youtubeInterest,
     });
+    if ((sproutifyInterest ?? youtubeInterest) && (sproutifyInterest ?? youtubeInterest) !== 'contact') {
+      window.setTimeout(() => setIsOpen(false), 1200);
+    }
   };
 
   const contactClint = () => {
@@ -219,11 +336,23 @@ export function SageSheet({ segment, setSegment, openSignal = 0 }: SageSheetProp
     setMessages((current) => [
       ...current,
       { role: 'user', content: 'I just want to get ahold of Clint.' },
-      { role: 'assistant', content: 'Absolutely. You can email or call Clint directly.' },
+      { role: 'assistant', content: 'Absolutely. Before I pass this along, what should I call you?' },
     ]);
     setInput('');
-    setStage('chat');
-    setShowContactActions(true);
+    setYoutubeInterest('contact');
+    setStage('name');
+  };
+
+  const requestCallback = () => {
+    if (sending) return;
+    const next = [
+      ...messages,
+      { role: 'user', content: 'Please ask Clint to call me.' } as ChatMessage,
+      { role: 'assistant', content: 'Your callback request is in. Clint will use the contact information you shared to follow up.' } as ChatMessage,
+    ];
+    setMessages(next);
+    setShowContactActions(false);
+    void requestReply(next, 'custom', { event: 'lead_captured', contact, interest: 'contact' });
   };
 
   return (
@@ -266,16 +395,46 @@ export function SageSheet({ segment, setSegment, openSignal = 0 }: SageSheetProp
                     <button disabled={sending} onClick={() => selectSegment('custom', 'Just curious')} className="min-h-11 rounded-full border border-[#365080] bg-[#15213b] px-3 py-2 text-xs font-semibold text-[#c9d6f7] transition hover:border-[#5d81ed] disabled:opacity-40">Just curious</button>
                   </div>
                 )}
+                {stage === 'sproutify_product' && (
+                  <div className="grid gap-2 pt-1 sm:grid-cols-2">
+                    {SPROUTIFY_OPTIONS.map(({ id, label }) => (
+                      <button
+                        type="button"
+                        disabled={sending}
+                        key={id}
+                        onClick={() => selectSproutifyInterest(id, label)}
+                        className={`min-h-12 rounded-xl border px-4 py-3 text-left text-sm font-semibold transition disabled:opacity-40 ${id === 'contact' ? 'border-[#526a9d] bg-[#1b2b4c] text-white sm:col-span-2' : 'border-[#365080] bg-[#15213b] text-[#dce5ff] hover:border-[#5d81ed] hover:bg-[#1b2b4c]'}`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {stage === 'source_interest' && (
+                  <div className="grid gap-2 pt-1 sm:grid-cols-2">
+                    {(entrySource === 'substack' ? SUBSTACK_OPTIONS : YOUTUBE_OPTIONS).map(({ id, label }) => (
+                      <button
+                        type="button"
+                        disabled={sending}
+                        key={id}
+                        onClick={() => selectYoutubeInterest(id, label)}
+                        className={`min-h-12 rounded-xl border px-4 py-3 text-left text-sm font-semibold transition disabled:opacity-40 ${id === 'contact' ? 'border-[#526a9d] bg-[#1b2b4c] text-white sm:col-span-2' : 'border-[#365080] bg-[#15213b] text-[#dce5ff] hover:border-[#5d81ed] hover:bg-[#1b2b4c]'}`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 {stage === 'recap' && (
                   <div className="grid grid-cols-2 gap-2">
                     <button type="button" disabled={sending} onClick={() => respondToRecap(true)} className="min-h-11 rounded-xl bg-[#2e5ce6] px-3 py-2 text-sm font-bold text-white transition hover:bg-[#3c69e9] disabled:opacity-40">Yes, email it</button>
                     <button type="button" disabled={sending} onClick={() => respondToRecap(false)} className="min-h-11 rounded-xl border border-[#365080] bg-[#15213b] px-3 py-2 text-sm font-bold text-[#dce5ff] transition hover:border-[#5d81ed] disabled:opacity-40">No thanks</button>
                   </div>
                 )}
-                {stage === 'substack' && (
+                {stage === 'mailing_list' && (
                   <div className="grid grid-cols-2 gap-2">
-                    <button type="button" disabled={sending} onClick={() => respondToSubstack(true)} className="min-h-11 rounded-xl bg-[#2e5ce6] px-3 py-2 text-sm font-bold text-white transition hover:bg-[#3c69e9] disabled:opacity-40">Yes, send them</button>
-                    <button type="button" disabled={sending} onClick={() => respondToSubstack(false)} className="min-h-11 rounded-xl border border-[#365080] bg-[#15213b] px-3 py-2 text-sm font-bold text-[#dce5ff] transition hover:border-[#5d81ed] disabled:opacity-40">No thanks</button>
+                    <button type="button" disabled={sending} onClick={() => respondToMailingList(true)} className="min-h-11 rounded-xl bg-[#2e5ce6] px-3 py-2 text-sm font-bold text-white transition hover:bg-[#3c69e9] disabled:opacity-40">Yes, add me</button>
+                    <button type="button" disabled={sending} onClick={() => respondToMailingList(false)} className="min-h-11 rounded-xl border border-[#365080] bg-[#15213b] px-3 py-2 text-sm font-bold text-[#dce5ff] transition hover:border-[#5d81ed] disabled:opacity-40">No thanks</button>
                   </div>
                 )}
                 {(stage === 'name' || stage === 'email' || stage === 'segment') && (
@@ -292,18 +451,12 @@ export function SageSheet({ segment, setSegment, openSignal = 0 }: SageSheetProp
                 {showContactActions && (
                   <div className="grid gap-2 sm:grid-cols-2">
                     <a href="mailto:clint@sweetwater.technology" className="flex items-center gap-3 rounded-2xl border border-[#365080] bg-[#15213b] px-4 py-3 text-sm font-bold text-white transition hover:border-[#5d81ed] hover:bg-[#1b2b4c]"><Mail size={18} className="text-[#9bb5ff]" /> Email Clint</a>
-                    <a href="tel:+16785211798" className="flex items-center gap-3 rounded-2xl border border-[#365080] bg-[#15213b] px-4 py-3 text-sm font-bold text-white transition hover:border-[#5d81ed] hover:bg-[#1b2b4c]"><Phone size={18} className="text-[#9bb5ff]" /> Call Clint</a>
+                    <button type="button" disabled={sending} onClick={requestCallback} className="flex items-center gap-3 rounded-2xl border border-[#365080] bg-[#15213b] px-4 py-3 text-left text-sm font-bold text-white transition hover:border-[#5d81ed] hover:bg-[#1b2b4c] disabled:opacity-40"><Phone size={18} className="text-[#9bb5ff]" /> Request a call</button>
                   </div>
-                )}
-                {showSubstackAction && (
-                  <a href={SUBSTACK_URL} target="_blank" rel="noreferrer" className="flex min-h-12 w-full items-center justify-between gap-3 rounded-2xl border border-[#365080] bg-[#15213b] px-4 py-3 text-sm font-bold text-white transition hover:border-[#5d81ed] hover:bg-[#1b2b4c]">
-                    <span className="inline-flex items-center gap-3"><Rss size={18} className="text-[#9bb5ff]" /> Subscribe on Substack</span>
-                    <ArrowUpRight size={17} className="text-[#9bb5ff]" />
-                  </a>
                 )}
                 {sending && <div className="flex items-center gap-2 text-xs text-[#8fa4d9]"><Loader2 size={14} className="animate-spin" /> Sage is thinking</div>}
               </div>
-              {stage === 'recap' || stage === 'substack' ? (
+              {stage === 'recap' || stage === 'mailing_list' || stage === 'sproutify_product' || stage === 'source_interest' ? (
                 <div className="border-t border-[#1e2c52] px-5 py-4 text-center text-xs text-[#7184ad]" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>Choose an option above to continue.</div>
               ) : <form onSubmit={(event) => { event.preventDefault(); submitInput(); }} className="border-t border-[#1e2c52] p-4" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
                 <div className="flex items-center gap-2 rounded-2xl border border-[#2a3c68] bg-[#0c1322] p-2 focus-within:border-[#5d81ed]">

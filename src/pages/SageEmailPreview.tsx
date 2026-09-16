@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowUpRight, CheckCircle2, Mail, Phone } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, CheckCircle2, Mail } from 'lucide-react';
 import { SweetwaterLogo } from '../components/SweetwaterLogo';
 
 export function SageEmailPreview() {
@@ -60,21 +60,21 @@ export function SageEmailPreview() {
               <p className="mt-3 text-sm leading-6 text-slate-600">Share the workflow that is slowing your team down, and we’ll figure out the most useful next step together.</p>
               <div className="mt-5 flex flex-col gap-3 sm:flex-row">
                 <a href="mailto:clint@sweetwater.technology" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#2e5ce6] px-5 py-3 text-sm font-bold text-white"><Mail size={17} /> Reply to Clint</a>
-                <a href="tel:+16785211798" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[#bfd0f4] bg-white px-5 py-3 text-sm font-bold text-slate-700"><Phone size={17} /> (678) 521-1798</a>
               </div>
             </section>
 
             <section className="mt-8 border-t border-slate-200 pt-7">
               <p className="text-xs font-extrabold uppercase tracking-[.18em] text-slate-500">Sweetwater Technology posts</p>
               <h2 className="mt-3 text-xl font-black tracking-tight">Keep up with what we’re building.</h2>
-              <p className="mt-2 text-sm leading-6 text-slate-600">If you chose to receive new posts, finish your free subscription directly with Substack.</p>
-              <a href="https://sweetwatertechnology.substack.com/" target="_blank" rel="noreferrer" className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#2e5ce6]">Visit Sweetwater Technology on Substack <ArrowUpRight size={16} /></a>
+              <p className="mt-2 text-sm leading-6 text-slate-600">Occasional product updates, practical notes, and links to new Sweetwater Technology posts will arrive here.</p>
+              <a href="https://sweetwatertechnology.substack.com/" target="_blank" rel="noreferrer" className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#2e5ce6]">Read Sweetwater Technology posts <ArrowUpRight size={16} /></a>
             </section>
           </div>
 
           <footer className="border-t border-slate-200 bg-slate-50 px-6 py-6 text-center sm:px-10">
             <p className="text-xs leading-5 text-slate-500">You received this email because you asked Sage to send your Sweetwater Technology recap.</p>
             <p className="mt-2 text-xs font-semibold text-slate-600">Sweetwater Technology · Atlanta, Georgia</p>
+            <p className="mt-2 text-xs text-slate-500"><a href="https://sweetwater.technology" className="text-[#2e5ce6]">sweetwater.technology</a> · <a href="mailto:clint@sweetwater.technology" className="text-[#2e5ce6]">Contact us</a> · <a href="mailto:clint@sweetwater.technology?subject=Unsubscribe%20from%20Sweetwater%20Technology" className="underline">Unsubscribe</a></p>
           </footer>
         </article>
 

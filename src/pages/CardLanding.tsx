@@ -1,16 +1,97 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowUpRight, Bot, Check, Mail, Phone, ScanLine, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Bot, Check, Mail, PhoneCall, ScanLine, Sparkles } from 'lucide-react';
 import { PROJECTS } from '../constants';
 import type { AppProject } from '../types';
 import { AppCardRenderer } from '../components/AppCardRenderer';
 import { SweetwaterLogo } from '../components/SweetwaterLogo';
-import { SageSheet } from '../components/SageSheet';
+import { SageSheet, type SproutifyInterest, type VisitorInterest, type VisitorSource, type YouTubeInterest } from '../components/SageSheet';
 import { SEGMENTS, isSegmentId, type SegmentId } from '../data/segments';
 import { PRODUCT_KNOWLEDGE } from '../data/sageKnowledge';
 
 const PRODUCTS_BY_ID = Object.fromEntries(PROJECTS.map((project) => [project.id, project])) as Record<string, AppProject>;
+
+const SPROUTIFY_LANDING: Partial<Record<SproutifyInterest, { heroHeadline: string; heroSub: string; portfolioOrder: string[] }>> = {
+  home: {
+    heroHeadline: 'Grow smarter with Sproutify Home',
+    heroSub: 'See how thoughtful mobile software can help home tower growers plan, track, troubleshoot, and celebrate every harvest.',
+    portfolioOrder: ['sproutify', 'sproutify-farm', 'sproutify-classrooms', 'sproutify-micro', 'atl-urban-farms'],
+  },
+  farm: {
+    heroHeadline: 'Run the farm with fewer blind spots',
+    heroSub: 'Explore the operational software behind planting, crop care, harvests, team tasks, and better day-to-day farm decisions.',
+    portfolioOrder: ['sproutify-farm', 'atl-urban-farms', 'sproutify-micro', 'sproutify-classrooms', 'sproutify'],
+  },
+  school: {
+    heroHeadline: 'Bring tower growing into the classroom',
+    heroSub: 'See how Sproutify School helps teachers manage growing programs while giving students a safe, useful way to participate.',
+    portfolioOrder: ['sproutify-classrooms', 'sproutify', 'sproutify-farm', 'sproutify-micro', 'atl-urban-farms'],
+  },
+  ipm: {
+    heroHeadline: 'Make pest management easier to see and act on',
+    heroSub: 'Explore how Sproutify supports consistent IPM observations, follow-through, and farm records without adding more paper to the greenhouse.',
+    portfolioOrder: ['sproutify-farm', 'atl-urban-farms', 'sproutify-micro', 'sproutify-classrooms', 'sproutify'],
+  },
+};
+
+const YOUTUBE_LANDING: Partial<Record<YouTubeInterest, { heroHeadline: string; heroSub: string; portfolioOrder: string[] }>> = {
+  'custom-app': {
+    heroHeadline: 'Turn your idea into software that works',
+    heroSub: 'See how Sweetwater turns real business needs into focused web and mobile products people can actually use.',
+    portfolioOrder: ['sproutify', 'spectiq', 'lanewise', 'rejoice', 'rekkrd'],
+  },
+  automation: {
+    heroHeadline: 'Give repetitive work back to software',
+    heroSub: 'Explore practical automation that reduces inbox work, handoffs, and administrative friction while keeping your team in control.',
+    portfolioOrder: ['lanewise', 'spectiq', 'sproutify-farm', 'sproutify', 'rejoice'],
+  },
+  portfolio: {
+    heroHeadline: 'The products behind the videos',
+    heroSub: 'Explore live software built for growers, operators, inspectors, and everyday people—with the story behind each product.',
+    portfolioOrder: ['sproutify', 'spectiq', 'lanewise', 'rejoice', 'rekkrd'],
+  },
+  contact: {
+    heroHeadline: 'Let’s continue the conversation',
+    heroSub: 'Tell Clint what caught your attention on YouTube, what you are building, or where a better piece of software could help.',
+    portfolioOrder: ['sproutify', 'spectiq', 'lanewise', 'rejoice', 'rekkrd'],
+  },
+};
+
+const YOUTUBE_DEFAULT = {
+  heroHeadline: 'You saw the idea. Now explore what it can do.',
+  heroSub: 'Choose what caught your attention on YouTube and Sage will bring the most relevant products, examples, and next steps to the top.',
+  portfolioOrder: ['sproutify', 'spectiq', 'lanewise', 'rejoice', 'rekkrd'],
+};
+
+const SUBSTACK_LANDING: Partial<Record<YouTubeInterest, { heroHeadline: string; heroSub: string; portfolioOrder: string[] }>> = {
+  'custom-app': {
+    heroHeadline: 'Let’s turn the idea into something useful',
+    heroSub: 'Move from an interesting concept to focused software built around the people, decisions, and workflow that matter.',
+    portfolioOrder: ['sproutify', 'spectiq', 'lanewise', 'rejoice', 'rekkrd'],
+  },
+  automation: {
+    heroHeadline: 'The best automation gives people better work',
+    heroSub: 'See how thoughtful automation can remove repetition while keeping judgment, approvals, and accountability with the team.',
+    portfolioOrder: ['lanewise', 'spectiq', 'sproutify-farm', 'sproutify', 'rejoice'],
+  },
+  portfolio: {
+    heroHeadline: 'Here’s what we’re building',
+    heroSub: 'Explore the products behind Sweetwater Technology’s posts—from growing and logistics to inspection workflows and consumer apps.',
+    portfolioOrder: ['sproutify', 'spectiq', 'lanewise', 'rejoice', 'rekkrd'],
+  },
+  contact: {
+    heroHeadline: 'Continue the conversation with Clint',
+    heroSub: 'Share the post, product, or problem that brought you here and we’ll find the most useful next step together.',
+    portfolioOrder: ['sproutify', 'spectiq', 'lanewise', 'rejoice', 'rekkrd'],
+  },
+};
+
+const SUBSTACK_DEFAULT = {
+  heroHeadline: 'From the post to the products',
+  heroSub: 'Welcome, Substack reader. Explore what Sweetwater Technology is building—or tell Sage which idea you want to take further.',
+  portfolioOrder: ['sproutify', 'spectiq', 'lanewise', 'rejoice', 'rekkrd'],
+};
 
 function SpectIQCard() {
   return (
@@ -63,14 +144,47 @@ function ProductContext({ knowledge, action }: { knowledge: typeof PRODUCT_KNOWL
 }
 
 export function CardLanding() {
+  const source = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('src');
   const [segment, setSegment] = useState<SegmentId>(() => {
     if (typeof window === 'undefined') return 'custom';
     const requested = new URLSearchParams(window.location.search).get('segment');
     return isSegmentId(requested) ? requested : 'custom';
   });
   const [openSignal, setOpenSignal] = useState(0);
-  const active = SEGMENTS[segment];
+  const [sproutifyInterest, setSproutifyInterest] = useState<SproutifyInterest | null>(null);
+  const [youtubeInterest, setYoutubeInterest] = useState<YouTubeInterest | null>(null);
+  const [substackInterest, setSubstackInterest] = useState<YouTubeInterest | null>(null);
+  const active = sproutifyInterest
+    ? SPROUTIFY_LANDING[sproutifyInterest] ?? SEGMENTS[segment]
+    : substackInterest
+      ? SUBSTACK_LANDING[substackInterest] ?? SEGMENTS[segment]
+    : youtubeInterest
+      ? YOUTUBE_LANDING[youtubeInterest] ?? SEGMENTS[segment]
+      : source === 'youtube' ? YOUTUBE_DEFAULT : source === 'substack' ? SUBSTACK_DEFAULT : SEGMENTS[segment];
   const order = useMemo(() => active.portfolioOrder, [active]);
+
+  const showInterestLanding = (interest: VisitorInterest, interestSource: VisitorSource) => {
+    if (interestSource === 'sproutify') {
+      setSproutifyInterest(interest as SproutifyInterest);
+      setYoutubeInterest(null);
+      setSubstackInterest(null);
+      setSegment('agtech');
+    } else if (interestSource === 'substack') {
+      setSubstackInterest(interest as YouTubeInterest);
+      setSproutifyInterest(null);
+      setYoutubeInterest(null);
+      setSegment('custom');
+    } else {
+      setYoutubeInterest(interest as YouTubeInterest);
+      setSproutifyInterest(null);
+      setSubstackInterest(null);
+      setSegment('custom');
+    }
+    const url = new URL(window.location.href);
+    url.searchParams.set('interest', interest);
+    window.history.replaceState({}, '', url);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
@@ -109,11 +223,11 @@ export function CardLanding() {
 
         <section className="border-y border-[#1e2c52] bg-[#101a30]/70"><div className="mx-auto flex max-w-6xl items-center justify-center gap-3 px-5 py-6 text-center text-sm font-semibold text-[#b7c5e6]"><Check size={18} className="text-[#6f91ec]" /> Built and shipped from Atlanta. Live products, real customers.</div></section>
 
-        <section className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28"><div className="relative overflow-hidden rounded-[2rem] border border-[#2a3c68] bg-[#101a30] p-7 sm:p-12"><div className="absolute right-0 top-0 h-64 w-64 translate-x-1/3 -translate-y-1/3 rounded-full bg-[#2e5ce6]/20 blur-3xl" /><p className="text-xs font-bold uppercase tracking-[.22em] text-[#7897ea]">Custom apps and automation</p><h2 className="mt-4 max-w-2xl text-3xl font-bold tracking-tight sm:text-5xl">Have a workflow that should feel easier?</h2><p className="mt-5 max-w-2xl leading-7 text-[#9cafda]">We turn operational friction, ambitious product ideas, and repetitive work into software your team can rely on.</p><div className="relative mt-8 flex flex-wrap gap-3"><a href="mailto:clint@sweetwater.technology" className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-[#0c1322]"><Mail size={17} /> Talk to Clint</a><a href="tel:+16785211798" className="inline-flex items-center gap-2 rounded-full border border-[#3b4f7c] px-5 py-3 text-sm font-bold text-white"><Phone size={17} /> +1 (678) 521-1798</a><button onClick={() => setOpenSignal((value) => value + 1)} className="inline-flex items-center gap-2 rounded-full border border-[#3b4f7c] px-5 py-3 text-sm font-bold text-white"><Bot size={17} /> Ask Sage</button></div></div></section>
+        <section className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28"><div className="relative overflow-hidden rounded-[2rem] border border-[#2a3c68] bg-[#101a30] p-7 sm:p-12"><div className="absolute right-0 top-0 h-64 w-64 translate-x-1/3 -translate-y-1/3 rounded-full bg-[#2e5ce6]/20 blur-3xl" /><p className="text-xs font-bold uppercase tracking-[.22em] text-[#7897ea]">Custom apps and automation</p><h2 className="mt-4 max-w-2xl text-3xl font-bold tracking-tight sm:text-5xl">Have a workflow that should feel easier?</h2><p className="mt-5 max-w-2xl leading-7 text-[#9cafda]">We turn operational friction, ambitious product ideas, and repetitive work into software your team can rely on.</p><div className="relative mt-8 flex flex-wrap gap-3"><a href="mailto:clint@sweetwater.technology" className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-[#0c1322]"><Mail size={17} /> Email Clint</a><button onClick={() => setOpenSignal((value) => value + 1)} className="inline-flex items-center gap-2 rounded-full border border-[#3b4f7c] px-5 py-3 text-sm font-bold text-white"><PhoneCall size={17} /> Request a call</button><button onClick={() => setOpenSignal((value) => value + 1)} className="inline-flex items-center gap-2 rounded-full border border-[#3b4f7c] px-5 py-3 text-sm font-bold text-white"><Bot size={17} /> Ask Sage</button></div></div></section>
       </main>
 
       <footer className="relative z-10 border-t border-[#1e2c52] px-5 py-8 text-center text-xs text-[#6578a3]">© {new Date().getFullYear()} Sweetwater Technology. Atlanta, Georgia.</footer>
-      <SageSheet segment={segment} setSegment={setSegment} openSignal={openSignal} />
+      <SageSheet segment={segment} setSegment={setSegment} onInterestReady={showInterestLanding} openSignal={openSignal} />
     </div>
   );
 }
