@@ -65,28 +65,9 @@ jobs:
         run: |
           set -euo pipefail
           npm run build
+          npm run audit:html
           echo "commit=${GITHUB_SHA}" > dist/build-info.txt
           date -u +"built_utc=%Y-%m-%dT%H:%M:%SZ" >> dist/build-info.txt
-          printf '%s\n' \
-            '# Never cache the SPA entry so new bundles are picked up immediately' \
-            '<IfModule mod_headers.c>' \
-            '  <Files "index.html">' \
-            '    Header set Cache-Control "no-cache, no-store, must-revalidate"' \
-            '    Header set Pragma "no-cache"' \
-            '    Header set Expires 0' \
-            '  </Files>' \
-            '</IfModule>' \
-            '' \
-            '# SPA routing that still serves real files directly' \
-            '<IfModule mod_rewrite.c>' \
-            '  RewriteEngine On' \
-            '  RewriteBase /' \
-            '  RewriteCond %{REQUEST_FILENAME} -f [OR]' \
-            '  RewriteCond %{REQUEST_FILENAME} -d' \
-            '  RewriteRule ^ - [L]' \
-            '  RewriteRule . /index.html [L]' \
-            '</IfModule>' \
-            > dist/.htaccess
 
       - name: Upload production build through SFTP
         env:
@@ -142,3 +123,6 @@ jobs:
           else
             echo "::warning::The upload completed, but build-info.txt could not be fetched yet."
           fi
+
+      - name: Verify live HTML and missing-page status
+        run: npm run audit:html -- --url "$LIVE_URL"
