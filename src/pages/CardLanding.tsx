@@ -227,7 +227,7 @@ export function CardLanding() {
       </main>
 
       <footer className="relative z-10 border-t border-[#1e2c52] px-5 py-8 text-center text-xs text-[#6578a3]">© {new Date().getFullYear()} Sweetwater Technology. Atlanta, Georgia.</footer>
-      <SageSheet segment={segment} setSegment={setSegment} onInterestReady={showInterestLanding} openSignal={openSignal} />
+      <SageSheet segment={segment} setSegment={setSegment} onInterestReady={showInterestLanding} onDetailsReady={() => document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' })} openSignal={openSignal} />
     </div>
   );
 }

@@ -15,6 +15,7 @@ interface SageSheetProps {
   segment: SegmentId;
   setSegment: (segment: SegmentId) => void;
   onInterestReady?: (interest: VisitorInterest, source: VisitorSource) => void;
+  onDetailsReady?: () => void;
   openSignal?: number;
 }
 
@@ -54,7 +55,12 @@ const SUBSTACK_OPTIONS: { id: YouTubeInterest; label: string }[] = [
   { id: 'contact', label: 'Connect with Clint' },
 ];
 
-export function SageSheet({ segment, setSegment, onInterestReady, openSignal = 0 }: SageSheetProps) {
+export function SageSheet({ segment, setSegment, onInterestReady, onDetailsReady, openSignal = 0 }: SageSheetProps) {
+  const [entrySegment] = useState<SegmentId | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const requested = new URLSearchParams(window.location.search).get('segment');
+    return isSegmentId(requested) ? requested : null;
+  });
   const [isOpen, setIsOpen] = useState(false);
   const [contact, setContact] = useState({ name: '', email: '' });
   const [stage, setStage] = useState<ConversationStage>('name');
@@ -121,7 +127,7 @@ export function SageSheet({ segment, setSegment, onInterestReady, openSignal = 0
   const requestReply = async (
     nextMessages: ChatMessage[],
     nextSegment: SegmentId | null,
-    options: { event?: SageEvent; recap?: boolean | null; mailingList?: boolean | null; sendRecap?: boolean; sendWelcome?: boolean; contact?: { name: string; email: string }; interest?: VisitorInterest | null } = {},
+    options: { event?: SageEvent; recap?: boolean | null; mailingList?: boolean | null; sendRecap?: boolean; sendWelcome?: boolean; contact?: { name: string; email: string }; interest?: VisitorInterest | null; captureOnly?: boolean } = {},
   ) => {
     setSending(true);
     try {
@@ -148,6 +154,8 @@ export function SageSheet({ segment, setSegment, onInterestReady, openSignal = 0
         }),
       });
       if (!response.ok) throw new Error('Chat request failed');
+      // Saving a known-interest lead must not restart onboarding or change the page.
+      if (options.captureOnly) return;
       const data = (await response.json()) as { reply?: string; segment?: unknown };
       if (isSegmentId(data.segment)) setSegment(data.segment);
       if (data.reply) setMessages((current) => [...current, { role: 'assistant', content: data.reply as string }]);
@@ -200,6 +208,23 @@ export function SageSheet({ segment, setSegment, onInterestReady, openSignal = 0
 
       const nextContact = { ...contact, email: clean };
       const selectedInterest = sproutifyInterest ?? youtubeInterest;
+      if (entrySegment && !selectedInterest) {
+        const next: ChatMessage[] = [
+          ...messages,
+          { role: 'user', content: clean },
+          { role: 'assistant', content: `Thanks, ${contact.name.split(/\s+/)[0]}. ${SEGMENTS[entrySegment].sageOpener}` },
+        ];
+        setContact(nextContact);
+        setMessages(next);
+        setInput('');
+        setSegment(entrySegment);
+        setHasSelectedSegment(true);
+        setStage('chat');
+        setIsOpen(false);
+        onDetailsReady?.();
+        void requestReply(next, entrySegment, { event: 'lead_captured', contact: nextContact, captureOnly: true });
+        return;
+      }
       const destination = selectedInterest === 'contact'
         ? 'someone from Sweetwater Technology'
         : SPROUTIFY_OPTIONS.find(({ id }) => id === sproutifyInterest)?.label
