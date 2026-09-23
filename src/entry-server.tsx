@@ -4,6 +4,7 @@ import App from './App';
 import { getPageSeo, PRERENDER_ROUTES, renderHead } from './seo';
 import { NEWS_ARTICLES } from './news';
 import { SERVICES, WORK_PROFILES } from './marketing';
+import { RESOURCES } from './resources';
 
 export const prerenderRoutes = PRERENDER_ROUTES;
 export const sitemapEntries = [
@@ -14,6 +15,8 @@ export const sitemapEntries = [
   { path: '/work', priority: '0.8' },
   ...WORK_PROFILES.map((profile) => ({ path: `/work/${profile.slug}`, priority: '0.8' })),
   { path: '/news', priority: '0.8' },
+  { path: '/resources', priority: '0.8' },
+  ...RESOURCES.map((resource) => ({ path: `/resources/${resource.slug}`, priority: '0.7' })),
   ...NEWS_ARTICLES.map((article) => ({
     path: `/news/${article.slug}`,
     lastmod: article.updatedAt.slice(0, 10),

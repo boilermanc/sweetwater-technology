@@ -1,6 +1,7 @@
 import { FAQS } from './content';
 import { findNewsArticle, NEWS_ARTICLES } from './news';
 import { findService, findWorkProfile, SERVICES, WORK_PROFILES } from './marketing';
+import { findResource, RESOURCES } from './resources';
 
 const SITE_URL = 'https://sweetwater.technology';
 const SOCIAL_IMAGE = `${SITE_URL}/og-image.png`;
@@ -163,6 +164,37 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
     };
   }
 
+  if (path === '/resources') {
+    return {
+      title: 'Free Resources | Sweetwater Technology',
+      description: 'Browse free documents and reusable tools from Sweetwater Technology.',
+      canonical: `${SITE_URL}/resources`,
+      type: 'website',
+      jsonLd: [organization],
+    };
+  }
+
+  if (path.startsWith('/resources/')) {
+    const isDownload = path.endsWith('/download');
+    const slug = path.slice('/resources/'.length).replace(/\/download$/, '');
+    const resource = findResource(slug);
+    if (resource) {
+      const canonical = `${SITE_URL}/resources/${resource.slug}`;
+      return {
+        title: `${resource.title} | Sweetwater Technology`,
+        description: resource.description,
+        canonical,
+        type: 'website',
+        jsonLd: isDownload ? [] : [organization, breadcrumbJsonLd([
+          { name: 'Home', url: `${SITE_URL}/` },
+          { name: 'Resources', url: `${SITE_URL}/resources` },
+          { name: resource.title, url: canonical },
+        ])],
+        ...(isDownload ? { robots: 'noindex, follow' } : {}),
+      };
+    }
+  }
+
   if (path === '/services') {
     return {
       title: 'Custom Software Development Services | Sweetwater Technology',
@@ -317,6 +349,8 @@ export const PRERENDER_ROUTES = [
   '/work',
   ...WORK_PROFILES.map((profile) => `/work/${profile.slug}`),
   '/news',
+  '/resources',
+  ...RESOURCES.flatMap((resource) => [`/resources/${resource.slug}`, `/resources/${resource.slug}/download`]),
   ...NEWS_ARTICLES.map((article) => `/news/${article.slug}`),
   '/404',
 ];

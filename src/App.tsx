@@ -17,6 +17,8 @@ import { ContinuumPage } from './components/ContinuumPage';
 import { CardLanding } from './pages/CardLanding';
 import { CardTestPage } from './pages/CardTestPage';
 import { SageEmailPreview } from './pages/SageEmailPreview';
+import { ResourcesIndex, ResourceDetail, ResourceDownload } from './pages/Resources';
+import { findResource } from './resources';
 
 const AppDetail = lazy(() => import('./components/AppDetail').then((module) => ({ default: module.AppDetail })));
 const RekkrdDetail = lazy(() => import('./components/cards/RekkrdDetail').then((module) => ({ default: module.RekkrdDetail })));
@@ -37,6 +39,10 @@ const App: React.FC<AppProps> = ({ path }) => {
   const workProfile = currentPath.startsWith('/work/')
     ? findWorkProfile(currentPath.slice('/work/'.length))
     : undefined;
+  const resourceSlug = currentPath.startsWith('/resources/')
+    ? currentPath.slice('/resources/'.length).replace(/\/download$/, '')
+    : '';
+  const resource = findResource(resourceSlug);
 
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
@@ -129,6 +135,12 @@ const App: React.FC<AppProps> = ({ path }) => {
         <WorkDetail profile={workProfile} />
       ) : currentPath === '/news' ? (
         <NewsIndex />
+      ) : currentPath === '/resources' ? (
+        <ResourcesIndex />
+      ) : resource && currentPath.endsWith('/download') ? (
+        <ResourceDownload resource={resource} />
+      ) : resource ? (
+        <ResourceDetail resource={resource} />
       ) : newsArticle ? (
         <NewsDetail article={newsArticle} />
       ) : (
