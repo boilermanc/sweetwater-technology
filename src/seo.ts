@@ -1,4 +1,4 @@
-import { FAQS } from './content';
+import { ABOUT_DESCRIPTION, FAQS } from './content';
 import { findNewsArticle, NEWS_ARTICLES } from './news';
 import { findService, findWorkProfile, SERVICES, WORK_PROFILES } from './marketing';
 import { findResource, RESOURCES } from './resources';
@@ -94,6 +94,20 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
       canonical: `${SITE_URL}/`,
       type: 'website',
       jsonLd: [organization, faqPage],
+    };
+  }
+
+  if (path === '/about') {
+    const canonical = `${SITE_URL}/about`;
+    return {
+      title: 'About Sweetwater Technology | Atlanta Software Studio',
+      description: ABOUT_DESCRIPTION,
+      canonical,
+      type: 'website',
+      jsonLd: [organization, breadcrumbJsonLd([
+        { name: 'Home', url: `${SITE_URL}/` },
+        { name: 'About', url: canonical },
+      ])],
     };
   }
 
@@ -340,6 +354,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
 
 export const PRERENDER_ROUTES = [
   '/',
+  '/about',
   '/card',
   '/card/test',
   '/card/email-preview',

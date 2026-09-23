@@ -19,6 +19,7 @@ import { CardTestPage } from './pages/CardTestPage';
 import { SageEmailPreview } from './pages/SageEmailPreview';
 import { ResourcesIndex, ResourceDetail, ResourceDownload } from './pages/Resources';
 import { findResource } from './resources';
+import { About } from './pages/About';
 
 const AppDetail = lazy(() => import('./components/AppDetail').then((module) => ({ default: module.AppDetail })));
 const RekkrdDetail = lazy(() => import('./components/cards/RekkrdDetail').then((module) => ({ default: module.RekkrdDetail })));
@@ -123,6 +124,8 @@ const App: React.FC<AppProps> = ({ path }) => {
 
           <Contact />
         </main>
+      ) : currentPath === '/about' ? (
+        <About />
       ) : currentPath === '/continuum' ? (
         <ContinuumPage />
       ) : currentPath === '/services' ? (

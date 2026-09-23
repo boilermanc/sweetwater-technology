@@ -4,6 +4,7 @@ import { X, Menu } from 'lucide-react';
 import { SweetwaterLogo } from './SweetwaterLogo';
 
 const NAV_LINKS = [
+  { href: '/about', label: 'About' },
   { href: '/continuum', label: 'Continuum' },
   { href: '/services', label: 'Services' },
   { href: '/work', label: 'Work' },
