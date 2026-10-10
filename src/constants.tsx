@@ -67,6 +67,19 @@ export const PROJECTS: AppProject[] = [
     color: '#279B51'
   },
   {
+    id: 'alison',
+    title: 'Alison.',
+    category: 'Living Archive',
+    description: 'A living archive of stories, photographs, places, and music, preserving a life through the people who knew her.',
+    longDescription: 'Alison. preserves Alison Tedford Songer\'s life through memories, photographs, voices, places, music, and objects. An editorial timeline, shared scrapbook, and soundtrack bring those connections together, while Alison\'s Circle invites the people who knew her to contribute. A private Studio gives the family tools to manage contributions and preserve the archive with care.',
+    image: '/images/optimized/alison-card.svg',
+    imageWidth: 1200,
+    imageHeight: 900,
+    tags: ['React', 'TypeScript', 'Supabase', 'GSAP', 'Vite'],
+    link: 'https://alisonsonger.life',
+    color: '#3F5C69'
+  },
+  {
     id: 'sproutify-farm',
     title: 'Sproutify Farm',
     category: 'Farm Management',
