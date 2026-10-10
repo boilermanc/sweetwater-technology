@@ -365,7 +365,7 @@ export const PRERENDER_ROUTES = [
   ...WORK_PROFILES.map((profile) => `/work/${profile.slug}`),
   '/news',
   '/resources',
-  ...RESOURCES.flatMap((resource) => [`/resources/${resource.slug}`, `/resources/${resource.slug}/download`]),
+  ...RESOURCES.flatMap((resource) => resource.file ? [`/resources/${resource.slug}`, `/resources/${resource.slug}/download`] : [`/resources/${resource.slug}`]),
   ...NEWS_ARTICLES.map((article) => `/news/${article.slug}`),
   '/404',
 ];

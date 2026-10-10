@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { ArrowRight, Bot, Download, FileArchive, Send } from 'lucide-react';
+import { ArrowRight, Bot, Download, FileArchive, Github, Monitor, Send } from 'lucide-react';
 import { RESOURCES, type Resource } from '../resources';
 
 const WEBHOOK_URL = 'https://n8n.sproutify.app/webhook/4a7ce38b-f497-424f-9936-f636f5b68514';
@@ -11,17 +11,40 @@ export function ResourcesIndex() {
     <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">Practical resources from Sweetwater Technology. Browse the catalog and choose what fits your project.</p>
     <div className="mt-12 grid gap-6 sm:grid-cols-2">
       {RESOURCES.map((resource) => <article key={resource.slug} className="rounded-3xl border border-slate-200 bg-white/85 p-7 shadow-sm">
-        <FileArchive className="h-8 w-8 text-blue-600" aria-hidden="true" />
+        {resource.repository ? <Monitor className="h-8 w-8 text-blue-600" aria-hidden="true" /> : <FileArchive className="h-8 w-8 text-blue-600" aria-hidden="true" />}
         <p className="mt-5 text-xs font-bold uppercase tracking-widest text-blue-600">{resource.kind}</p>
         <h2 className="mt-2 text-2xl font-black text-slate-900">{resource.title}</h2>
         <p className="mt-3 leading-7 text-slate-600">{resource.description}</p>
+        {resource.video && <video controls playsInline preload="none" poster={resource.poster} aria-label={`${resource.title} demonstration`} className="mt-6 aspect-video w-full rounded-2xl border border-slate-200 bg-slate-50"><source src={resource.video} type="video/mp4" />Your browser does not support this video. <a href={resource.video}>Download the demo</a>.</video>}
+        {resource.repository && <a href={resource.repository} target="_blank" rel="noopener noreferrer" className="mt-6 mr-5 inline-flex min-h-12 items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-700"><Github size={18} aria-hidden="true" /> View on GitHub<span className="sr-only"> (opens in a new tab)</span></a>}
         <a className="mt-6 inline-flex items-center gap-2 font-bold text-blue-600 hover:text-blue-700" href={`/resources/${resource.slug}`}>View resource <ArrowRight size={18} aria-hidden="true" /></a>
       </article>)}
     </div>
   </main>;
 }
 
+function OpenSourceResource({ resource }: { resource: Resource }) {
+  return <main className="relative z-10 mx-auto min-h-screen max-w-5xl px-4 pb-24 pt-32 sm:px-6">
+    <nav aria-label="Breadcrumb" className="mb-8 text-sm font-semibold text-slate-500"><a href="/resources" className="hover:text-blue-600">Resources</a> <span aria-hidden="true">/</span> {resource.title}</nav>
+    <p className="text-xs font-bold uppercase tracking-[0.3em] text-blue-600">{resource.kind}</p>
+    <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900 sm:text-6xl">{resource.title}</h1>
+    <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-600">{resource.description}</p>
+    <video controls playsInline preload="metadata" poster={resource.poster} aria-label={`${resource.title} demonstration`} className="mt-9 aspect-video w-full rounded-3xl border border-slate-200 bg-slate-50 shadow-lg"><source src={resource.video} type="video/mp4" />Your browser does not support this video. <a href={resource.video}>Download the demo</a>.</video>
+    <p className="mt-3 text-sm text-slate-500">26-second demo with music. Fictional sample chats illustrate the dashboard.</p>
+    <div className="mt-10 rounded-3xl border border-white bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-7 shadow-sm sm:p-9">
+      <h2 className="text-2xl font-black text-slate-900">Your chats, at a glance</h2>
+      <ul className="mt-5 list-disc space-y-3 pl-6 leading-7 text-slate-600">{resource.highlights?.map((highlight) => <li key={highlight}>{highlight}</li>)}</ul>
+      <p className="mt-6 leading-7 text-slate-600">Designed for Windows 11 and the ESP32-2432S028R with an ILI9341 display and XPT2046 touch controller. Uses a local USB helper; no OpenAI API key is required. This unofficial project uses an undocumented Codex desktop interface, so app updates may affect compatibility.</p>
+      <a href={resource.repository} target="_blank" rel="noopener noreferrer" className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-bold text-white hover:bg-blue-700"><Github size={20} aria-hidden="true" /> Get the project on GitHub<span className="sr-only"> (opens in a new tab)</span></a>
+    </div>
+  </main>;
+}
+
 export function ResourceDetail({ resource }: { resource: Resource }) {
+  return resource.repository ? <OpenSourceResource resource={resource} /> : <DownloadResourceDetail resource={resource} />;
+}
+
+function DownloadResourceDetail({ resource }: { resource: Resource }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [input, setInput] = useState('');
@@ -101,6 +124,7 @@ export function ResourceDetail({ resource }: { resource: Resource }) {
 }
 
 export function ResourceDownload({ resource }: { resource: Resource }) {
+  if (resource.repository) return <OpenSourceResource resource={resource} />;
   return <main className="relative z-10 mx-auto min-h-screen max-w-3xl px-4 pb-24 pt-32 sm:px-6">
     <p className="text-xs font-bold uppercase tracking-[0.3em] text-blue-600">Your resource</p>
     <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900 sm:text-6xl">{resource.title}</h1>
