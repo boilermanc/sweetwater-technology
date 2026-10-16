@@ -86,3 +86,7 @@ The shared main-site footer now includes services, company navigation, resources
 The privacy draft follows the observed site code and avoids inventing provider, retention, training, cookie, or sale/sharing promises. Review background: https://www.ftc.gov/business-guidance/privacy-security/consumer-privacy and https://www.ftc.gov/business-guidance/resources/protecting-personal-information-guide-business-0 . Production data handling still needs a business/legal review.
 
 Additional files: src/components/FloatingAiGuide.tsx, src/components/Footer.tsx, src/pages/LegalDraft.tsx, src/legalContent.ts, public/downloads/try-ai-this-week.pdf. Updated homepage copy, guide, routes/SEO, tests and this handoff are included in the same review branch.
+
+## Free introductory call
+
+`/book` is the destination printed in the updated PDF. It reuses the shared contact form with a prefilled call request and prompts for preferred times and time zone. It is a request, not live calendar booking. Until the existing inquiry endpoint is activated, the email draft is the working contact route. No calendar service or new backend was added.

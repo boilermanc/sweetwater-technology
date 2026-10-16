@@ -48,3 +48,16 @@ test('footer destinations, legal drafts and the printable guide are available', 
     assert.ok(!html('sitemap.xml').includes('/' + route + '</loc>'));
   }
 });
+
+test('booking page is discoverable and offers an honest call request through the shared form', () => {
+  const html = file => readFileSync(new URL('../dist/' + file, import.meta.url), 'utf8');
+  const book = html('book/index.html');
+  assert.match(book, /Free 20-Minute Introductory Call/);
+  assert.ok(book.includes('https://sweetwater.technology/book'));
+  assert.ok(book.includes('only booked once we confirm'));
+  assert.ok(book.includes('Online sending is not connected yet'));
+  assert.ok(html('sitemap.xml').includes('/book</loc>'));
+  assert.ok(html('index.html').includes('href="/book"'));
+  const href = book.match(/href="(mailto:[^"]+)"/)[1].replaceAll('&amp;', '&');
+  assert.ok(new URL(href).searchParams.get('body').includes('free 20-minute introductory call'));
+});

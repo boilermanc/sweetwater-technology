@@ -8,9 +8,9 @@ const empty: HomeContactDetails = { name: '', business: '', email: '', phone: ''
 
 const subscribe = () => () => {};
 
-export function ContactForm() {
+export function ContactForm({ initialMessage = '' }: { initialMessage?: string }) {
   const hydrated = useSyncExternalStore(subscribe, () => true, () => false);
-  const [details, setDetails] = useState(empty);
+  const [details, setDetails] = useState({ ...empty, message: initialMessage });
   const [pending, setPending] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
@@ -37,7 +37,7 @@ export function ContactForm() {
       setError('That didn’t send. Please try again or email us at team@sweetwater.technology.');
     } finally { lock.current = false; setPending(false); }
   }
-  if (submitted) return <div role="status" className="rounded-3xl border border-blue-200 bg-blue-50 p-8"><CheckCircle size={32} className="text-blue-600" aria-hidden="true" /><h3 className="mt-5 text-2xl font-black text-slate-900">Thanks—we received your message.</h3><p className="mt-4 leading-7 text-slate-700">Clint or Sheree will follow up using the details you provided.</p><button className="mt-6 font-bold text-blue-700 underline" onClick={() => { setDetails(empty); setSubmitted(false); retry.current = null; }}>Send another message</button></div>;
+  if (submitted) return <div role="status" className="rounded-3xl border border-blue-200 bg-blue-50 p-8"><CheckCircle size={32} className="text-blue-600" aria-hidden="true" /><h3 className="mt-5 text-2xl font-black text-slate-900">Thanks—we received your message.</h3><p className="mt-4 leading-7 text-slate-700">Clint or Sheree will follow up using the details you provided.</p><button className="mt-6 font-bold text-blue-700 underline" onClick={() => { setDetails({ ...empty, message: initialMessage }); setSubmitted(false); retry.current = null; }}>Send another message</button></div>;
   return <form onSubmit={submit} className="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-sm sm:p-8" aria-label="Contact Sweetwater">
     {isMock && <p className="mb-5 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">Local test only. The first request fails; retry succeeds. No message is saved or sent.</p>}
     <fieldset disabled={!hydrated || pending} className="space-y-5">

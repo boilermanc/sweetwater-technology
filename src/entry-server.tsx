@@ -9,6 +9,7 @@ import { RESOURCES } from './resources';
 export const prerenderRoutes = PRERENDER_ROUTES;
 export const sitemapEntries = [
   { path: '/', priority: '1.0' },
+  { path: '/book', priority: '0.8' },
   { path: '/about', priority: '0.8' },
   { path: '/headwaters/', priority: '0.8' },
   { path: '/headwaters/continuum/', priority: '0.7' },
