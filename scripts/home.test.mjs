@@ -35,3 +35,16 @@ test('prerendered homepage, guide and catalog preserve the agreed journeys', () 
   for (const name of ['Rekkrd', 'Once Upon a Drawing', 'Rejoice', 'Sproutify Home', 'Sproutify School', 'Alison.', 'Sproutify Farm', 'Shane', 'Sproutify Micro', 'ATL Urban Farms', 'LaneWise', 'SpectIQ']) assert.ok(work.includes(name), name + ' missing from /work');
   assert.ok(!/>7<|>21<|>33<|>44<|>9</.test(work), 'Stray lottery numbers remain');
 });
+
+test('footer destinations, legal drafts and the printable guide are available', () => {
+  const html = file => readFileSync(new URL('../dist/' + file, import.meta.url), 'utf8');
+  const home = html('index.html');
+  for (const link of ['/terms', '/privacy', '/#contact-form', '/portal', '/headwaters/', '/downloads/try-ai-this-week.pdf']) assert.ok(home.includes('href="' + link + '"'), link);
+  assert.ok(home.includes('Dip your toe into AI'));
+  assert.equal(readFileSync(new URL('../dist/downloads/try-ai-this-week.pdf', import.meta.url)).subarray(0,5).toString(), '%PDF-');
+  for (const route of ['terms', 'privacy']) {
+    const draft = html(route + '/index.html');
+    assert.ok(draft.includes('Draft for review')); assert.ok(draft.includes('noindex, follow'));
+    assert.ok(!html('sitemap.xml').includes('/' + route + '</loc>'));
+  }
+});

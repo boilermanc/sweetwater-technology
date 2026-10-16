@@ -4,4 +4,4 @@ export const HOME_FAQS = [
   { question: 'What does it cost?', answer: 'The first conversation is free. Any assessment and implementation are scoped and priced separately, before that work begins.' },
   { question: 'Does it work with my current software?', answer: 'Often, yes. We’ll look at what you use and tell you where the limits are.' },
 ];
-export const HOME_DESCRIPTION = 'We help you spend less time on quotes, paperwork and double entry with practical tools, custom software and AI you stay in control of.';
+export const HOME_DESCRIPTION = 'Reply sooner, keep quotes and follow-ups moving, and spend less time on busywork with practical software and AI you stay in control of.';

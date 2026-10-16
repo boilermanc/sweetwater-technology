@@ -89,6 +89,10 @@ export const normalizePath = (path: string) => {
 export const getPageSeo = (requestedPath: string): PageSeo => {
   const path = normalizePath(requestedPath);
 
+  if (path === '/terms' || path === '/privacy') {
+    return { title: (path === '/terms' ? 'Website Terms' : 'Privacy Notice') + ' — Draft for Review | Sweetwater Technology', description: 'Unapproved draft for business and legal review. No effective date has been assigned.', canonical: SITE_URL + path, type: 'website', jsonLd: [organization], robots: 'noindex, follow' };
+  }
+
   if (path === '/portal') {
     return { title: 'Client Login | Sweetwater Technology', description: 'Private Sweetwater Technology workspace.', canonical: `${SITE_URL}/portal`, type: 'website', jsonLd: [], robots: 'noindex, nofollow' };
   }
@@ -382,6 +386,8 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
 };
 
 export const PRERENDER_ROUTES = [
+  '/terms',
+  '/privacy',
   '/ai-help',
   '/app-idea',
   '/portal',

@@ -74,3 +74,15 @@ The build reports the existing large main-bundle warning. npm reports four depen
 - src/pages/TryAiGuide.tsx
 - src/resources.ts
 - src/seo.ts
+
+## Follow-up: deals, printable guide and footer
+
+The hero now connects less busywork with quicker replies and timely follow-ups. The next section focuses on keeping good opportunities from going cold, without a guaranteed sales claim.
+
+The supplied four-page PDF is preserved byte-for-byte at /downloads/try-ai-this-week.pdf. The blue, white-text lower-right guide card opens it directly in a new tab, is dismissible, and hides while the contact form or footer is visible. The online guide also links to the printable PDF.
+
+The shared main-site footer now includes services, company navigation, resources, the guide, client login, contact email, and Terms/Privacy draft links. There were no existing legal pages in the inspected repository history. At the user's request, /terms and /privacy contain substantive review drafts, visibly marked unapproved, with unresolved facts listed. They are prerendered but noindex and excluded from the sitemap. They must not be treated as approved legal policies. No production deployment is authorized by this update.
+
+The privacy draft follows the observed site code and avoids inventing provider, retention, training, cookie, or sale/sharing promises. Review background: https://www.ftc.gov/business-guidance/privacy-security/consumer-privacy and https://www.ftc.gov/business-guidance/resources/protecting-personal-information-guide-business-0 . Production data handling still needs a business/legal review.
+
+Additional files: src/components/FloatingAiGuide.tsx, src/components/Footer.tsx, src/pages/LegalDraft.tsx, src/legalContent.ts, public/downloads/try-ai-this-week.pdf. Updated homepage copy, guide, routes/SEO, tests and this handoff are included in the same review branch.

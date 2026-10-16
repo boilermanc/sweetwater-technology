@@ -2,11 +2,13 @@ import React, { lazy, Suspense, useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
+import { FloatingAiGuide } from './components/FloatingAiGuide';
 import { HomeSections } from './components/HomeSections';
 import { Contact } from './components/Contact';
 import { AnimatedBackground } from './components/AnimatedBackground';
 import type { AppProject } from './types';
-import { SweetwaterLogo } from './components/SweetwaterLogo';
+import { Footer } from './components/Footer';
+import { LegalDraft } from './pages/LegalDraft';
 import { NewsDetail, NewsIndex, NotFound } from './components/News';
 import { findNewsArticle } from './news';
 import { normalizePath } from './seo';
@@ -56,6 +58,14 @@ const App: React.FC<AppProps> = ({ path }) => {
     return () => window.removeEventListener('keydown', handleEsc);
   }, []);
 
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      const anchor = window.location.hash.slice(1);
+      if (anchor) document.getElementById(anchor)?.scrollIntoView();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [currentPath]);
+
   if (currentPath === '/portal') {
     return <Suspense fallback={<main className="min-h-screen grid place-items-center text-slate-600" role="status">Loading workspace…</main>}><Portal /></Suspense>;
   }
@@ -86,7 +96,10 @@ const App: React.FC<AppProps> = ({ path }) => {
           <Hero />
           <HomeSections onSelectApp={setSelectedApp} />
           <Contact />
+          <FloatingAiGuide />
         </main>
+      ) : currentPath === '/terms' || currentPath === '/privacy' ? (
+        <LegalDraft kind={currentPath === '/terms' ? 'terms' : 'privacy'} />
       ) : currentPath === '/about' ? (
         <About />
       ) : currentPath === '/headwaters' ? (
@@ -115,15 +128,7 @@ const App: React.FC<AppProps> = ({ path }) => {
         <NotFound />
       )}
 
-      <footer className="relative z-10 py-8 sm:py-12 px-4 sm:px-6 border-t border-slate-100 bg-white/50 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6">
-          <SweetwaterLogo markClassName="h-8 w-8" />
-          <a href="/headwaters/" className="text-sm font-semibold text-slate-600 hover:text-blue-600">Headwaters</a>
-          <div className="text-slate-500 text-xs sm:text-sm text-center">
-            © {new Date().getFullYear()} Sweetwater Technology. All rights reserved.
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       <Suspense fallback={null}>
         <AnimatePresence>
