@@ -1,3 +1,4 @@
+import { CONTINUUM_PAPER, HEADWATERS_INTRO } from './headwaters';
 import { ABOUT_DESCRIPTION, FAQS } from './content';
 import { findNewsArticle, NEWS_ARTICLES } from './news';
 import { findService, findWorkProfile, SERVICES, WORK_PROFILES } from './marketing';
@@ -148,25 +149,39 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
     };
   }
 
-  if (path === '/continuum') {
-    const canonical = `${SITE_URL}/continuum`;
+  if (path === '/headwaters') {
     return {
-      title: 'Sweetwater Continuum | Governed Personal Continuity for AI',
-      description:
-        'Sweetwater Continuum is the governed personal continuity layer for an agentic world—carrying context forward without turning it into standing authority.',
-      canonical,
+      title: 'Headwaters | Ideas on AI and Software | Sweetwater Technology',
+      description: HEADWATERS_INTRO,
+      canonical: `${SITE_URL}/headwaters/`,
       type: 'website',
+      jsonLd: [organization],
+    };
+  }
+
+  if (path === '/headwaters/continuum') {
+    const canonical = `${SITE_URL}/headwaters/continuum/`;
+    return {
+      title: 'Sweetwater Continuum | Headwaters | Sweetwater Technology',
+      description: CONTINUUM_PAPER.summary,
+      canonical,
+      type: 'article',
       jsonLd: [
         organization,
         {
           '@context': 'https://schema.org',
-          '@type': 'TechArticle',
-          headline: 'Sweetwater Continuum: Governed Personal Continuity for an Agentic World',
-          description: 'The working thesis for a personal continuity and delegation layer across AI agents and services.',
-          author: { '@id': `${SITE_URL}/#organization` },
+          '@type': 'Article',
+          headline: CONTINUUM_PAPER.title,
+          description: CONTINUUM_PAPER.summary,
+          datePublished: CONTINUUM_PAPER.datePublished,
+          author: { '@type': 'Organization', name: 'Sweetwater Technology' },
           publisher: { '@id': `${SITE_URL}/#organization` },
           mainEntityOfPage: canonical,
         },
+        breadcrumbJsonLd([
+          { name: 'Headwaters', url: `${SITE_URL}/headwaters/` },
+          { name: CONTINUUM_PAPER.title, url: canonical },
+        ]),
       ],
     };
   }
@@ -363,7 +378,8 @@ export const PRERENDER_ROUTES = [
   '/card',
   '/card/test',
   '/card/email-preview',
-  '/continuum',
+  '/headwaters/',
+  '/headwaters/continuum/',
   '/services',
   ...SERVICES.map((service) => `/services/${service.slug}`),
   '/work',

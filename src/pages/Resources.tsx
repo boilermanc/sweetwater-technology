@@ -19,6 +19,7 @@ export function ResourcesIndex() {
         {resource.repository && <a href={resource.repository} target="_blank" rel="noopener noreferrer" className="mt-6 mr-5 inline-flex min-h-12 items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-700"><Github size={18} aria-hidden="true" /> View on GitHub<span className="sr-only"> (opens in a new tab)</span></a>}
         <a className="mt-6 inline-flex items-center gap-2 font-bold text-blue-600 hover:text-blue-700" href={`/resources/${resource.slug}`}>View resource <ArrowRight size={18} aria-hidden="true" /></a>
       </article>)}
+      <article className="rounded-3xl border border-slate-200 bg-white/85 p-7 shadow-sm"><p className="text-xs font-bold uppercase tracking-widest text-blue-600">Ideas and perspectives</p><h2 className="mt-2 text-2xl font-black text-slate-900">Headwaters</h2><p className="mt-3 leading-7 text-slate-600">Explore our thinking about where AI and software are heading. Points of view, not products or services.</p><a href="/headwaters/" className="mt-6 inline-flex items-center gap-2 font-bold text-blue-600 hover:text-blue-700">Explore Headwaters <ArrowRight size={18} aria-hidden="true" /></a></article>
     </div>
   </main>;
 }

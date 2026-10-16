@@ -13,6 +13,7 @@ import { findNewsArticle } from './news';
 import { normalizePath } from './seo';
 import { ServiceDetail, ServicesIndex, WorkDetail, WorkIndex } from './components/MarketingPages';
 import { findService, findWorkProfile, SERVICES } from './marketing';
+import { HeadwatersPage } from './pages/Headwaters';
 import { ContinuumPage } from './components/ContinuumPage';
 import { CardLanding } from './pages/CardLanding';
 import { CardTestPage } from './pages/CardTestPage';
@@ -131,7 +132,9 @@ const App: React.FC<AppProps> = ({ path }) => {
         </main>
       ) : currentPath === '/about' ? (
         <About />
-      ) : currentPath === '/continuum' ? (
+      ) : currentPath === '/headwaters' ? (
+        <HeadwatersPage />
+      ) : currentPath === '/headwaters/continuum' ? (
         <ContinuumPage />
       ) : currentPath === '/services' ? (
         <ServicesIndex />
@@ -158,6 +161,7 @@ const App: React.FC<AppProps> = ({ path }) => {
       <footer className="relative z-10 py-8 sm:py-12 px-4 sm:px-6 border-t border-slate-100 bg-white/50 backdrop-blur-md">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6">
           <SweetwaterLogo markClassName="h-8 w-8" />
+          <a href="/headwaters/" className="text-sm font-semibold text-slate-600 hover:text-blue-600">Headwaters</a>
           <div className="text-slate-500 text-xs sm:text-sm text-center">
             © {new Date().getFullYear()} Sweetwater Technology. All rights reserved.
           </div>

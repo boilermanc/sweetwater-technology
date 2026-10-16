@@ -10,7 +10,8 @@ export const prerenderRoutes = PRERENDER_ROUTES;
 export const sitemapEntries = [
   { path: '/', priority: '1.0' },
   { path: '/about', priority: '0.8' },
-  { path: '/continuum', priority: '0.9' },
+  { path: '/headwaters/', priority: '0.8' },
+  { path: '/headwaters/continuum/', priority: '0.7' },
   { path: '/services', priority: '0.9' },
   ...SERVICES.map((service) => ({ path: `/services/${service.slug}`, priority: '0.9' })),
   { path: '/work', priority: '0.8' },

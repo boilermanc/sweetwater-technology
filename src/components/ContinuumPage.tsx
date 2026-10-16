@@ -109,10 +109,18 @@ export const ContinuumPage: React.FC = () => (
     <section className="relative border-b border-slate-200 px-4 pb-20 pt-20 sm:px-6 sm:pb-28 sm:pt-28">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_15%_15%,rgba(37,99,235,0.16),transparent_35%),radial-gradient(circle_at_85%_25%,rgba(124,58,237,0.14),transparent_34%),linear-gradient(to_bottom,#ffffff,#f8fafc)]" />
       <div className="mx-auto max-w-7xl">
-        <div className="grid gap-14 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
+        <nav aria-label="Breadcrumb" className="mb-8 text-sm font-semibold text-slate-600"><a href="/headwaters/" className="hover:text-blue-600">Headwaters</a> <span aria-hidden="true">›</span> <span aria-current="page">Sweetwater Continuum</span></nav>
+        <div className="grid max-w-5xl gap-10">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.34em] text-blue-600">Sweetwater Continuum · Working thesis</p>
+            <p className="text-xs font-black uppercase tracking-[0.34em] text-blue-600">Sweetwater Continuum · Working thesis</p><span className="mt-4 inline-block rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">Thesis</span>
             <h1 className="mt-6 max-w-5xl text-5xl font-black leading-[0.94] tracking-[-0.055em] sm:text-7xl lg:text-[6.6rem]">Governed personal continuity for an agentic world.</h1>
+            <section aria-label="Continuum in plain English" className="mt-8 rounded-3xl border border-blue-200 bg-white p-6 shadow-sm sm:p-8">
+              <dl className="space-y-6 text-base leading-7 text-slate-600">
+                <div><dt className="font-bold text-slate-950">The idea</dt><dd className="mt-2">Your AI tools should remember who you are — your goals, preferences and past decisions — and carry that from one AI to the next. But remembering you shouldn't give them permission to act for you.</dd></div>
+                <div><dt className="font-bold text-slate-950">How it works</dt><dd className="mt-2">Every time an AI needs to do something on your behalf, it gets a narrow, one-time permission for that task. It expires, you can revoke it, and there's a record of who was allowed to do what.</dd></div>
+                <div><dt className="font-bold text-slate-950">Status</dt><dd className="mt-2">A thesis we're exploring. Not a product, and nothing to buy.</dd></div>
+              </dl>
+            </section>
           </div>
           <div className="border-l-2 border-blue-600 pl-6">
             <p className="text-xl font-semibold leading-relaxed text-slate-700">Carry the right goals, decisions, preferences, and boundaries into any AI you choose—without giving it blanket access or control.</p>
@@ -320,7 +328,16 @@ export const ContinuumPage: React.FC = () => (
         <p className="text-xs font-black uppercase tracking-[0.3em] text-cyan-300">The destination</p>
         <blockquote className="mt-8 max-w-5xl text-4xl font-black leading-tight tracking-[-0.04em] sm:text-6xl">Continuity without delegation becomes memory infrastructure. Delegation without continuity becomes a permissions product.</blockquote>
         <p className="mt-10 max-w-3xl text-lg leading-relaxed text-blue-100">Continuum is the governed relationship between them: a way for a person to carry themselves forward without allowing their history to become someone else’s authority.</p>
-        <div className="mt-12 flex flex-col gap-4 border-t border-white/20 pt-8 sm:flex-row sm:items-center sm:justify-between"><p className="font-black">Automation should increase without human agency decreasing.</p><a href="mailto:team@sweetwater.technology?subject=Sweetwater%20Continuum%20thesis" className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 font-black text-slate-950 transition-transform hover:scale-105">Discuss the thesis <ArrowRight aria-hidden="true" className="h-4 w-4" /></a></div>
+        <div className="mt-12 flex flex-col gap-4 border-t border-white/20 pt-8 sm:flex-row sm:items-center sm:justify-between"><p className="font-black">Automation should increase without human agency decreasing.</p></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="client-work-heading" className="px-4 pb-20 sm:px-6">
+      <div className="mx-auto max-w-5xl rounded-3xl border border-slate-200 bg-slate-50 p-8 sm:p-12">
+        <h2 id="client-work-heading" className="text-3xl font-black tracking-tight sm:text-4xl">How this shapes our client work</h2>
+        <p className="mt-6 text-lg leading-relaxed text-slate-600">When we automate a workflow for a business, the same rule applies: AI can prepare the work, but a person approves anything that commits money, sends a message, or changes a customer record. Access is limited, it expires, and every approval is logged.</p>
+        <a href="/services" className="mt-8 inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3 font-bold text-slate-900 transition-colors hover:border-blue-600 hover:text-blue-600">See how we work with businesses →</a>
+        <div className="mt-8 border-t border-slate-200 pt-6"><a href="mailto:team@sweetwater.technology?subject=Sweetwater%20Continuum%20thesis" className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 font-black text-slate-950 transition-transform hover:scale-105">Discuss the thesis <ArrowRight aria-hidden="true" className="h-4 w-4" /></a></div>
       </div>
     </section>
   </main>

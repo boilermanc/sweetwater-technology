@@ -13,6 +13,8 @@ ErrorDocument 404 /404.html
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+  # Run before the existing-file check: old deployed /continuum/ files may remain.
+  RewriteRule ^continuum/?$ /headwaters/continuum/ [R=301,L]
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
