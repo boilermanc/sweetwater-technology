@@ -18,9 +18,9 @@ export function HomeSections({ onSelectApp }: { onSelectApp: (app: AppProject) =
   return <>
     <section className={sectionClass} aria-labelledby="problems-title">
       <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-700">For small and growing businesses</p>
-      <h2 id="problems-title" className="mt-4 max-w-2xl text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Keep good opportunities from going cold.</h2>
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">{['Get quotes out sooner', 'Follow up before interest fades', 'Know the next step on every deal'].map(text => <p key={text} className="flex gap-3 rounded-2xl border border-slate-200 bg-white/80 p-5 font-semibold text-slate-700"><Check className="shrink-0 text-blue-600" size={20} aria-hidden="true" />{text}</p>)}</div>
-      <p className="mt-5 max-w-2xl leading-7 text-slate-600">A slow reply or forgotten follow-up can cost you good work. We help keep inquiries, quotes and next steps connected, so your team can spend more time winning the work.</p>
+      <h2 id="problems-title" className="mt-4 max-w-2xl text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Win the work. Keep it moving.</h2>
+      <div className="mt-8 grid gap-4 sm:grid-cols-3">{['Get quotes out sooner', 'Follow up before interest fades', 'Know the next step on every deal', 'Connect the tools your team already uses', 'Stop copying the same details twice', 'Make handoffs clear from sales to delivery'].map(text => <p key={text} className="flex gap-3 rounded-2xl border border-slate-200 bg-white/80 p-5 font-semibold text-slate-700"><Check className="shrink-0 text-blue-600" size={20} aria-hidden="true" />{text}</p>)}</div>
+      <p className="mt-5 max-w-2xl leading-7 text-slate-600">A slow reply can cost you good work. Disconnected tools can slow down everything that follows. We help connect inquiries, quotes, schedules and follow-ups, so information moves with the job and your team knows what comes next.</p>
     </section>
     <section id="portfolio" className={sectionClass + ' scroll-mt-24'} aria-labelledby="proof-title">
       <div className="flex flex-wrap items-end justify-between gap-5"><div><p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-700">Ideas put into practice</p><h2 id="proof-title" className="mt-4 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Built around real work.</h2></div><a href="/work" className="font-bold text-blue-700 hover:underline">See all our work →</a></div>
