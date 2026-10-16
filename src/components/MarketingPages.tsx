@@ -1,3 +1,4 @@
+import { ServiceContactForm } from './ServiceContactForm';
 import { ServicesPage, AiServicesPage } from './ServicesPages';
 import React from 'react';
 import { ArrowRight, Check, ExternalLink } from 'lucide-react';
@@ -138,7 +139,7 @@ export const WorkIndex: React.FC = () => (
           </article>
         ))}
       </section>
-      <ContactCta />
+      <ServiceContactForm />
     </div>
   </main>
 );
