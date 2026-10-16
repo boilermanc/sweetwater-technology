@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Menu } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { X, Menu, ChevronDown, ArrowUpRight, LockKeyhole } from 'lucide-react';
 import { SweetwaterLogo } from './SweetwaterLogo';
 
 const NAV_LINKS = [
@@ -15,6 +15,26 @@ const NAV_LINKS = [
 
 export const Header: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const loginRef = useRef<HTMLDivElement>(null);
+  const loginButton = useRef<HTMLButtonElement>(null);
+  const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (!loginOpen) return;
+    const dismiss = (event: PointerEvent) => {
+      if (!loginRef.current?.contains(event.target as Node)) setLoginOpen(false);
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { setLoginOpen(false); loginButton.current?.focus(); }
+    };
+    document.addEventListener('pointerdown', dismiss);
+    document.addEventListener('keydown', escape);
+    return () => {
+      document.removeEventListener('pointerdown', dismiss);
+      document.removeEventListener('keydown', escape);
+    };
+  }, [loginOpen]);
 
   return (
     <>
@@ -35,7 +55,7 @@ export const Header: React.FC = () => {
           />
         </a>
 
-        <nav className="hidden lg:flex items-center gap-8">
+        <nav className="hidden xl:flex items-center gap-6">
           {NAV_LINKS.map((link) => (
             <a key={link.href} href={link.href} className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">
               {link.label}
@@ -43,13 +63,26 @@ export const Header: React.FC = () => {
           ))}
         </nav>
 
+        <div className="flex items-center gap-2 shrink-0">
+        <div ref={loginRef} className="relative" onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setLoginOpen(false); }}>
+          <button ref={loginButton} type="button" aria-expanded={loginOpen} aria-controls="client-login-panel" onClick={() => { setLoginOpen(!loginOpen); setMobileOpen(false); }} className="flex items-center gap-1 rounded-xl border border-blue-100 bg-blue-50 px-2 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold text-blue-700 hover:bg-blue-100 focus-visible:outline-2 focus-visible:outline-blue-600">
+            Client Login <ChevronDown size={14} className={loginOpen ? 'rotate-180' : ''} />
+          </button>
+          {loginOpen && <motion.div id="client-login-panel" initial={{ opacity: 0, y: reducedMotion ? 0 : -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reducedMotion ? 0 : 0.2 }} className="absolute right-0 top-full mt-4 w-64 max-w-[calc(100vw-3rem)] rounded-2xl border border-slate-200 bg-white p-5 shadow-xl">
+            <LockKeyhole size={22} className="mb-3 text-blue-600" />
+            <p className="font-bold text-slate-900">Client Login</p>
+            <p className="mt-2 text-sm leading-relaxed text-slate-500">Access your Sweetwater workspace with your approved email address.</p>
+            <a href="/portal" className="mt-4 flex items-center justify-between rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700">Continue to login <ArrowUpRight size={16} /></a>
+          </motion.div>}
+        </div>
         <button
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="lg:hidden text-slate-900 p-1"
+          onClick={() => { setMobileOpen(!mobileOpen); setLoginOpen(false); }}
+          className="xl:hidden text-slate-900 p-1"
         >
           {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
+        </div>
       </motion.header>
 
       {/* Mobile drawer */}
@@ -61,14 +94,14 @@ export const Header: React.FC = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileOpen(false)}
-              className="fixed inset-0 z-40 bg-slate-900/20 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-40 bg-slate-900/20 backdrop-blur-sm xl:hidden"
             />
             <motion.nav
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 z-50 w-72 bg-white shadow-2xl lg:hidden flex flex-col"
+              className="fixed top-0 right-0 bottom-0 z-50 w-72 bg-white shadow-2xl xl:hidden flex flex-col"
             >
               <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
                 <span className="font-extrabold text-slate-900 tracking-tight">Menu</span>

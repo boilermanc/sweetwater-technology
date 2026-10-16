@@ -86,6 +86,10 @@ export const normalizePath = (path: string) => {
 export const getPageSeo = (requestedPath: string): PageSeo => {
   const path = normalizePath(requestedPath);
 
+  if (path === '/portal') {
+    return { title: 'Client Login | Sweetwater Technology', description: 'Private Sweetwater Technology workspace.', canonical: `${SITE_URL}/portal`, type: 'website', jsonLd: [], robots: 'noindex, nofollow' };
+  }
+
   if (path === '/') {
     return {
       title: 'Custom Web Apps & AI Automation | Sweetwater Technology',
@@ -353,6 +357,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
 };
 
 export const PRERENDER_ROUTES = [
+  '/portal',
   '/',
   '/about',
   '/card',

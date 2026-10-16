@@ -21,6 +21,7 @@ import { ResourcesIndex, ResourceDetail, ResourceDownload } from './pages/Resour
 import { findResource } from './resources';
 import { About } from './pages/About';
 
+const Portal = lazy(() => import('./portal/Portal'));
 const AppDetail = lazy(() => import('./components/AppDetail').then((module) => ({ default: module.AppDetail })));
 const RekkrdDetail = lazy(() => import('./components/cards/RekkrdDetail').then((module) => ({ default: module.RekkrdDetail })));
 
@@ -54,6 +55,10 @@ const App: React.FC<AppProps> = ({ path }) => {
     window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
   }, []);
+
+  if (currentPath === '/portal') {
+    return <Suspense fallback={<main className="min-h-screen grid place-items-center text-slate-600" role="status">Loading workspace…</main>}><Portal /></Suspense>;
+  }
 
   if (currentPath === '/card/test') {
     return <CardTestPage />;

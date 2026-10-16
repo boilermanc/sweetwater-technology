@@ -76,3 +76,7 @@ For local landing-page review, append `&test=1` to either destination. This skip
 the scan webhook, but Sage still calls its webhook with `testMode: true`; automated
 tests must intercept external requests to avoid sending messages or notifications.
 Never include `test=1` in the published QR or description link.
+
+## Private client workspace
+
+Use Client Login in the header or /portal. Access is restricted to the two approved Sweetwater team accounts with email sign-in and authenticator verification. Guided discovery saves to Trellis. See [portal setup](docs/portal-setup.md).
