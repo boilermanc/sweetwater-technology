@@ -22,6 +22,7 @@ const ContactCta: React.FC = () => (
     <a href="mailto:team@sweetwater.technology" className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-bold text-slate-900 hover:bg-blue-50">
       Email team@sweetwater.technology <ArrowRight aria-hidden="true" className="h-4 w-4" />
     </a>
+    <a href="/book" className="mt-5 block w-fit py-3 font-bold text-blue-200 underline">Book a free 20-minute call →</a>
   </aside>
 );
 

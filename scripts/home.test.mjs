@@ -49,15 +49,26 @@ test('footer destinations, legal drafts and the printable guide are available', 
   }
 });
 
-test('booking page is discoverable and offers an honest call request through the shared form', () => {
+test('booking page is discoverable and renders the configured booking experience', () => {
   const html = file => readFileSync(new URL('../dist/' + file, import.meta.url), 'utf8');
   const book = html('book/index.html');
   assert.match(book, /Free 20-Minute Introductory Call/);
   assert.ok(book.includes('https://sweetwater.technology/book'));
-  assert.ok(book.includes('only booked once we confirm'));
-  assert.ok(book.includes('Online sending is not connected yet'));
+  const enabled = process.env.VITE_BOOKING_ENABLED === 'true';
+  if (enabled) {
+    assert.ok(book.includes('Choose your free call'));
+    assert.ok(book.includes('Checking available times'));
+    assert.ok(!book.includes('Your call is booked.'));
+  } else {
+    assert.ok(book.includes('only booked once we confirm'));
+    assert.ok(book.includes('Online sending is not connected yet'));
+  }
   assert.ok(html('sitemap.xml').includes('/book</loc>'));
   assert.ok(html('index.html').includes('href="/book"'));
   const href = book.match(/href="(mailto:[^"]+)"/)[1].replaceAll('&amp;', '&');
-  assert.ok(new URL(href).searchParams.get('body').includes('free 20-minute introductory call'));
+  if (!enabled) assert.ok(new URL(href).searchParams.get('body').includes('free 20-minute introductory call'));
+  for (const route of ['index.html','about/index.html','services/index.html','services/ai-workflow-automation/index.html','resources/try-ai-this-week/index.html','card/index.html','ai-help/index.html','app-idea/index.html']) {
+    assert.ok(html(route).includes('href="/book"'), route + ' links to internal booking');
+    assert.ok(!/href="https:\/\/(calendar\.google|calendly\.com)/.test(html(route)),route + ' does not redirect booking externally');
+  }
 });

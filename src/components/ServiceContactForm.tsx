@@ -60,6 +60,7 @@ export function ServiceContactForm() {
   return <section id="service-contact" aria-labelledby="service-contact-title" className="mt-20 scroll-mt-28 rounded-[2rem] border border-slate-200 bg-slate-50 p-6 sm:p-12">
     <h2 id="service-contact-title" className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Tell us what's slowing you down</h2>
     <p className="mb-7 mt-4 leading-7 text-slate-600">A few sentences is plenty. Clint or Sheree will follow up.</p>
+    <a href="/book" className="mb-6 inline-flex min-h-11 items-center font-bold text-blue-700 underline">Book a free 20-minute call →</a>
     <ContactForm />
   </section>;
 }

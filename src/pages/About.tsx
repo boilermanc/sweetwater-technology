@@ -85,7 +85,7 @@ export const About = () => (
             </div>
           ))}
         </div>
-        <a href="/#contact" className="mt-8 inline-flex items-center gap-2 rounded-full bg-slate-900 px-6 py-3 font-bold text-white hover:bg-blue-700">Tell us what you’re building <ArrowRight aria-hidden="true" size={18} /></a>
+        <a href="/#contact" className="mt-8 inline-flex items-center gap-2 rounded-full bg-slate-900 px-6 py-3 font-bold text-white hover:bg-blue-700">Tell us what you’re building <ArrowRight aria-hidden="true" size={18} /></a><div><a href="/book" className="mt-5 inline-flex min-h-11 items-center font-bold text-blue-700 underline">Book a free 20-minute call →</a></div>
       </section>
     </div>
   </main>

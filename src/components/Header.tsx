@@ -11,6 +11,7 @@ const NAV_LINKS = [
   { href: '/resources', label: 'Resources' },
   { href: '/headwaters/', label: 'Headwaters' },
   { href: '/#contact', label: 'Connect' },
+  { href: '/book', label: 'Book a free call' },
 ];
 
 export const Header: React.FC = () => {

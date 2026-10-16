@@ -1,0 +1,21 @@
+{
+  "enabled": false,
+  "calendarId": "964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com",
+  "busyCalendarIds": [
+    "964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com",
+    "boilermanc@gmail.com"
+  ],
+  "timeZone": "America/New_York",
+  "weekdays": [
+    "Tue",
+    "Thu"
+  ],
+  "openMinute": 600,
+  "closeMinute": 720,
+  "durationMinutes": 20,
+  "stepMinutes": 30,
+  "bufferMinutes": 10,
+  "noticeHours": 24,
+  "horizonDays": 30,
+  "turnstileHostname": "sweetwater.technology"
+}

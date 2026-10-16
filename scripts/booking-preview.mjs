@@ -1,0 +1,7 @@
+import {readFileSync} from 'node:fs';
+import {slots} from '../n8n/booking/core.mjs';
+import {createServer} from 'vite';
+let attempts=0;
+const saved=new Map();
+const mockSlots=slots(JSON.parse(readFileSync('n8n/booking/config.json','utf8')),Date.now()).slice(0,8);
+const server=await createServer({server:{host:'127.0.0.1',port:4006,strictPort:true},define:{'import.meta.env.VITE_BOOKING_MOCK':JSON.stringify('true')},plugins:[{name:'booking-local-mock',configureServer(server){server.middlewares.use('/__booking',(req,res)=>{res.setHeader('Content-Type','application/json');if(req.url==='/availability'){res.end(JSON.stringify({timeZone:'America/New_York',durationMinutes:20,slots:mockSlots}));return;}if(req.method!=='POST'){res.statusCode=405;res.end('{}');return;}let text='';req.on('data',chunk=>text+=chunk);req.on('end',()=>{const b=JSON.parse(text);attempts++;console.log('Mock attempt '+attempts+' requestId='+b.requestId);setTimeout(()=>{if(attempts===1){res.statusCode=503;res.end('{}');return;}const slot=mockSlots.find(s=>s.start===b.start);if(!slot){res.statusCode=409;res.end('{}');return;}const result=saved.get(b.requestId)||{confirmed:true,requestId:b.requestId,bookingId:'local-demo',...slot};saved.set(b.requestId,result);res.end(JSON.stringify(result));},500);});});}}]});await server.listen();console.log('Booking demo http://127.0.0.1:4006/book — no calendar or email writes.');

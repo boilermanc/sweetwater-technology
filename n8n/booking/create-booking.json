@@ -1,0 +1,743 @@
+{
+  "name": "Sweetwater Create Booking",
+  "nodes": [
+    {
+      "id": "185c4eeb-563a-4764-8d72-7d6175a565f7",
+      "name": "Booking webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        240
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sweetwater-booking-create",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "https://sweetwater.technology"
+        }
+      }
+    },
+    {
+      "id": "9af40b10-9e66-4534-a6ce-7c52ce35e325",
+      "name": "Validate booking request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        240
+      ],
+      "parameters": {
+        "jsCode": "// This file is embedded into the n8n Code nodes by build-booking-workflows.mjs.\n// Keep configuration in config.json; no credentials belong in these files.\nfunction slots(config, now, busy = []) {\n  const fmt = new Intl.DateTimeFormat('en-US', { timeZone: config.timeZone, weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });\n  const earliest = now + config.noticeHours * 3600000;\n  const latest = now + config.horizonDays * 86400000;\n  const step = config.stepMinutes * 60000;\n  const result = [];\n  for (let start = Math.ceil(earliest / step) * step; start < latest; start += step) {\n    const p = Object.fromEntries(fmt.formatToParts(start).map(p => [p.type, p.value]));\n    const minute = Number(p.hour) * 60 + Number(p.minute);\n    const end = start + config.durationMinutes * 60000;\n    if (!config.weekdays.includes(p.weekday) || minute < config.openMinute || minute + config.durationMinutes > config.closeMinute) continue;\n    const buffer = config.bufferMinutes * 60000;\n    if (busy.some(b => start < Date.parse(b.end) + buffer && end + buffer > Date.parse(b.start))) continue;\n    result.push({ start: new Date(start).toISOString(), end: new Date(end).toISOString() });\n  }\n  return result;\n}\nfunction busyWindows(response, config) {\n  if (response.statusCode !== 200 || !response.body?.calendars) throw new Error('Calendar unavailable');\n  return config.busyCalendarIds.flatMap(id => {\n    const cal = response.body.calendars[id];\n    if (!cal || cal.errors?.length || !Array.isArray(cal.busy)) throw new Error('Calendar unavailable');\n    if (cal.busy.some(b => !Number.isFinite(Date.parse(b.start)) || !Number.isFinite(Date.parse(b.end)) || Date.parse(b.end) <= Date.parse(b.start))) throw new Error('Invalid availability');\n    return cal.busy;\n  });\n}\nfunction validateBooking(body, config, now) {\n  if (!body || typeof body !== 'object' || body.website) throw new Error('Invalid request');\n  if (typeof body.requestId !== 'string' || !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(body.requestId)) throw new Error('Invalid request identifier');\n  const field = (key, max, required = true) => { const value = body[key]; if (typeof value !== 'string' || value.length > max || (required && !value.trim())) throw new Error('Invalid ' + key); return value.trim(); };\n  const name = field('name',120); const email = field('email',254).toLowerCase(); const topic = field('topic',1000,false);\n  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) throw new Error('Invalid email');\n  const start = field('start',40);\n  const slot = slots({ ...config, noticeHours: 0, horizonDays: config.horizonDays + 1 }, now - 86400000).find(s => s.start === start);\n  if (!slot) throw new Error('Slot is outside booking hours');\n  return { ...slot, name, email, topic, requestId: body.requestId.toLowerCase(), eventId: '5a' + body.requestId.toLowerCase().replaceAll('-', '') };\n}\nfunction sameBooking(event, booking) {\n  return event?.status === 'confirmed' && event.id === booking.eventId && event.extendedProperties?.private?.sweetwaterRequestId === booking.requestId && event.extendedProperties?.private?.sweetwaterEmail === booking.email && event.extendedProperties?.private?.sweetwaterName === booking.name && event.extendedProperties?.private?.sweetwaterTopic === booking.topic && Date.parse(event.start?.dateTime) === Date.parse(booking.start) && Date.parse(event.end?.dateTime) === Date.parse(booking.end);\n}\nfunction confirmation(event, booking) {\n  if (!sameBooking(event, booking)) throw new Error('Booking was not confirmed');\n  return { confirmed: true, requestId: booking.requestId, bookingId: event.id, start: booking.start, end: booking.end };\n}\nfunction eventBody(booking, config) {\n  const escape = s => s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');\n  return { id: booking.eventId, summary: 'Sweetwater introductory call — ' + booking.name,\n    description: 'Free 20-minute introductory call.\\nTopic: ' + escape(booking.topic) + '\\nSweetwater will contact you to arrange call details.',\n    start: {dateTime: booking.start,timeZone:config.timeZone}, end: {dateTime:booking.end,timeZone:config.timeZone},\n    visibility:'private', transparency:'opaque', attendees:[{email:booking.email,displayName:booking.name}],\n    guestsCanModify:false,guestsCanInviteOthers:false,guestsCanSeeOtherGuests:false,\n    extendedProperties:{private:{sweetwaterRequestId:booking.requestId,sweetwaterEmail:booking.email,sweetwaterName:booking.name,sweetwaterTopic:booking.topic}}\n  };\n}\r\n\nconst config = {\"enabled\":false,\"calendarId\":\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\",\"busyCalendarIds\":[\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\",\"boilermanc@gmail.com\"],\"timeZone\":\"America/New_York\",\"weekdays\":[\"Tue\",\"Thu\"],\"openMinute\":600,\"closeMinute\":720,\"durationMinutes\":20,\"stepMinutes\":30,\"bufferMinutes\":10,\"noticeHours\":24,\"horizonDays\":30,\"turnstileHostname\":\"sweetwater.technology\"};\nconst fail = (statusCode,message) => [{json:{proceed:false,statusCode,body:{confirmed:false,message}}}];\nconst req = $input.first().json;\nif (req.headers?.origin !== 'https://sweetwater.technology') return fail(403,'Request not allowed.');\nif (!config.enabled || !config.calendarId || !config.busyCalendarIds.includes(config.calendarId)) return fail(503,'Online booking is not connected yet. Please email team@sweetwater.technology.');\ntry { const b=validateBooking(req.body,config,Date.now()); if (typeof req.body.turnstileToken !== 'string' || !req.body.turnstileToken || req.body.turnstileToken.length>2048) return fail(400,'Please complete the security check.'); return [{json:{proceed:true,booking:b,turnstileToken:req.body.turnstileToken}}]; } catch { return fail(400,'Please check your details and choose an available time.'); }"
+      }
+    },
+    {
+      "id": "bf2640d5-c514-47ef-8c4d-b6f1d0782ba0",
+      "name": "Valid request?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        240
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "745b9b4d-fe3e-4619-a7e1-a76632b3b3eb",
+              "leftValue": "={{ $json.proceed === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "1fbdc294-b732-455a-952f-cefefb587f01",
+      "name": "Verify human",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        240
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "response",
+              "value": "={{ $json.turnstileToken }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "b1dfe309-ed5d-4c75-a952-dab08005e331",
+      "name": "Check human verification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        240
+      ],
+      "parameters": {
+        "jsCode": "// This file is embedded into the n8n Code nodes by build-booking-workflows.mjs.\n// Keep configuration in config.json; no credentials belong in these files.\nfunction slots(config, now, busy = []) {\n  const fmt = new Intl.DateTimeFormat('en-US', { timeZone: config.timeZone, weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });\n  const earliest = now + config.noticeHours * 3600000;\n  const latest = now + config.horizonDays * 86400000;\n  const step = config.stepMinutes * 60000;\n  const result = [];\n  for (let start = Math.ceil(earliest / step) * step; start < latest; start += step) {\n    const p = Object.fromEntries(fmt.formatToParts(start).map(p => [p.type, p.value]));\n    const minute = Number(p.hour) * 60 + Number(p.minute);\n    const end = start + config.durationMinutes * 60000;\n    if (!config.weekdays.includes(p.weekday) || minute < config.openMinute || minute + config.durationMinutes > config.closeMinute) continue;\n    const buffer = config.bufferMinutes * 60000;\n    if (busy.some(b => start < Date.parse(b.end) + buffer && end + buffer > Date.parse(b.start))) continue;\n    result.push({ start: new Date(start).toISOString(), end: new Date(end).toISOString() });\n  }\n  return result;\n}\nfunction busyWindows(response, config) {\n  if (response.statusCode !== 200 || !response.body?.calendars) throw new Error('Calendar unavailable');\n  return config.busyCalendarIds.flatMap(id => {\n    const cal = response.body.calendars[id];\n    if (!cal || cal.errors?.length || !Array.isArray(cal.busy)) throw new Error('Calendar unavailable');\n    if (cal.busy.some(b => !Number.isFinite(Date.parse(b.start)) || !Number.isFinite(Date.parse(b.end)) || Date.parse(b.end) <= Date.parse(b.start))) throw new Error('Invalid availability');\n    return cal.busy;\n  });\n}\nfunction validateBooking(body, config, now) {\n  if (!body || typeof body !== 'object' || body.website) throw new Error('Invalid request');\n  if (typeof body.requestId !== 'string' || !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(body.requestId)) throw new Error('Invalid request identifier');\n  const field = (key, max, required = true) => { const value = body[key]; if (typeof value !== 'string' || value.length > max || (required && !value.trim())) throw new Error('Invalid ' + key); return value.trim(); };\n  const name = field('name',120); const email = field('email',254).toLowerCase(); const topic = field('topic',1000,false);\n  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) throw new Error('Invalid email');\n  const start = field('start',40);\n  const slot = slots({ ...config, noticeHours: 0, horizonDays: config.horizonDays + 1 }, now - 86400000).find(s => s.start === start);\n  if (!slot) throw new Error('Slot is outside booking hours');\n  return { ...slot, name, email, topic, requestId: body.requestId.toLowerCase(), eventId: '5a' + body.requestId.toLowerCase().replaceAll('-', '') };\n}\nfunction sameBooking(event, booking) {\n  return event?.status === 'confirmed' && event.id === booking.eventId && event.extendedProperties?.private?.sweetwaterRequestId === booking.requestId && event.extendedProperties?.private?.sweetwaterEmail === booking.email && event.extendedProperties?.private?.sweetwaterName === booking.name && event.extendedProperties?.private?.sweetwaterTopic === booking.topic && Date.parse(event.start?.dateTime) === Date.parse(booking.start) && Date.parse(event.end?.dateTime) === Date.parse(booking.end);\n}\nfunction confirmation(event, booking) {\n  if (!sameBooking(event, booking)) throw new Error('Booking was not confirmed');\n  return { confirmed: true, requestId: booking.requestId, bookingId: event.id, start: booking.start, end: booking.end };\n}\nfunction eventBody(booking, config) {\n  const escape = s => s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');\n  return { id: booking.eventId, summary: 'Sweetwater introductory call — ' + booking.name,\n    description: 'Free 20-minute introductory call.\\nTopic: ' + escape(booking.topic) + '\\nSweetwater will contact you to arrange call details.',\n    start: {dateTime: booking.start,timeZone:config.timeZone}, end: {dateTime:booking.end,timeZone:config.timeZone},\n    visibility:'private', transparency:'opaque', attendees:[{email:booking.email,displayName:booking.name}],\n    guestsCanModify:false,guestsCanInviteOthers:false,guestsCanSeeOtherGuests:false,\n    extendedProperties:{private:{sweetwaterRequestId:booking.requestId,sweetwaterEmail:booking.email,sweetwaterName:booking.name,sweetwaterTopic:booking.topic}}\n  };\n}\r\n\nconst config = {\"enabled\":false,\"calendarId\":\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\",\"busyCalendarIds\":[\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\",\"boilermanc@gmail.com\"],\"timeZone\":\"America/New_York\",\"weekdays\":[\"Tue\",\"Thu\"],\"openMinute\":600,\"closeMinute\":720,\"durationMinutes\":20,\"stepMinutes\":30,\"bufferMinutes\":10,\"noticeHours\":24,\"horizonDays\":30,\"turnstileHostname\":\"sweetwater.technology\"};\nconst fail = (statusCode,message) => [{json:{proceed:false,statusCode,body:{confirmed:false,message}}}];\nconst r=$input.first().json; if(r.statusCode!==200 || r.body?.success!==true || r.body.hostname!==config.turnstileHostname || r.body.action!=='sweetwater-booking') return fail(400,'Please retry the security check.'); return [{json:{proceed:true,booking:$('Validate booking request').first().json.booking}}];"
+      }
+    },
+    {
+      "id": "450b1148-aa35-4d32-99a2-1f92c7cb5495",
+      "name": "Human verified?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1200,
+        240
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "dda0499a-8fdc-4a4b-b8d4-8a723b55dedb",
+              "leftValue": "={{ $json.proceed === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "50471619-1fc4-48b0-9050-44a9cd3497d6",
+      "name": "Find existing booking",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1440,
+        240
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\") + '/events/' + $('Validate booking request').first().json.booking.eventId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleCalendarOAuth2Api",
+        "options": {
+          "timeout": 15000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "7f22e9f6-b7b5-421c-a107-2ea925476ac1",
+      "name": "Handle booking retry",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        240
+      ],
+      "parameters": {
+        "jsCode": "// This file is embedded into the n8n Code nodes by build-booking-workflows.mjs.\n// Keep configuration in config.json; no credentials belong in these files.\nfunction slots(config, now, busy = []) {\n  const fmt = new Intl.DateTimeFormat('en-US', { timeZone: config.timeZone, weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });\n  const earliest = now + config.noticeHours * 3600000;\n  const latest = now + config.horizonDays * 86400000;\n  const step = config.stepMinutes * 60000;\n  const result = [];\n  for (let start = Math.ceil(earliest / step) * step; start < latest; start += step) {\n    const p = Object.fromEntries(fmt.formatToParts(start).map(p => [p.type, p.value]));\n    const minute = Number(p.hour) * 60 + Number(p.minute);\n    const end = start + config.durationMinutes * 60000;\n    if (!config.weekdays.includes(p.weekday) || minute < config.openMinute || minute + config.durationMinutes > config.closeMinute) continue;\n    const buffer = config.bufferMinutes * 60000;\n    if (busy.some(b => start < Date.parse(b.end) + buffer && end + buffer > Date.parse(b.start))) continue;\n    result.push({ start: new Date(start).toISOString(), end: new Date(end).toISOString() });\n  }\n  return result;\n}\nfunction busyWindows(response, config) {\n  if (response.statusCode !== 200 || !response.body?.calendars) throw new Error('Calendar unavailable');\n  return config.busyCalendarIds.flatMap(id => {\n    const cal = response.body.calendars[id];\n    if (!cal || cal.errors?.length || !Array.isArray(cal.busy)) throw new Error('Calendar unavailable');\n    if (cal.busy.some(b => !Number.isFinite(Date.parse(b.start)) || !Number.isFinite(Date.parse(b.end)) || Date.parse(b.end) <= Date.parse(b.start))) throw new Error('Invalid availability');\n    return cal.busy;\n  });\n}\nfunction validateBooking(body, config, now) {\n  if (!body || typeof body !== 'object' || body.website) throw new Error('Invalid request');\n  if (typeof body.requestId !== 'string' || !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(body.requestId)) throw new Error('Invalid request identifier');\n  const field = (key, max, required = true) => { const value = body[key]; if (typeof value !== 'string' || value.length > max || (required && !value.trim())) throw new Error('Invalid ' + key); return value.trim(); };\n  const name = field('name',120); const email = field('email',254).toLowerCase(); const topic = field('topic',1000,false);\n  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) throw new Error('Invalid email');\n  const start = field('start',40);\n  const slot = slots({ ...config, noticeHours: 0, horizonDays: config.horizonDays + 1 }, now - 86400000).find(s => s.start === start);\n  if (!slot) throw new Error('Slot is outside booking hours');\n  return { ...slot, name, email, topic, requestId: body.requestId.toLowerCase(), eventId: '5a' + body.requestId.toLowerCase().replaceAll('-', '') };\n}\nfunction sameBooking(event, booking) {\n  return event?.status === 'confirmed' && event.id === booking.eventId && event.extendedProperties?.private?.sweetwaterRequestId === booking.requestId && event.extendedProperties?.private?.sweetwaterEmail === booking.email && event.extendedProperties?.private?.sweetwaterName === booking.name && event.extendedProperties?.private?.sweetwaterTopic === booking.topic && Date.parse(event.start?.dateTime) === Date.parse(booking.start) && Date.parse(event.end?.dateTime) === Date.parse(booking.end);\n}\nfunction confirmation(event, booking) {\n  if (!sameBooking(event, booking)) throw new Error('Booking was not confirmed');\n  return { confirmed: true, requestId: booking.requestId, bookingId: event.id, start: booking.start, end: booking.end };\n}\nfunction eventBody(booking, config) {\n  const escape = s => s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');\n  return { id: booking.eventId, summary: 'Sweetwater introductory call — ' + booking.name,\n    description: 'Free 20-minute introductory call.\\nTopic: ' + escape(booking.topic) + '\\nSweetwater will contact you to arrange call details.',\n    start: {dateTime: booking.start,timeZone:config.timeZone}, end: {dateTime:booking.end,timeZone:config.timeZone},\n    visibility:'private', transparency:'opaque', attendees:[{email:booking.email,displayName:booking.name}],\n    guestsCanModify:false,guestsCanInviteOthers:false,guestsCanSeeOtherGuests:false,\n    extendedProperties:{private:{sweetwaterRequestId:booking.requestId,sweetwaterEmail:booking.email,sweetwaterName:booking.name,sweetwaterTopic:booking.topic}}\n  };\n}\r\n\nconst config = {\"enabled\":false,\"calendarId\":\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\",\"busyCalendarIds\":[\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\",\"boilermanc@gmail.com\"],\"timeZone\":\"America/New_York\",\"weekdays\":[\"Tue\",\"Thu\"],\"openMinute\":600,\"closeMinute\":720,\"durationMinutes\":20,\"stepMinutes\":30,\"bufferMinutes\":10,\"noticeHours\":24,\"horizonDays\":30,\"turnstileHostname\":\"sweetwater.technology\"};\nconst fail = (statusCode,message) => [{json:{proceed:false,statusCode,body:{confirmed:false,message}}}];\nconst r=$input.first().json,b=$('Validate booking request').first().json.booking;\nif(r.statusCode===404)return [{json:{proceed:true}}];\nif(r.statusCode===200){if(sameBooking(r.body,b))return [{json:{proceed:false,statusCode:200,body:confirmation(r.body,b)}}]; return fail(409,'That time is no longer available. Please choose another.');}\nreturn fail(503,'We could not check this booking. Please retry the same request.');"
+      }
+    },
+    {
+      "id": "c97831fa-8d33-42d3-ba51-f0f95694e270",
+      "name": "New booking?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1920,
+        240
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e989727f-92d6-4d33-93c3-8a48e2b399c9",
+              "leftValue": "={{ $json.proceed === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "74ba6350-d969-4235-ac8d-dcec803113be",
+      "name": "Recheck calendar busy windows",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2160,
+        240
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/calendar/v3/freeBusy",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleCalendarOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({timeMin:new Date(Date.now()-86400000).toISOString(),timeMax:new Date(Date.now()+31*86400000).toISOString(),items:[{\"id\":\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\"},{\"id\":\"boilermanc@gmail.com\"}]}) }}",
+        "options": {
+          "timeout": 15000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "e512c711-b215-4f50-9540-3180e2137691",
+      "name": "Check selected time",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2400,
+        240
+      ],
+      "parameters": {
+        "jsCode": "// This file is embedded into the n8n Code nodes by build-booking-workflows.mjs.\n// Keep configuration in config.json; no credentials belong in these files.\nfunction slots(config, now, busy = []) {\n  const fmt = new Intl.DateTimeFormat('en-US', { timeZone: config.timeZone, weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });\n  const earliest = now + config.noticeHours * 3600000;\n  const latest = now + config.horizonDays * 86400000;\n  const step = config.stepMinutes * 60000;\n  const result = [];\n  for (let start = Math.ceil(earliest / step) * step; start < latest; start += step) {\n    const p = Object.fromEntries(fmt.formatToParts(start).map(p => [p.type, p.value]));\n    const minute = Number(p.hour) * 60 + Number(p.minute);\n    const end = start + config.durationMinutes * 60000;\n    if (!config.weekdays.includes(p.weekday) || minute < config.openMinute || minute + config.durationMinutes > config.closeMinute) continue;\n    const buffer = config.bufferMinutes * 60000;\n    if (busy.some(b => start < Date.parse(b.end) + buffer && end + buffer > Date.parse(b.start))) continue;\n    result.push({ start: new Date(start).toISOString(), end: new Date(end).toISOString() });\n  }\n  return result;\n}\nfunction busyWindows(response, config) {\n  if (response.statusCode !== 200 || !response.body?.calendars) throw new Error('Calendar unavailable');\n  return config.busyCalendarIds.flatMap(id => {\n    const cal = response.body.calendars[id];\n    if (!cal || cal.errors?.length || !Array.isArray(cal.busy)) throw new Error('Calendar unavailable');\n    if (cal.busy.some(b => !Number.isFinite(Date.parse(b.start)) || !Number.isFinite(Date.parse(b.end)) || Date.parse(b.end) <= Date.parse(b.start))) throw new Error('Invalid availability');\n    return cal.busy;\n  });\n}\nfunction validateBooking(body, config, now) {\n  if (!body || typeof body !== 'object' || body.website) throw new Error('Invalid request');\n  if (typeof body.requestId !== 'string' || !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(body.requestId)) throw new Error('Invalid request identifier');\n  const field = (key, max, required = true) => { const value = body[key]; if (typeof value !== 'string' || value.length > max || (required && !value.trim())) throw new Error('Invalid ' + key); return value.trim(); };\n  const name = field('name',120); const email = field('email',254).toLowerCase(); const topic = field('topic',1000,false);\n  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) throw new Error('Invalid email');\n  const start = field('start',40);\n  const slot = slots({ ...config, noticeHours: 0, horizonDays: config.horizonDays + 1 }, now - 86400000).find(s => s.start === start);\n  if (!slot) throw new Error('Slot is outside booking hours');\n  return { ...slot, name, email, topic, requestId: body.requestId.toLowerCase(), eventId: '5a' + body.requestId.toLowerCase().replaceAll('-', '') };\n}\nfunction sameBooking(event, booking) {\n  return event?.status === 'confirmed' && event.id === booking.eventId && event.extendedProperties?.private?.sweetwaterRequestId === booking.requestId && event.extendedProperties?.private?.sweetwaterEmail === booking.email && event.extendedProperties?.private?.sweetwaterName === booking.name && event.extendedProperties?.private?.sweetwaterTopic === booking.topic && Date.parse(event.start?.dateTime) === Date.parse(booking.start) && Date.parse(event.end?.dateTime) === Date.parse(booking.end);\n}\nfunction confirmation(event, booking) {\n  if (!sameBooking(event, booking)) throw new Error('Booking was not confirmed');\n  return { confirmed: true, requestId: booking.requestId, bookingId: event.id, start: booking.start, end: booking.end };\n}\nfunction eventBody(booking, config) {\n  const escape = s => s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');\n  return { id: booking.eventId, summary: 'Sweetwater introductory call — ' + booking.name,\n    description: 'Free 20-minute introductory call.\\nTopic: ' + escape(booking.topic) + '\\nSweetwater will contact you to arrange call details.',\n    start: {dateTime: booking.start,timeZone:config.timeZone}, end: {dateTime:booking.end,timeZone:config.timeZone},\n    visibility:'private', transparency:'opaque', attendees:[{email:booking.email,displayName:booking.name}],\n    guestsCanModify:false,guestsCanInviteOthers:false,guestsCanSeeOtherGuests:false,\n    extendedProperties:{private:{sweetwaterRequestId:booking.requestId,sweetwaterEmail:booking.email,sweetwaterName:booking.name,sweetwaterTopic:booking.topic}}\n  };\n}\r\n\nconst config = {\"enabled\":false,\"calendarId\":\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\",\"busyCalendarIds\":[\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\",\"boilermanc@gmail.com\"],\"timeZone\":\"America/New_York\",\"weekdays\":[\"Tue\",\"Thu\"],\"openMinute\":600,\"closeMinute\":720,\"durationMinutes\":20,\"stepMinutes\":30,\"bufferMinutes\":10,\"noticeHours\":24,\"horizonDays\":30,\"turnstileHostname\":\"sweetwater.technology\"};\nconst fail = (statusCode,message) => [{json:{proceed:false,statusCode,body:{confirmed:false,message}}}];\ntry {const b=$('Validate booking request').first().json.booking; const busy=busyWindows($input.first().json,config); if(!slots(config,Date.now(),busy).some(s=>s.start===b.start))return fail(409,'That time is no longer available. Please choose another.');return [{json:{proceed:true,event:eventBody(b,config)}}];}catch{return fail(503,'We could not verify availability. Please try again.');}"
+      }
+    },
+    {
+      "id": "644a0c46-9401-49fe-9b1b-9e5cce49dbb4",
+      "name": "Time still available?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2640,
+        240
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7d6739dc-a944-4153-bbbf-0059563defa6",
+              "leftValue": "={{ $json.proceed === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "af6a3b5c-e7ad-4ccb-9b71-9b97cb2c7b12",
+      "name": "Claim booking slot",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2880,
+        240
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://horvjqqifgrzxesuxtfm.supabase.co/rest/v1/sweetwater_booking_claims",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({slot_start: $(\"Validate booking request\").first().json.booking.start, request_id: $(\"Validate booking request\").first().json.booking.requestId}) }}",
+        "options": {
+          "timeout": 15000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "705d598d-700b-48c1-836f-84dc74a6317e",
+      "name": "Check slot claim",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3120,
+        240
+      ],
+      "parameters": {
+        "jsCode": "// This file is embedded into the n8n Code nodes by build-booking-workflows.mjs.\n// Keep configuration in config.json; no credentials belong in these files.\nfunction slots(config, now, busy = []) {\n  const fmt = new Intl.DateTimeFormat('en-US', { timeZone: config.timeZone, weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });\n  const earliest = now + config.noticeHours * 3600000;\n  const latest = now + config.horizonDays * 86400000;\n  const step = config.stepMinutes * 60000;\n  const result = [];\n  for (let start = Math.ceil(earliest / step) * step; start < latest; start += step) {\n    const p = Object.fromEntries(fmt.formatToParts(start).map(p => [p.type, p.value]));\n    const minute = Number(p.hour) * 60 + Number(p.minute);\n    const end = start + config.durationMinutes * 60000;\n    if (!config.weekdays.includes(p.weekday) || minute < config.openMinute || minute + config.durationMinutes > config.closeMinute) continue;\n    const buffer = config.bufferMinutes * 60000;\n    if (busy.some(b => start < Date.parse(b.end) + buffer && end + buffer > Date.parse(b.start))) continue;\n    result.push({ start: new Date(start).toISOString(), end: new Date(end).toISOString() });\n  }\n  return result;\n}\nfunction busyWindows(response, config) {\n  if (response.statusCode !== 200 || !response.body?.calendars) throw new Error('Calendar unavailable');\n  return config.busyCalendarIds.flatMap(id => {\n    const cal = response.body.calendars[id];\n    if (!cal || cal.errors?.length || !Array.isArray(cal.busy)) throw new Error('Calendar unavailable');\n    if (cal.busy.some(b => !Number.isFinite(Date.parse(b.start)) || !Number.isFinite(Date.parse(b.end)) || Date.parse(b.end) <= Date.parse(b.start))) throw new Error('Invalid availability');\n    return cal.busy;\n  });\n}\nfunction validateBooking(body, config, now) {\n  if (!body || typeof body !== 'object' || body.website) throw new Error('Invalid request');\n  if (typeof body.requestId !== 'string' || !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(body.requestId)) throw new Error('Invalid request identifier');\n  const field = (key, max, required = true) => { const value = body[key]; if (typeof value !== 'string' || value.length > max || (required && !value.trim())) throw new Error('Invalid ' + key); return value.trim(); };\n  const name = field('name',120); const email = field('email',254).toLowerCase(); const topic = field('topic',1000,false);\n  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) throw new Error('Invalid email');\n  const start = field('start',40);\n  const slot = slots({ ...config, noticeHours: 0, horizonDays: config.horizonDays + 1 }, now - 86400000).find(s => s.start === start);\n  if (!slot) throw new Error('Slot is outside booking hours');\n  return { ...slot, name, email, topic, requestId: body.requestId.toLowerCase(), eventId: '5a' + body.requestId.toLowerCase().replaceAll('-', '') };\n}\nfunction sameBooking(event, booking) {\n  return event?.status === 'confirmed' && event.id === booking.eventId && event.extendedProperties?.private?.sweetwaterRequestId === booking.requestId && event.extendedProperties?.private?.sweetwaterEmail === booking.email && event.extendedProperties?.private?.sweetwaterName === booking.name && event.extendedProperties?.private?.sweetwaterTopic === booking.topic && Date.parse(event.start?.dateTime) === Date.parse(booking.start) && Date.parse(event.end?.dateTime) === Date.parse(booking.end);\n}\nfunction confirmation(event, booking) {\n  if (!sameBooking(event, booking)) throw new Error('Booking was not confirmed');\n  return { confirmed: true, requestId: booking.requestId, bookingId: event.id, start: booking.start, end: booking.end };\n}\nfunction eventBody(booking, config) {\n  const escape = s => s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');\n  return { id: booking.eventId, summary: 'Sweetwater introductory call — ' + booking.name,\n    description: 'Free 20-minute introductory call.\\nTopic: ' + escape(booking.topic) + '\\nSweetwater will contact you to arrange call details.',\n    start: {dateTime: booking.start,timeZone:config.timeZone}, end: {dateTime:booking.end,timeZone:config.timeZone},\n    visibility:'private', transparency:'opaque', attendees:[{email:booking.email,displayName:booking.name}],\n    guestsCanModify:false,guestsCanInviteOthers:false,guestsCanSeeOtherGuests:false,\n    extendedProperties:{private:{sweetwaterRequestId:booking.requestId,sweetwaterEmail:booking.email,sweetwaterName:booking.name,sweetwaterTopic:booking.topic}}\n  };\n}\r\n\nconst config = {\"enabled\":false,\"calendarId\":\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\",\"busyCalendarIds\":[\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\",\"boilermanc@gmail.com\"],\"timeZone\":\"America/New_York\",\"weekdays\":[\"Tue\",\"Thu\"],\"openMinute\":600,\"closeMinute\":720,\"durationMinutes\":20,\"stepMinutes\":30,\"bufferMinutes\":10,\"noticeHours\":24,\"horizonDays\":30,\"turnstileHostname\":\"sweetwater.technology\"};\nconst fail = (statusCode,message) => [{json:{proceed:false,statusCode,body:{confirmed:false,message}}}];\nconst r=$input.first().json,b=$('Validate booking request').first().json.booking; if(r.statusCode===201 && Array.isArray(r.body) && r.body.length===1 && r.body[0].request_id===b.requestId && Date.parse(r.body[0].slot_start)===Date.parse(b.start))return [{json:{proceed:true,event:eventBody(b,config)}}];return [{json:{proceed:false}}];"
+      }
+    },
+    {
+      "id": "b7497e2b-abc6-4b57-a530-d07d4360540e",
+      "name": "Claim acquired?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3360,
+        240
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ac91a73b-7d6d-4a5f-bd65-21b8e9bc282f",
+              "leftValue": "={{ $json.proceed === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "08261f29-622e-42fd-b35c-7dfe69687610",
+      "name": "Create Google Calendar event",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3600,
+        240
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\") + '/events?sendUpdates=all' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleCalendarOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.event) }}",
+        "options": {
+          "timeout": 15000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "bbf6b8be-9bfc-498a-b6b8-52bb6f23fc7e",
+      "name": "Verify saved event",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3840,
+        240
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\") + '/events/' + $('Validate booking request').first().json.booking.eventId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleCalendarOAuth2Api",
+        "options": {
+          "timeout": 15000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "a28aaf99-cf32-4c4b-853f-fe01a00a41a4",
+      "name": "Confirm saved booking",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4080,
+        240
+      ],
+      "parameters": {
+        "jsCode": "// This file is embedded into the n8n Code nodes by build-booking-workflows.mjs.\n// Keep configuration in config.json; no credentials belong in these files.\nfunction slots(config, now, busy = []) {\n  const fmt = new Intl.DateTimeFormat('en-US', { timeZone: config.timeZone, weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });\n  const earliest = now + config.noticeHours * 3600000;\n  const latest = now + config.horizonDays * 86400000;\n  const step = config.stepMinutes * 60000;\n  const result = [];\n  for (let start = Math.ceil(earliest / step) * step; start < latest; start += step) {\n    const p = Object.fromEntries(fmt.formatToParts(start).map(p => [p.type, p.value]));\n    const minute = Number(p.hour) * 60 + Number(p.minute);\n    const end = start + config.durationMinutes * 60000;\n    if (!config.weekdays.includes(p.weekday) || minute < config.openMinute || minute + config.durationMinutes > config.closeMinute) continue;\n    const buffer = config.bufferMinutes * 60000;\n    if (busy.some(b => start < Date.parse(b.end) + buffer && end + buffer > Date.parse(b.start))) continue;\n    result.push({ start: new Date(start).toISOString(), end: new Date(end).toISOString() });\n  }\n  return result;\n}\nfunction busyWindows(response, config) {\n  if (response.statusCode !== 200 || !response.body?.calendars) throw new Error('Calendar unavailable');\n  return config.busyCalendarIds.flatMap(id => {\n    const cal = response.body.calendars[id];\n    if (!cal || cal.errors?.length || !Array.isArray(cal.busy)) throw new Error('Calendar unavailable');\n    if (cal.busy.some(b => !Number.isFinite(Date.parse(b.start)) || !Number.isFinite(Date.parse(b.end)) || Date.parse(b.end) <= Date.parse(b.start))) throw new Error('Invalid availability');\n    return cal.busy;\n  });\n}\nfunction validateBooking(body, config, now) {\n  if (!body || typeof body !== 'object' || body.website) throw new Error('Invalid request');\n  if (typeof body.requestId !== 'string' || !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(body.requestId)) throw new Error('Invalid request identifier');\n  const field = (key, max, required = true) => { const value = body[key]; if (typeof value !== 'string' || value.length > max || (required && !value.trim())) throw new Error('Invalid ' + key); return value.trim(); };\n  const name = field('name',120); const email = field('email',254).toLowerCase(); const topic = field('topic',1000,false);\n  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) throw new Error('Invalid email');\n  const start = field('start',40);\n  const slot = slots({ ...config, noticeHours: 0, horizonDays: config.horizonDays + 1 }, now - 86400000).find(s => s.start === start);\n  if (!slot) throw new Error('Slot is outside booking hours');\n  return { ...slot, name, email, topic, requestId: body.requestId.toLowerCase(), eventId: '5a' + body.requestId.toLowerCase().replaceAll('-', '') };\n}\nfunction sameBooking(event, booking) {\n  return event?.status === 'confirmed' && event.id === booking.eventId && event.extendedProperties?.private?.sweetwaterRequestId === booking.requestId && event.extendedProperties?.private?.sweetwaterEmail === booking.email && event.extendedProperties?.private?.sweetwaterName === booking.name && event.extendedProperties?.private?.sweetwaterTopic === booking.topic && Date.parse(event.start?.dateTime) === Date.parse(booking.start) && Date.parse(event.end?.dateTime) === Date.parse(booking.end);\n}\nfunction confirmation(event, booking) {\n  if (!sameBooking(event, booking)) throw new Error('Booking was not confirmed');\n  return { confirmed: true, requestId: booking.requestId, bookingId: event.id, start: booking.start, end: booking.end };\n}\nfunction eventBody(booking, config) {\n  const escape = s => s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');\n  return { id: booking.eventId, summary: 'Sweetwater introductory call — ' + booking.name,\n    description: 'Free 20-minute introductory call.\\nTopic: ' + escape(booking.topic) + '\\nSweetwater will contact you to arrange call details.',\n    start: {dateTime: booking.start,timeZone:config.timeZone}, end: {dateTime:booking.end,timeZone:config.timeZone},\n    visibility:'private', transparency:'opaque', attendees:[{email:booking.email,displayName:booking.name}],\n    guestsCanModify:false,guestsCanInviteOthers:false,guestsCanSeeOtherGuests:false,\n    extendedProperties:{private:{sweetwaterRequestId:booking.requestId,sweetwaterEmail:booking.email,sweetwaterName:booking.name,sweetwaterTopic:booking.topic}}\n  };\n}\r\n\nconst config = {\"enabled\":false,\"calendarId\":\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\",\"busyCalendarIds\":[\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\",\"boilermanc@gmail.com\"],\"timeZone\":\"America/New_York\",\"weekdays\":[\"Tue\",\"Thu\"],\"openMinute\":600,\"closeMinute\":720,\"durationMinutes\":20,\"stepMinutes\":30,\"bufferMinutes\":10,\"noticeHours\":24,\"horizonDays\":30,\"turnstileHostname\":\"sweetwater.technology\"};\nconst fail = (statusCode,message) => [{json:{proceed:false,statusCode,body:{confirmed:false,message}}}];\nconst r=$input.first().json,b=$('Validate booking request').first().json.booking; if(r.statusCode===200 && sameBooking(r.body,b))return [{json:{statusCode:200,body:confirmation(r.body,b)}}];if(r.statusCode===200 || r.statusCode===410)return fail(409,'That time is no longer available. Please choose another.');return fail(503,'We could not confirm the booking. Retry with the same details to check it.');"
+      }
+    },
+    {
+      "id": "6aea1332-52ee-4377-b639-fd363f03a62c",
+      "name": "Return public response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        4320,
+        240
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.body }}",
+        "options": {
+          "responseCode": "={{ $json.statusCode }}",
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Cache-Control",
+                "value": "no-store"
+              },
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "https://sweetwater.technology"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "97020291-1d8e-401b-ab3e-21d211731038",
+      "name": "Activation requirements",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4560,
+        240
+      ],
+      "parameters": {
+        "content": "## Do not publish yet\nConfirm calendar and booking hours in config.json, select Google Calendar OAuth on all Google HTTP nodes, connect Turnstile and rate limiting, and verify concurrent booking behavior before enabling.\nSelect Trellis Supabase credentials for Claim booking slot. Only a new INSERT can create an event. Never upsert or automatically expire claims. See docs/booking-setup.md.",
+        "width": 620,
+        "height": 240
+      }
+    }
+  ],
+  "connections": {
+    "Booking webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate booking request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate booking request": {
+      "main": [
+        [
+          {
+            "node": "Valid request?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid request?": {
+      "main": [
+        [
+          {
+            "node": "Verify human",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return public response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify human": {
+      "main": [
+        [
+          {
+            "node": "Check human verification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check human verification": {
+      "main": [
+        [
+          {
+            "node": "Human verified?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Human verified?": {
+      "main": [
+        [
+          {
+            "node": "Find existing booking",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return public response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find existing booking": {
+      "main": [
+        [
+          {
+            "node": "Handle booking retry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle booking retry": {
+      "main": [
+        [
+          {
+            "node": "New booking?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New booking?": {
+      "main": [
+        [
+          {
+            "node": "Recheck calendar busy windows",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return public response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recheck calendar busy windows": {
+      "main": [
+        [
+          {
+            "node": "Check selected time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check selected time": {
+      "main": [
+        [
+          {
+            "node": "Time still available?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Time still available?": {
+      "main": [
+        [
+          {
+            "node": "Claim booking slot",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return public response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claim booking slot": {
+      "main": [
+        [
+          {
+            "node": "Check slot claim",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check slot claim": {
+      "main": [
+        [
+          {
+            "node": "Claim acquired?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claim acquired?": {
+      "main": [
+        [
+          {
+            "node": "Create Google Calendar event",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verify saved event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Google Calendar event": {
+      "main": [
+        [
+          {
+            "node": "Verify saved event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify saved event": {
+      "main": [
+        [
+          {
+            "node": "Confirm saved booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirm saved booking": {
+      "main": [
+        [
+          {
+            "node": "Return public response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "none",
+    "saveManualExecutions": false,
+    "executionTimeout": 90,
+    "timezone": "America/New_York"
+  }
+}
