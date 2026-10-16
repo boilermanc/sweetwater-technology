@@ -1,61 +1,65 @@
-import { useState, useSyncExternalStore } from 'react';
+import { useRef, useState, useSyncExternalStore, type FormEvent } from 'react';
+import { CheckCircle, ArrowUpRight, Send } from 'lucide-react';
+import { submitRequest } from '../lib/aiHelp';
+import { homeContactEmail, homeContactPayload, validateHomeContact, type HomeContactDetails } from '../lib/homeContact';
 
-const inputClass = 'mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200';
+const fieldClass = 'mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-500 focus:outline-2 focus:outline-offset-2 focus:outline-blue-600';
+const empty: HomeContactDetails = { name: '', business: '', email: '', phone: '', message: '', website: '' };
 
 const subscribe = () => () => {};
 
-export function ServiceContactForm() {
+export function ContactForm() {
   const hydrated = useSyncExternalStore(subscribe, () => true, () => false);
-  const [contactError, setContactError] = useState('');
-  const [unavailable, setUnavailable] = useState(false);
-
-  function submit(event: React.FormEvent<HTMLFormElement>) {
+  const [details, setDetails] = useState(empty);
+  const [pending, setPending] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
+  const lock = useRef(false);
+  const retry = useRef<{ fingerprint: string; id: string } | null>(null);
+  const endpoint = import.meta.env.VITE_SAGE_DISCOVERY_CONTACT_URL?.trim();
+  const isMock = import.meta.env.DEV && import.meta.env.VITE_HOME_CONTACT_MOCK === 'true' && endpoint === '/__home_contact_mock';
+  const enabled = isMock || (import.meta.env.VITE_HOME_CONTACT_ENABLED === 'true' && !!endpoint?.startsWith('https://'));
+  function update(key: keyof HomeContactDetails, value: string) { setDetails(current => ({ ...current, [key]: value })); }
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = event.currentTarget;
-    const data = new FormData(form);
-    const email = String(data.get('email') ?? '').trim();
-    const phone = String(data.get('phone') ?? '').trim();
-    if (!email && !phone) {
-      setContactError('Enter an email or phone number so we can reach you.');
-      form.querySelector<HTMLInputElement>('[name="email"]')?.focus();
-      return;
-    }
-    setContactError('');
-    // Delivery and server-side Turnstile verification will be connected later.
-    // Do not send, persist, or report successful receipt of these details.
-    setUnavailable(true);
+    if (lock.current) return;
+    const validation = validateHomeContact(details);
+    if (validation) { setError(validation); return; }
+    if (!enabled || !endpoint) { setError('Online sending is not connected yet. You can open an email with your details below.'); return; }
+    lock.current = true; setPending(true); setError('');
+    const source = window.location.pathname === '/' ? 'homepage-contact' : 'website:' + window.location.pathname;
+    const fingerprint = JSON.stringify(homeContactPayload(details, '', source));
+    if (retry.current?.fingerprint !== fingerprint) retry.current = { fingerprint, id: crypto.randomUUID() };
+    try {
+      await submitRequest(endpoint, homeContactPayload(details, retry.current.id, source));
+      setSubmitted(true);
+    } catch {
+      setError('That didn’t send. Please try again or email us at team@sweetwater.technology.');
+    } finally { lock.current = false; setPending(false); }
   }
+  if (submitted) return <div role="status" className="rounded-3xl border border-blue-200 bg-blue-50 p-8"><CheckCircle size={32} className="text-blue-600" aria-hidden="true" /><h3 className="mt-5 text-2xl font-black text-slate-900">Thanks—we received your message.</h3><p className="mt-4 leading-7 text-slate-700">Clint or Sheree will follow up using the details you provided.</p><button className="mt-6 font-bold text-blue-700 underline" onClick={() => { setDetails(empty); setSubmitted(false); retry.current = null; }}>Send another message</button></div>;
+  return <form onSubmit={submit} className="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-sm sm:p-8" aria-label="Contact Sweetwater">
+    {isMock && <p className="mb-5 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">Local test only. The first request fails; retry succeeds. No message is saved or sent.</p>}
+    <fieldset disabled={!hydrated || pending} className="space-y-5">
+      <legend className="sr-only">Your message and contact details</legend>
+      <div><label htmlFor="contact-message" className="font-semibold text-slate-800">What’s slowing you down?</label><textarea id="contact-message" name="message" required maxLength={1000} rows={4} value={details.message} onChange={e => update('message', e.target.value)} aria-describedby="contact-privacy" placeholder="e.g. chasing quotes, typing the same info twice, purchase orders in spreadsheets" className={fieldClass} /><p id="contact-privacy" className="mt-2 text-sm leading-6 text-slate-600">Keep it general—no patient, client or customer personal details.</p></div>
+      <div className="grid gap-5 sm:grid-cols-2"><div><label htmlFor="contact-name" className="font-semibold text-slate-800">Your name</label><input id="contact-name" name="name" autoComplete="name" required maxLength={120} value={details.name} onChange={e => update('name', e.target.value)} className={fieldClass} /></div><div><label htmlFor="contact-business" className="font-semibold text-slate-800">Business name <span className="font-normal">(optional)</span></label><input id="contact-business" name="business" autoComplete="organization" maxLength={120} value={details.business} onChange={e => update('business', e.target.value)} className={fieldClass} /></div></div>
+      <p id="contact-method" className="text-sm text-slate-600">Leave an email address or phone number so we can reply.</p>
+      <div className="grid gap-5 sm:grid-cols-2"><div><label htmlFor="contact-email" className="font-semibold text-slate-800">Email</label><input id="contact-email" name="email" type="email" autoComplete="email" aria-describedby="contact-method" maxLength={254} value={details.email} onChange={e => update('email', e.target.value)} className={fieldClass} /></div><div><label htmlFor="contact-phone" className="font-semibold text-slate-800">Phone</label><input id="contact-phone" name="phone" type="tel" autoComplete="tel" aria-describedby="contact-method" maxLength={40} value={details.phone} onChange={e => update('phone', e.target.value)} className={fieldClass} /></div></div>
+      <div className="absolute -left-[10000px] h-px w-px overflow-hidden" aria-hidden="true"><label htmlFor="contact-website">Website</label><input id="contact-website" name="website" tabIndex={-1} autoComplete="off" value={details.website} onChange={e => update('website', e.target.value)} /></div>
+      {!enabled && <p className="rounded-xl bg-blue-50 p-4 text-sm leading-6 text-slate-700">Online sending is not connected yet. Use the email link below to open a draft with your details. Nothing is sent until you send that email.</p>}
+      {error && <p role="alert" className="rounded-xl bg-red-50 p-4 text-sm text-red-800">{error}</p>}
+      <button disabled={!hydrated || !enabled || pending} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"><Send size={18} aria-hidden="true" />{pending ? 'Sending…' : 'Send to Sweetwater'}</button>
+    </fieldset>
+    <noscript><p className="mt-4 text-sm">JavaScript is needed for online sending. Please email team@sweetwater.technology instead.</p></noscript>
+    <a href={homeContactEmail(details)} className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-blue-700 underline">Email team@sweetwater.technology <ArrowUpRight size={16} aria-hidden="true" /></a>
+  </form>;
+}
 
+export function ServiceContactForm() {
   return <section id="service-contact" aria-labelledby="service-contact-title" className="mt-20 scroll-mt-28 rounded-[2rem] border border-slate-200 bg-slate-50 p-6 sm:p-12">
     <h2 id="service-contact-title" className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Tell us what's slowing you down</h2>
-    <p className="mt-4 leading-7 text-slate-600">A few sentences is plenty. Clint or Sheree will follow up.</p>
-    <p className="mt-4 text-sm leading-6 text-slate-600">Preview only — this form isn't connected yet. Nothing entered here will be sent.</p>
-    <form className="mt-8 max-w-3xl" onSubmit={submit}>
-      <fieldset disabled={!hydrated} className="space-y-6">
-      <legend className="sr-only">Your enquiry</legend>
-      <div>
-        <label htmlFor="service-message" className="font-bold text-slate-900">What's slowing you down?</label>
-        <textarea id="service-message" name="message" required maxLength={5000} rows={4} aria-describedby="service-message-note" className={inputClass} placeholder="e.g. chasing quotes, typing the same info twice, purchase orders in spreadsheets" />
-        <p id="service-message-note" className="mt-2 text-sm text-slate-600">Keep it general — no patient, client or customer personal details.</p>
-      </div>
-      <div className="grid gap-6 sm:grid-cols-2">
-        <div><label htmlFor="service-name" className="font-bold text-slate-900">Your name</label><input id="service-name" name="name" required autoComplete="name" maxLength={200} className={inputClass} /></div>
-        <div><label htmlFor="service-business" className="font-bold text-slate-900">Business name (optional)</label><input id="service-business" name="business" autoComplete="organization" maxLength={200} className={inputClass} /></div>
-      </div>
-      <fieldset>
-        <legend className="font-bold text-slate-900">How can we reach you?</legend>
-        <p id="service-contact-help" className="mt-1 text-sm text-slate-600">At least one, so we can reach you.</p>
-        <div className="mt-4 grid gap-6 sm:grid-cols-2">
-          <div><label htmlFor="service-email" className="font-bold text-slate-900">Email</label><input id="service-email" name="email" type="email" autoComplete="email" maxLength={254} onChange={() => setContactError('')} aria-invalid={Boolean(contactError)} aria-describedby="service-contact-help service-contact-error" className={inputClass} /></div>
-          <div><label htmlFor="service-phone" className="font-bold text-slate-900">Phone</label><input id="service-phone" name="phone" type="tel" autoComplete="tel" maxLength={50} onChange={() => setContactError('')} aria-invalid={Boolean(contactError)} aria-describedby="service-contact-help service-contact-error" className={inputClass} /></div>
-        </div>
-        <p id="service-contact-error" role="alert" className="mt-2 text-sm text-red-700">{contactError}</p>
-      </fieldset>
-      <div aria-hidden="true" className="hidden"><label htmlFor="service-website">Leave this empty</label><input id="service-website" name="website" tabIndex={-1} autoComplete="off" /></div>
-      {unavailable && <p role="status" className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-slate-700">This form isn't connected yet, so your message hasn't been sent. Your entries are still here. You can reach us at <a href="mailto:team@sweetwater.technology" className="font-bold text-blue-600 underline">team@sweetwater.technology</a>.</p>}
-      <button type="submit" className="inline-flex min-h-12 items-center justify-center rounded-full bg-blue-600 px-6 py-3 font-bold text-white hover:bg-blue-700">Send to Sweetwater</button>
-      </fieldset>
-      <noscript><p className="mt-3 text-sm">This preview form requires JavaScript. Please email team@sweetwater.technology instead.</p></noscript>
-    </form>
+    <p className="mb-7 mt-4 leading-7 text-slate-600">A few sentences is plenty. Clint or Sheree will follow up.</p>
+    <ContactForm />
   </section>;
 }

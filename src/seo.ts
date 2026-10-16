@@ -1,6 +1,7 @@
 import { AI_SERVICES_COPY, SERVICES_COPY } from './servicesContent';
 import { CONTINUUM_PAPER, HEADWATERS_INTRO } from './headwaters';
-import { ABOUT_DESCRIPTION, FAQS } from './content';
+import { ABOUT_DESCRIPTION } from './content';
+import { HOME_DESCRIPTION, HOME_FAQS } from './homeContent';
 import { findNewsArticle, NEWS_ARTICLES } from './news';
 import { findService, findWorkProfile, SERVICES, WORK_PROFILES } from './marketing';
 import { findResource, RESOURCES } from './resources';
@@ -58,7 +59,7 @@ const organization = {
 const faqPage = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: FAQS.map((faq) => ({
+  mainEntity: HOME_FAQS.map((faq) => ({
     '@type': 'Question',
     name: faq.question,
     acceptedAnswer: {
@@ -92,16 +93,8 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
     return { title: 'Client Login | Sweetwater Technology', description: 'Private Sweetwater Technology workspace.', canonical: `${SITE_URL}/portal`, type: 'website', jsonLd: [], robots: 'noindex, nofollow' };
   }
 
-  if (path === '/') {
-    return {
-      title: 'Custom Web Apps & AI Automation | Sweetwater Technology',
-      description:
-        'Sweetwater Technology builds custom web apps, mobile products, and AI workflow automation for businesses from Atlanta, Georgia.',
-      canonical: `${SITE_URL}/`,
-      type: 'website',
-      jsonLd: [organization, faqPage],
-    };
-  }
+  if (path === '/') return { title: 'Get Your Hours Back | Sweetwater Technology', description: HOME_DESCRIPTION, canonical: SITE_URL + '/', type: 'website', jsonLd: [organization, faqPage] };
+  if (path === '/ai-help' || path === '/app-idea') return { title: (path === '/ai-help' ? 'Practical AI for your business' : 'Talk through your app idea') + ' | Sweetwater Technology', description: 'Start a conversation about your business or app idea. Explore a useful first step with Sweetwater Technology.', canonical: SITE_URL + path, type: 'website', jsonLd: [organization], robots: 'noindex, follow' };
 
   if (path === '/about') {
     const canonical = `${SITE_URL}/about`;
@@ -212,6 +205,21 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
     const isDownload = path.endsWith('/download');
     const slug = path.slice('/resources/'.length).replace(/\/download$/, '');
     const resource = findResource(slug);
+    if (resource?.article && !isDownload) {
+      const canonical = SITE_URL + '/resources/' + resource.slug;
+      return {
+        title: 'Try AI This Week: A Starter Guide for Small Businesses | Sweetwater Technology',
+        description: resource.description, canonical, type: 'article',
+        jsonLd: [organization, {
+          '@context': 'https://schema.org', '@type': 'Article', headline: resource.title,
+          description: resource.description, author: { '@id': SITE_URL + '/#organization' },
+          publisher: { '@id': SITE_URL + '/#organization' }, mainEntityOfPage: canonical,
+        }, breadcrumbJsonLd([
+          { name: 'Home', url: SITE_URL + '/' }, { name: 'Resources', url: SITE_URL + '/resources' },
+          { name: resource.title, url: canonical },
+        ])],
+      };
+    }
     if (resource) {
       const canonical = `${SITE_URL}/resources/${resource.slug}`;
       return {
@@ -374,6 +382,8 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
 };
 
 export const PRERENDER_ROUTES = [
+  '/ai-help',
+  '/app-idea',
   '/portal',
   '/',
   '/about',

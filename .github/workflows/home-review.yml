@@ -1,0 +1,23 @@
+name: Homepage review checks
+on:
+  push:
+    branches: [feature/home-plain-english]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: node --test scripts/home.test.mjs scripts/ai-help.test.mjs scripts/discovery.test.mjs scripts/portal.test.mjs scripts/guided-portal.test.mjs
+      - run: npm run audit:html

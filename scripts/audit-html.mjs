@@ -17,7 +17,7 @@ const plainText = (html) => html
   .replace(/<[^>]+>/g, ' ')
   .replace(/\s+/g, ' ').trim();
 const requiredCopy = new Map([
-  ['/', 'Sweetwater Technology builds custom web applications, mobile products, and AI workflow automation from Atlanta, Georgia.'],
+  ['/', 'Get your'],
   ['/services/custom-web-applications', 'Custom Web Application Development'],
   ['/services/ai-workflow-automation', 'AI does the busywork. You make the calls.'],
   ['/services/mobile-app-development', 'Mobile App Development'],

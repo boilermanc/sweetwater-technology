@@ -1,3 +1,4 @@
+import { TryAiGuide } from './TryAiGuide';
 import { useState, type FormEvent } from 'react';
 import { ArrowRight, Bot, Download, FileArchive, Github, Monitor, Send } from 'lucide-react';
 import { RESOURCES, type Resource } from '../resources';
@@ -42,6 +43,7 @@ function OpenSourceResource({ resource }: { resource: Resource }) {
 }
 
 export function ResourceDetail({ resource }: { resource: Resource }) {
+  if (resource.article) return <TryAiGuide />;
   return resource.repository ? <OpenSourceResource resource={resource} /> : <DownloadResourceDetail resource={resource} />;
 }
 
@@ -125,6 +127,7 @@ function DownloadResourceDetail({ resource }: { resource: Resource }) {
 }
 
 export function ResourceDownload({ resource }: { resource: Resource }) {
+  if (resource.article) return <TryAiGuide />;
   if (resource.repository) return <OpenSourceResource resource={resource} />;
   return <main className="relative z-10 mx-auto min-h-screen max-w-3xl px-4 pb-24 pt-32 sm:px-6">
     <p className="text-xs font-bold uppercase tracking-[0.3em] text-blue-600">Your resource</p>

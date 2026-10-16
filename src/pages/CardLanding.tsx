@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, Bot, Check, Mail, PhoneCall, ScanLine, Sparkles } from 'lucide-react';
@@ -143,7 +143,7 @@ function ProductContext({ knowledge, action }: { knowledge: typeof PRODUCT_KNOWL
   );
 }
 
-export function CardLanding() {
+export function CardLanding({ aiHelp = false, appIdea = false }: { aiHelp?: boolean; appIdea?: boolean }) {
   const source = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('src');
   const [segment, setSegment] = useState<SegmentId>(() => {
     if (typeof window === 'undefined') return 'custom';
@@ -154,14 +154,22 @@ export function CardLanding() {
   const [sproutifyInterest, setSproutifyInterest] = useState<SproutifyInterest | null>(null);
   const [youtubeInterest, setYoutubeInterest] = useState<YouTubeInterest | null>(null);
   const [substackInterest, setSubstackInterest] = useState<YouTubeInterest | null>(null);
-  const active = sproutifyInterest
+  const active = appIdea ? {
+    heroHeadline: 'An app idea starts with a conversation',
+    heroSub: "You don't need a finished plan or be ready to build. Talk through your idea, who it could help, and what a useful first version might do. AI is optional.",
+    portfolioOrder: ['rekkrd', 'rejoice', 'lanewise'],
+  } : aiHelp ? {
+    heroHeadline: 'Practical AI for local businesses',
+    heroSub: "Too much time on everyday admin? Let’s look at where AI could help your business, starting with the work you already do. You don’t need a project figured out.",
+    portfolioOrder: ['lanewise', 'spectiq', 'sproutify-farm'],
+  } : sproutifyInterest
     ? SPROUTIFY_LANDING[sproutifyInterest] ?? SEGMENTS[segment]
     : substackInterest
       ? SUBSTACK_LANDING[substackInterest] ?? SEGMENTS[segment]
     : youtubeInterest
       ? YOUTUBE_LANDING[youtubeInterest] ?? SEGMENTS[segment]
       : source === 'youtube' ? YOUTUBE_DEFAULT : source === 'substack' ? SUBSTACK_DEFAULT : SEGMENTS[segment];
-  const order = useMemo(() => active.portfolioOrder, [active]);
+  const order = active.portfolioOrder;
 
   const showInterestLanding = (interest: VisitorInterest, interestSource: VisitorSource) => {
     if (interestSource === 'sproutify') {
@@ -188,7 +196,7 @@ export function CardLanding() {
 
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
-    if (query.get('test') === '1') return;
+    if (aiHelp || appIdea || query.get('test') === '1') return;
     void fetch('https://n8n.sproutify.app/webhook/card-scan', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -199,7 +207,7 @@ export function CardLanding() {
         ua: navigator.userAgent,
       }),
     }).catch(() => undefined);
-  }, []);
+  }, [aiHelp, appIdea]);
 
   return (
     <div className="min-h-screen overflow-hidden bg-[#0c1322] text-white selection:bg-[#2e5ce6] selection:text-white">
@@ -213,8 +221,21 @@ export function CardLanding() {
             <h1 className="max-w-4xl text-5xl font-bold leading-[.98] tracking-[-.055em] sm:text-7xl lg:text-[5.7rem]">{active.heroHeadline}</h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-[#aebfe8] sm:text-xl">{active.heroSub}</p>
           </motion.div>
-          <div className="mt-10 flex flex-wrap gap-3"><button onClick={() => setOpenSignal((value) => value + 1)} className="rounded-full bg-[#2e5ce6] px-6 py-3 text-sm font-bold shadow-xl shadow-blue-950/30 transition hover:bg-[#3c69e9]">Tell Sage what you need</button><a href="#work" className="rounded-full border border-[#2a3c68] px-6 py-3 text-sm font-bold text-[#c7d4f5] transition hover:border-[#526a9d]">See the work</a></div>
+          <div className="mt-10 flex flex-wrap gap-3"><button onClick={() => setOpenSignal((value) => value + 1)} className="rounded-full bg-[#2e5ce6] px-6 py-3 text-sm font-bold shadow-xl shadow-blue-950/30 transition hover:bg-[#3c69e9]">{appIdea ? 'Talk through my idea' : aiHelp ? 'Talk with Clint' : 'Tell Sage what you need'}</button><a href="#work" className="rounded-full border border-[#2a3c68] px-6 py-3 text-sm font-bold text-[#c7d4f5] transition hover:border-[#526a9d]">See the work</a></div>
         </section>
+
+        {(aiHelp || appIdea) && <section aria-label="How we can help" className="mx-auto max-w-6xl px-5 pb-12 sm:px-8">
+          <div className="grid gap-4 sm:grid-cols-3">{(appIdea ? [
+            ['Start with the idea', 'A rough thought is enough. Explore what it might do and who would use it.'],
+            ['Find the useful part', 'Talk through the problem and what people do today to work around it.'],
+            ['Shape a first version', 'Find one useful starting point without committing to a build.'],
+          ] : [
+            ['Customer questions', 'Explore ways to organize inquiries and draft useful replies for you to review.'],
+            ['Everyday paperwork', 'Look at repetitive notes, estimates, and follow-ups that take time away from your work.'],
+            ['A sensible first step', 'Talk through one task and decide together whether AI is worth trying.'],
+          ]).map(([title, description]) => <div key={title} className="rounded-2xl border border-[#2a3c68] bg-[#101a30] p-6"><h2 className="text-lg font-bold">{title}</h2><p className="mt-3 text-sm leading-7 text-[#aebfe8]">{description}</p></div>)}</div>
+          <p className="mt-8 max-w-3xl text-base leading-8 text-[#c7d4f5]">Start with a free introductory conversation of approximately 20 minutes. Any assessment or implementation afterward has an agreed scope and fixed pricing.</p>
+        </section>}
 
         <section id="work" className="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-20">
           <div className="mb-8 flex items-end justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[.22em] text-[#6f91ec]">Selected work</p><h2 className="mt-3 text-3xl font-bold tracking-tight">A product, and the problem it solves</h2></div><p className="hidden max-w-xs text-right text-sm leading-6 text-[#8499c7] sm:block">The same product cards from our full portfolio, with the story behind each one.</p></div>
@@ -227,7 +248,7 @@ export function CardLanding() {
       </main>
 
       <footer className="relative z-10 border-t border-[#1e2c52] px-5 py-8 text-center text-xs text-[#6578a3]">© {new Date().getFullYear()} Sweetwater Technology. Atlanta, Georgia.</footer>
-      <SageSheet segment={segment} setSegment={setSegment} onInterestReady={showInterestLanding} onDetailsReady={() => document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' })} openSignal={openSignal} />
+      <SageSheet aiHelp={aiHelp} appIdea={appIdea} segment={segment} setSegment={setSegment} onInterestReady={showInterestLanding} onDetailsReady={() => document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' })} openSignal={openSignal} />
     </div>
   );
 }

@@ -3,6 +3,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowUp, Droplets, Loader2, Mail, MessageCircle, Phone, UserRound, X } from 'lucide-react';
 import { SEGMENTS, SEGMENT_ORDER, isSegmentId, type SegmentId } from '../data/segments';
 
+import { SageDiscovery } from './SageDiscovery';
+
 type ChatMessage = { role: 'user' | 'assistant'; content: string };
 type ConversationStage = 'source_interest' | 'sproutify_product' | 'name' | 'email' | 'segment' | 'recap' | 'mailing_list' | 'chat';
 type SageEvent = 'lead_captured' | 'preferences_complete' | 'chat';
@@ -12,6 +14,8 @@ export type VisitorInterest = SproutifyInterest | YouTubeInterest;
 export type VisitorSource = 'sproutify' | 'youtube' | 'substack';
 
 interface SageSheetProps {
+  aiHelp?: boolean;
+  appIdea?: boolean;
   segment: SegmentId;
   setSegment: (segment: SegmentId) => void;
   onInterestReady?: (interest: VisitorInterest, source: VisitorSource) => void;
@@ -55,7 +59,11 @@ const SUBSTACK_OPTIONS: { id: YouTubeInterest; label: string }[] = [
   { id: 'contact', label: 'Connect with Clint' },
 ];
 
-export function SageSheet({ segment, setSegment, onInterestReady, onDetailsReady, openSignal = 0 }: SageSheetProps) {
+export function SageSheet(props: SageSheetProps) {
+  return props.aiHelp || props.appIdea ? <SageDiscovery intent={props.appIdea ? 'app-idea' : 'ai-help'} openSignal={props.openSignal} /> : <CardSageSheet {...props} />;
+}
+
+function CardSageSheet({ segment, setSegment, onInterestReady, onDetailsReady, openSignal = 0 }: SageSheetProps) {
   const [entrySegment] = useState<SegmentId | null>(() => {
     if (typeof window === 'undefined') return null;
     const requested = new URLSearchParams(window.location.search).get('segment');

@@ -16,38 +16,6 @@ interface ShanesRetirementFundCardProps {
   onClick: () => void;
 }
 
-// Lottery ball decorations — small circles that float in the background
-const LotteryBall: React.FC<{
-  number: number;
-  x: string;
-  y: string;
-  size: string;
-  delay: number;
-  accent?: boolean;
-}> = ({ number, x, y, size, delay, accent }) => (
-  <motion.div
-    className="absolute flex items-center justify-center rounded-full font-black text-white select-none pointer-events-none"
-    style={{
-      left: x,
-      top: y,
-      width: size,
-      height: size,
-      fontSize: `calc(${size} * 0.38)`,
-      background: accent
-        ? "linear-gradient(135deg, #E29578 0%, #FFDDD2 100%)"
-        : "linear-gradient(135deg, #006D77 0%, #83C5BE 100%)",
-      boxShadow: accent
-        ? "0 4px 12px rgba(226, 149, 120, 0.4)"
-        : "0 4px 12px rgba(0, 109, 119, 0.3)",
-    }}
-    initial={{ opacity: 0, scale: 0 }}
-    animate={{ opacity: 0.7, scale: 1 }}
-    transition={{ delay: 0.4 + delay * 0.12, type: "spring", stiffness: 200 }}
-  >
-    {number}
-  </motion.div>
-);
-
 const ShanesRetirementFundCard: React.FC<ShanesRetirementFundCardProps> = ({
   app,
   index,
@@ -106,21 +74,7 @@ const ShanesRetirementFundCard: React.FC<ShanesRetirementFundCardProps> = ({
           }}
         />
 
-        {/* Floating lottery balls */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <LotteryBall number={7} x="78%" y="8%" size="28px" delay={0} accent />
-          <LotteryBall number={21} x="85%" y="42%" size="22px" delay={1} />
-          <LotteryBall
-            number={33}
-            x="6%"
-            y="65%"
-            size="24px"
-            delay={2}
-            accent
-          />
-          <LotteryBall number={44} x="72%" y="72%" size="20px" delay={3} />
-          <LotteryBall number={9} x="12%" y="18%" size="18px" delay={4} />
-        </div>
+
 
         {/* Decorative gradient blobs */}
         <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#83C5BE]/15 rounded-full blur-3xl pointer-events-none" />

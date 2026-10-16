@@ -1,6 +1,8 @@
 import { ServiceContactForm } from './ServiceContactForm';
 import { ServicesPage, AiServicesPage } from './ServicesPages';
 import React from 'react';
+import { AppGrid } from './AppGrid';
+import type { AppProject } from '../types';
 import { ArrowRight, Check, ExternalLink } from 'lucide-react';
 import { SERVICES, WORK_PROFILES, type ServicePage, type WorkProfile } from '../marketing';
 
@@ -111,7 +113,7 @@ export const ServiceDetail: React.FC<{ service: ServicePage }> = ({ service }) =
   );
 };
 
-export const WorkIndex: React.FC = () => (
+export const WorkIndex: React.FC<{ onSelectApp: (app: AppProject) => void }> = ({ onSelectApp }) => (
   <main className="relative z-10 min-h-screen px-4 pb-24 pt-32 sm:px-6">
     <div className="mx-auto max-w-6xl">
       <PageIntro
@@ -139,6 +141,7 @@ export const WorkIndex: React.FC = () => (
           </article>
         ))}
       </section>
+      <section className="mt-16" aria-labelledby="all-products"><h2 id="all-products" className="mb-8 text-3xl font-black text-slate-900">All our products</h2><AppGrid onSelectApp={onSelectApp} /></section>
       <ServiceContactForm />
     </div>
   </main>
