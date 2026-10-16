@@ -21,7 +21,7 @@ export function Book() {
         <p className="mb-6 mt-3 leading-7 text-slate-600">Add a little about your business and a couple of times that work for you, including your time zone. Clint or Sheree will follow up to agree a time. Your appointment is only booked once we confirm it with you.</p>
         <ContactForm initialMessage="I’d like a free 20-minute introductory call.
 
-What I’d like to discuss: 
+What I’d like to discuss:
 
 Times that work for me (with time zone): " />
       </section>
