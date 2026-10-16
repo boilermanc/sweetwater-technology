@@ -33,6 +33,8 @@ export function addEmailNodes(workflow, config) {
     code('Record accepted confirmation',confirmationMarker.toString()+"\nconst patch=confirmationMarker($input.first().json,$('Build Sweetwater confirmation').first().json.event);return patch?[{json:{patch}}]:[];"),
     google('Save confirmation email receipt','PATCH','={{ JSON.stringify($json.patch) }}')
   ];
+  // Do not overwrite a concurrent cancellation/reschedule with an older property snapshot.
+  const receipt=nodes.at(-1);receipt.parameters.sendHeaders=true;receipt.parameters.headerParameters={parameters:[{name:'If-Match',value: "={{ $('Build Sweetwater confirmation').first().json.event.etag }}"}]};
   nodes.forEach((n,i)=>{n.position=[4800+i*260,720];workflow.nodes.push(n);});
   const chain=['Return public response',...nodes.map(n=>n.name)];
   for(let i=0;i<chain.length-1;i++)workflow.connections[chain[i]]={main:[[{node:chain[i+1],type:'main',index:0}]]};

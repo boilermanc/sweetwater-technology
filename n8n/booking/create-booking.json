@@ -670,6 +670,15 @@
               "responseFormat": "json"
             }
           }
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "If-Match",
+              "value": "={{ $('Build Sweetwater confirmation').first().json.event.etag }}"
+            }
+          ]
         }
       }
     }
