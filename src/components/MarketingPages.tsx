@@ -1,3 +1,4 @@
+import { ServicesPage, AiServicesPage } from './ServicesPages';
 import React from 'react';
 import { ArrowRight, Check, ExternalLink } from 'lucide-react';
 import { SERVICES, WORK_PROFILES, type ServicePage, type WorkProfile } from '../marketing';
@@ -21,34 +22,10 @@ const ContactCta: React.FC = () => (
   </aside>
 );
 
-export const ServicesIndex: React.FC = () => (
-  <main className="relative z-10 min-h-screen px-4 pb-24 pt-32 sm:px-6">
-    <div className="mx-auto max-w-6xl">
-      <PageIntro
-        eyebrow="Services"
-        title="Custom software built around the work"
-        description="Sweetwater Technology builds custom web applications, human-supervised AI automation, and mobile products for businesses with specialized workflows."
-      />
-      <section aria-labelledby="services-list" className="mt-16">
-        <h2 id="services-list" className="sr-only">Sweetwater Technology services</h2>
-        <div className="grid gap-6 lg:grid-cols-3">
-          {SERVICES.map((service) => (
-            <article key={service.slug} className="flex flex-col rounded-3xl border border-slate-200 bg-white/85 p-7 shadow-sm">
-              <h2 className="text-2xl font-black tracking-tight text-slate-900">{service.shortTitle}</h2>
-              <p className="mt-4 flex-1 leading-relaxed text-slate-600">{service.description}</p>
-              <a href={`/services/${service.slug}`} className="mt-6 inline-flex items-center gap-2 font-bold text-blue-600">
-                Explore {service.shortTitle.toLowerCase()} <ArrowRight aria-hidden="true" className="h-4 w-4" />
-              </a>
-            </article>
-          ))}
-        </div>
-      </section>
-      <ContactCta />
-    </div>
-  </main>
-);
+export const ServicesIndex = ServicesPage;
 
 export const ServiceDetail: React.FC<{ service: ServicePage }> = ({ service }) => {
+  if (service.slug === 'ai-workflow-automation') return <AiServicesPage />;
   const relatedWork = WORK_PROFILES.filter((profile) => service.relatedWork.includes(profile.slug));
 
   return (

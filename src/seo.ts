@@ -1,3 +1,4 @@
+import { AI_SERVICES_COPY, SERVICES_COPY } from './servicesContent';
 import { CONTINUUM_PAPER, HEADWATERS_INTRO } from './headwaters';
 import { ABOUT_DESCRIPTION, FAQS } from './content';
 import { findNewsArticle, NEWS_ARTICLES } from './news';
@@ -230,8 +231,8 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
 
   if (path === '/services') {
     return {
-      title: 'Custom Software Development Services | Sweetwater Technology',
-      description: 'Explore custom web application development, AI workflow automation, and mobile app development services from Sweetwater Technology in Atlanta.',
+      title: `${SERVICES_COPY.title} | Sweetwater Technology`,
+      description: SERVICES_COPY.description,
       canonical: `${SITE_URL}/services`,
       type: 'website',
       jsonLd: [organization],
@@ -242,9 +243,10 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
     const service = findService(path.slice('/services/'.length));
     if (service) {
       const canonical = `${SITE_URL}/services/${service.slug}`;
+      const copy = service.slug === 'ai-workflow-automation' ? AI_SERVICES_COPY : service;
       return {
-        title: `${service.title} | Sweetwater Technology`,
-        description: service.description,
+        title: `${copy.title} | Sweetwater Technology`,
+        description: copy.description,
         canonical,
         type: 'website',
         jsonLd: [
@@ -252,9 +254,9 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
           {
             '@context': 'https://schema.org',
             '@type': 'Service',
-            name: service.title,
+            name: copy.title,
             serviceType: service.shortTitle,
-            description: service.description,
+            description: copy.description,
             url: canonical,
             provider: { '@id': `${SITE_URL}/#organization` },
             areaServed: { '@type': 'Country', name: 'United States' },
@@ -262,7 +264,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
           {
             '@context': 'https://schema.org',
             '@type': 'FAQPage',
-            mainEntity: service.faqs.map((faq) => ({
+            mainEntity: copy.faqs.map((faq) => ({
               '@type': 'Question',
               name: faq.question,
               acceptedAnswer: { '@type': 'Answer', text: faq.answer },

@@ -19,7 +19,7 @@ const plainText = (html) => html
 const requiredCopy = new Map([
   ['/', 'Sweetwater Technology builds custom web applications, mobile products, and AI workflow automation from Atlanta, Georgia.'],
   ['/services/custom-web-applications', 'Custom Web Application Development'],
-  ['/services/ai-workflow-automation', 'AI Workflow Automation'],
+  ['/services/ai-workflow-automation', 'AI does the busywork. You make the calls.'],
   ['/services/mobile-app-development', 'Mobile App Development'],
 ]);
 
@@ -69,7 +69,9 @@ function inspect(html, route, uniqueTitle = true) {
   for (const [, json] of schemas) JSON.parse(json);
   if (requiredCopy.has(route)) assert(text.includes(requiredCopy.get(route)), `${route}: expected business copy missing`);
   if (route.startsWith('/services/')) {
-    for (const phrase of ['Who this service is for', 'What Sweetwater Technology delivers', 'How the engagement works']) {
+    for (const phrase of route === '/services/ai-workflow-automation'
+      ? ['Sound familiar?', 'What you get', 'How it works', 'Tell us what']
+      : ['Who this service is for', 'What Sweetwater Technology delivers', 'How the engagement works']) {
       assert(text.includes(phrase), `${route}: missing service content: ${phrase}`);
     }
   }
