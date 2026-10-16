@@ -19,5 +19,5 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run build
-      - run: node --test scripts/booking.test.mjs scripts/home.test.mjs scripts/ai-help.test.mjs scripts/discovery.test.mjs scripts/portal.test.mjs scripts/guided-portal.test.mjs
+      - run: node --test scripts/*.test.mjs
       - run: npm run audit:html

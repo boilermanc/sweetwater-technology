@@ -1,3 +1,4 @@
+import { addEmailNodes } from '../n8n/booking/email.mjs';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 const core = readFileSync('n8n/booking/core.mjs','utf8').replaceAll('export function','function');
@@ -54,4 +55,5 @@ for(let i=0;i<chain.length-1;i++)link(chain[i],chain[i+1]);
 link('Claim acquired?','Verify saved event',1);
 for(const name of ['Valid request?','Human verified?','New booking?','Time still available?'])link(name,'Return public response',1);
 add('Activation requirements','stickyNote',{content:'## Do not publish yet\nConfirm calendar and booking hours in config.json, select Google Calendar OAuth on all Google HTTP nodes, connect Turnstile and rate limiting, and verify concurrent booking behavior before enabling.\nSelect Trellis Supabase credentials for Claim booking slot. Only a new INSERT can create an event. Never upsert or automatically expire claims. See docs/booking-setup.md.',width:620,height:240},1);
+addEmailNodes({nodes,connections},config);
 save('create-booking.json','Sweetwater Create Booking');

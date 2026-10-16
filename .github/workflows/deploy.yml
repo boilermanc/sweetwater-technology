@@ -77,7 +77,7 @@ jobs:
           fi
           npm run build
           npm run lint
-          node --test scripts/booking.test.mjs scripts/home.test.mjs scripts/ai-help.test.mjs scripts/discovery.test.mjs scripts/portal.test.mjs scripts/guided-portal.test.mjs
+          node --test scripts/*.test.mjs
           npm run audit:html
           echo "commit=${GITHUB_SHA}" > dist/build-info.txt
           date -u +"built_utc=%Y-%m-%dT%H:%M:%SZ" >> dist/build-info.txt

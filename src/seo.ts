@@ -100,6 +100,8 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
   if (path === '/') return { title: 'Get Your Hours Back | Sweetwater Technology', description: HOME_DESCRIPTION, canonical: SITE_URL + '/', type: 'website', jsonLd: [organization, faqPage] };
   if (path === '/ai-help' || path === '/app-idea') return { title: (path === '/ai-help' ? 'Practical AI for your business' : 'Talk through your app idea') + ' | Sweetwater Technology', description: 'Start a conversation about your business or app idea. Explore a useful first step with Sweetwater Technology.', canonical: SITE_URL + path, type: 'website', jsonLd: [organization], robots: 'noindex, follow' };
 
+  if (path === '/book/manage') return { title: 'Manage Your Booking | Sweetwater Technology', description: 'Manage your private Sweetwater call booking.', canonical: SITE_URL + '/book/manage', type: 'website', jsonLd: [], robots: 'noindex, nofollow' };
+
   if (path === '/book') return { title: 'Free 20-Minute Introductory Call | Sweetwater Technology', description: 'Book a free 20-minute call to talk through your business workflow, connected systems, and practical next steps with Sweetwater Technology.', canonical: SITE_URL + '/book', type: 'website', jsonLd: [organization] };
 
   if (path === '/about') {
@@ -388,6 +390,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
 };
 
 export const PRERENDER_ROUTES = [
+  '/book/manage',
   '/book',
   '/terms',
   '/privacy',

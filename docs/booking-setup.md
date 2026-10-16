@@ -15,11 +15,11 @@ Run node scripts/build-booking-workflows.mjs after changes to configuration or c
 - Google Cloud project sweetwater-booking: Calendar API enabled, OAuth app In production. Owner reconnected Google on 2026-10-16 after the status change. n8n uses Google Calendar account for all Google HTTP nodes.
 - OAuth callback: https://n8n.sproutify.app/rest/oauth2-credential/callback
 - Cloudflare Turnstile widget Sweetwater Booking: Managed, hostname sweetwater.technology only, no pre-clearance. Public site key 0x4AAAAAAFYv6L2Bv43OoITD. The owner-entered secret is in encrypted Custom Auth credential Sweetwater Booking Turnstile, restricted to challenges.cloudflare.com. Never put secrets in repository files.
-- Cloudflare rate rule Sweetwater booking endpoints: 20 requests per 10 seconds per IP, block 10 seconds; matches only the two production booking webhook paths on n8n.sproutify.app. Rule ID 86ce186a9a4f467d92da1a339923dd83.
+- Cloudflare rate rule Sweetwater booking endpoints: 20 requests per 10 seconds per IP, block 10 seconds; matches the availability, create and manage production booking webhook paths on n8n.sproutify.app. Rule ID 86ce186a9a4f467d92da1a339923dd83.
 - Trellis credential Sproutify Trellis is bound to Claim booking slot. Migration 20261016194928_sweetwater_booking_claims.sql lives in the Trellis repository. The private table permits service-role SELECT/INSERT only; public roles have no access.
 - GitHub production build variables: VITE_BOOKING_ENABLED=true and VITE_BOOKING_TURNSTILE_SITE_KEY set to the public key above. Existing portal deployment configuration must be preserved.
 - Build and Deploy Sweetwater Technology deploys main pushes or an explicitly dispatched branch through IONOS SFTP. Homepage review checks only validate the feature branch.
-- Resend domain sweetwater.technology is verified. Existing IONOS mail records remain in place. Booking currently requests Google Calendar invitations; it does not send Resend confirmations or generate Google Meet links. The page states that call details follow separately.
+- Resend domain sweetwater.technology is verified. Existing IONOS mail records remain in place. Booking requests Google Calendar invitations. The Resend confirmation branch is live (creation version 797f6c98), bound to Sweetwater Booking Resend. Delivery to the owner inbox was verified on 2026-10-16 with SPF, DKIM and DMARC passing. It does not generate Google Meet links. The page states that call details follow separately.
 
 ## Booking integrity and cancellation
 
@@ -41,3 +41,30 @@ Run npm run lint, npm run build, npm run audit:html, and node --test scripts/*.t
 ## Recovery
 
 Set VITE_BOOKING_ENABLED=false and redeploy to return to the existing request-call fallback. Unpublish the two workflows if endpoint rollback is needed. These steps do not cancel existing events or remove claims. Do not change existing IONOS DNS or unrelated workflows during rollback.
+
+## Sweetwater confirmation email
+
+The branch runs after Return public response, so email failures do not change a confirmed booking. It rereads Google and verifies the event identity, request, recipient, name, topic and times. Only confirmed events created within 23 hours without a sweetwaterConfirmationId marker are eligible. HTML escapes visitor input; plain text is included. Free-text topics are excluded from email. Sender and reply-to are team@sweetwater.technology.
+
+Bind Send Sweetwater confirmation to the encrypted Sweetwater Booking Resend Header Auth credential: Authorization header, Bearer token entered by the owner, requests restricted to api.resend.com. Use a Sending access Resend key scoped to sweetwater.technology. Never store it in files or output.
+
+Resend requests use a stable sweetwater-booking/<eventId> idempotency key, up to three attempts with one-second delays and ten-second timeouts. After a valid Resend API acknowledgement, Google stores its message ID in private extended properties with sendUpdates=none. This marker indicates accepted for sending, not delivered. Resend delivery logs or the recipient inbox are required to verify delivery. A timeout or rejected send leaves the marker unset; reusing the same booking request can retry within 23 hours. The cutoff prevents duplicate uncertain sends after Resend’s 24-hour key expiry. Older unresolved sends require operator reconciliation. There is no background delivery-retry queue or bounce webhook yet.
+
+Recovery: restore the previous published workflow version to remove only the confirmation branch; appointments and existing Google invitations remain intact. The original workflow was downloaded before editing. Do not clear booking claims to retry email.
+
+
+## Self-service booking management (rollout in progress, 2026-10-16)
+
+The Trellis migration 20261016213929_sweetwater_booking_management.sql is applied with owner approval. Rollback-only tests passed for reschedule, cancellation, incorrect tokens, concurrent operations, verified abort and service-role enforcement. No test records remain. The Trellis SQL_SCHEMA includes this migration.
+
+The draft adds /book/manage (noindex, nofollow; excluded from sitemap). Confirmation emails register a private token and put the booking ID/token in the link fragment, never query parameters. Guests explicitly confirm changes; opening a link only views the booking. Treat links as bearer credentials: never log or share them. Registration failure falls back to the existing reply-for-help email.
+
+Generate with node scripts/build-booking-management.mjs. The management workflow is published with owner approval at https://n8n.sproutify.app/workflow/4vpSIcnTmBsjoLXTq6pwL (version 0a127769). It uses existing Google and Trellis credentials. Imports do not apply settings: disable successful, failed and manual execution retention and progress retention; set a 90-second timeout. The existing Cloudflare booking rate rule now includes /webhook/sweetwater-booking-manage, verified Active with its original threshold.
+
+POST requests require the private token. Public responses expose only booking ID, time, status and operation ID. A new operation reserves the target while retaining the old claim. Google PATCH uses the observed ETag (If-Match), preserves private properties and requests invitation updates. Readback must match the operation marker and status/time before the service-only finish RPC releases the old claim. Retries reuse the same operation ID. The same link works after rescheduling.
+
+Known busy targets are rejected before reservation. If a conflict appears afterward, or a write is uncertain, retain claims and retry the exact operation. Never automatically expire reservations. Guests who close the page during an uncertain change may need operator help. To reconcile manually, ensure no execution is running or capable of writing late, then read the exact Google event and operation. Finish only a verified applied operation; abort only a definitively unchanged event after excluding delayed writes. Never bulk-clear records or claims.
+
+Activation order: verify the draft and rate rule, publish with approval, test a disposable appointment through reschedule/cancel and restored availability, deploy the management page, then publish the creation-email link branch. Existing emails do not gain links retroactively. To roll back, restore the previous creation workflow to stop new links. Retain management for already-issued links unless disabling them is intentional. Website/email changes are not deployed for this draft.
+
+Verification: database rollback tests; generated workflow with mocked Google/Trellis (including timeout-after-write and failed readback); strict browser response matching; 48 passing tests; build/lint/HTML audit. The live endpoint rejects invalid links (404), malformed requests (400), and unapproved origins (403). A disposable appointment successfully rescheduled and cancelled; both times reopened, with 28 total open slots. Cancellation retry returned the same success. The real reschedule retry exposed a preflight issue; the corrected version includes full-workflow regression coverage. Browser access to the isolated local preview was blocked; responsive/keyboard and real reschedule/cancel checks remain outstanding.
