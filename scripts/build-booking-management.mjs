@@ -1,3 +1,4 @@
+import {addOwnerNotifications} from '../n8n/booking/owner-notifications.mjs';
 import {addManagementEmailNodes} from '../n8n/booking/management-email.mjs';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {randomUUID} from 'node:crypto';
@@ -48,4 +49,5 @@ add('Return management response','respondToWebhook',{respondWith:'json',response
 const chain=nodes.map(n=>n.name);for(let i=0;i<chain.length-1;i++)link(chain[i],chain[i+1]);
 for(const n of nodes.filter(n=>n.type.endsWith('.if')))link(n.name,n.name==='Calendar write needed?'?'Verify management readback':'Return management response',1);
 addManagementEmailNodes({nodes,connections},config);
+addOwnerNotifications({nodes,connections},config,"management");
 writeFileSync('n8n/booking/manage-booking.json',JSON.stringify({name:'Sweetwater Manage Booking',nodes,connections,active:false,settings:{executionOrder:'v1',saveDataSuccessExecution:'none',saveDataErrorExecution:'none',saveManualExecutions:false,executionTimeout:90,timezone:config.timeZone}},null,2)+'\n');

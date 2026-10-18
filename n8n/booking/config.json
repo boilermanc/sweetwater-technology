@@ -17,5 +17,7 @@
   "bufferMinutes": 10,
   "noticeHours": 24,
   "horizonDays": 30,
-  "turnstileHostname": "sweetwater.technology"
+  "turnstileHostname": "sweetwater.technology",
+  "ownerEmail": "boilermanc@gmail.com",
+  "ownerSlackUserId": "UFNPKCQH3"
 }
