@@ -10,8 +10,8 @@ const NAV_LINKS = [
   { href: '/news', label: 'News' },
   { href: '/resources', label: 'Resources' },
   { href: '/headwaters/', label: 'Headwaters' },
-  { href: '/#contact', label: 'Connect' },
-  { href: '/book', label: 'Book a free call' },
+  { href: '/#contact-form', label: 'Connect' },
+  { href: '/book', label: 'Book a free 20-minute call' },
 ];
 
 export const Header: React.FC = () => {
@@ -56,7 +56,7 @@ export const Header: React.FC = () => {
           />
         </a>
 
-        <nav className="hidden xl:flex items-center gap-6">
+        <nav className="hidden xl:flex items-center gap-4">
           {NAV_LINKS.map((link) => (
             <a key={link.href} href={link.href} className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">
               {link.label}
@@ -102,7 +102,7 @@ export const Header: React.FC = () => {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 z-50 w-72 bg-white shadow-2xl xl:hidden flex flex-col"
+              className="fixed top-0 right-0 bottom-0 z-50 w-72 bg-white shadow-2xl xl:hidden flex flex-col overflow-y-auto"
             >
               <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
                 <span className="font-extrabold text-slate-900 tracking-tight">Menu</span>

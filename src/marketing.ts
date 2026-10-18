@@ -33,104 +33,159 @@ export interface WorkProfile {
 
 export const SERVICES: ServicePage[] = [
   {
-    slug: 'custom-web-applications',
-    title: 'Custom Web Application Development',
-    shortTitle: 'Custom web applications',
-    description:
-      'Sweetwater Technology designs and builds custom web applications, internal tools, SaaS products, and customer portals for businesses with specialized workflows.',
-    intro:
-      'Custom software is valuable when the business process is too specific for an off-the-shelf platform. Sweetwater Technology turns those workflows into secure, maintainable web applications that teams can use from any modern browser.',
-    audience: [
-      'Businesses running important operations through spreadsheets, inboxes, and disconnected tools',
-      'Founders who need a production-ready minimum viable product',
-      'Teams replacing a legacy application or extending an existing platform',
-      'Companies that need a customer portal, operations dashboard, marketplace, or specialized SaaS product',
+    "slug": "custom-web-applications",
+    "title": "Custom Web Application Development",
+    "shortTitle": "Custom web apps",
+    "description": "Keep jobs, customers and paperwork in one place with software built around your business.",
+    "intro": "When spreadsheets and separate tools stop fitting the job, a custom app can bring the important details together. We start with the work your team needs to do.",
+    "audience": [
+      "Teams copying details between emails and spreadsheets",
+      "Businesses that need a place for customers to request work or check progress",
+      "Owners with an app idea they want to test"
     ],
-    deliverables: [
-      { title: 'Product definition', description: 'A practical feature scope, user-flow map, data model, and delivery plan tied to the business goal.' },
-      { title: 'Application design', description: 'Responsive interfaces designed around the people who will use the product every day.' },
-      { title: 'Full-stack development', description: 'Frontend, backend, database, authentication, integrations, and administrative tools built as one coherent system.' },
-      { title: 'Launch and iteration', description: 'Deployment preparation, production verification, monitoring, and a plan for improvements after real users arrive.' },
+    "deliverables": [
+      {
+        "title": "A clear plan",
+        "description": "Agree what the first version needs to do and what it will cost."
+      },
+      {
+        "title": "An app your team can use",
+        "description": "Clear screens for everyday tasks, on a computer or phone."
+      },
+      {
+        "title": "Connected tools",
+        "description": "Bring information across from your existing tools where they support it."
+      },
+      {
+        "title": "Help getting started",
+        "description": "Testing, training and handover so the team can use what we build."
+      }
     ],
-    process: [
-      { title: 'Understand the workflow', description: 'We document the current process, users, constraints, and the result the software must produce.' },
-      { title: 'Shape the smallest useful release', description: 'We prioritize the capabilities needed to create value and defer work that does not support the first outcome.' },
-      { title: 'Build in working increments', description: 'Stakeholders review functioning software throughout development instead of waiting for a final reveal.' },
-      { title: 'Launch with evidence', description: 'The production release is checked across devices, key workflows, analytics, and operational handoffs.' },
+    "process": [
+      {
+        "title": "Understand the job",
+        "description": "Show us where time gets lost."
+      },
+      {
+        "title": "Agree the first step",
+        "description": "Choose a useful starting point and a clear price."
+      },
+      {
+        "title": "Try working software",
+        "description": "Review it as we build and tell us what needs changing."
+      },
+      {
+        "title": "Put it to work",
+        "description": "Test the important tasks and help your team get started."
+      }
     ],
-    faqs: [
-      { question: 'How much does a custom web application cost?', answer: 'Pricing depends on scope, integrations, security requirements, and the amount of product definition already completed. Sweetwater Technology provides a clear project proposal or retainer structure after an initial conversation.' },
-      { question: 'How long does a custom web application take to build?', answer: 'Focused MVPs can often ship in weeks. Larger operational platforms are delivered in stages so the highest-value workflows reach users first.' },
-      { question: 'Can Sweetwater Technology improve an existing application?', answer: 'Yes. Engagements can begin with a targeted feature, interface modernization, integration, reliability issue, or a staged replacement of a legacy system.' },
+    "faqs": [
+      {
+        "question": "What does it cost?",
+        "answer": "The first conversation is free. We agree the scope and price before paid work begins."
+      },
+      {
+        "question": "Can you improve an app we already use?",
+        "answer": "Often, yes. We will look at the app and explain what can be changed before proposing work."
+      }
     ],
-    relatedWork: ['lanewise', 'atl-urban-farms'],
+    "relatedWork": [
+      "lanewise",
+      "atl-urban-farms"
+    ]
   },
   {
-    slug: 'ai-workflow-automation',
-    title: 'AI Workflow Automation',
-    shortTitle: 'AI workflow automation',
-    description:
-      'Sweetwater Technology builds human-supervised AI workflows that extract information, prepare decisions, and reduce repetitive operational work.',
-    intro:
-      'Useful AI automation starts with a repeatable business process, not a chatbot. Sweetwater Technology connects language and vision models to the systems a team already uses, with review steps and visible assumptions where accuracy matters.',
-    audience: [
-      'Operations teams repeatedly reading emails, documents, images, or form submissions',
-      'Businesses that prepare quotes, summaries, listings, or structured records by hand',
-      'Product teams adding AI-assisted search, classification, recommendations, or content generation',
-      'Organizations that require a person to review an AI-generated result before it is sent or committed',
+    "slug": "ai-workflow-automation",
+    "title": "AI helpers for everyday work",
+    "shortTitle": "AI helpers",
+    "description": "Prepare replies, organize incoming information and cut repeated typing with practical AI your team can review.",
+    "intro": "Start with one repeated task and test whether AI can help.",
+    "audience": [
+      "Small and growing businesses"
     ],
-    deliverables: [
-      { title: 'Workflow assessment', description: 'A map of the current inputs, decisions, exceptions, and systems involved in the process.' },
-      { title: 'AI-assisted pipeline', description: 'Extraction, classification, generation, or recommendation steps connected to real business data.' },
-      { title: 'Human review controls', description: 'Clear source data, assumptions, confidence signals, and approval steps for consequential outputs.' },
-      { title: 'Measurement and safeguards', description: 'Evaluation examples, failure handling, access controls, and monitoring designed for the specific workflow.' },
+    "deliverables": [
+      {
+        "title": "Useful drafts",
+        "description": "Give your team something to review instead of a blank page."
+      }
     ],
-    process: [
-      { title: 'Choose a measurable task', description: 'We identify a narrow process with known inputs, outputs, and a meaningful definition of success.' },
-      { title: 'Test against real examples', description: 'Representative cases expose ambiguity and exceptions before the workflow is connected to production systems.' },
-      { title: 'Integrate with review', description: 'The automation prepares useful work while the responsible person retains control over the final action.' },
-      { title: 'Improve from observed failures', description: 'Real usage informs prompt, data, interface, and workflow changes after launch.' },
+    "process": [
+      {
+        "title": "Start small",
+        "description": "Agree a task, a test and a price."
+      }
     ],
-    faqs: [
-      { question: 'What business processes can be automated with AI?', answer: 'Strong candidates include document and email intake, data extraction, product enrichment, draft preparation, image identification, internal search, and recommendations grounded in business data.' },
-      { question: 'Does AI automation replace employees?', answer: 'Sweetwater Technology primarily designs AI as a copilot for repetitive work. The system prepares information or a draft while people handle judgment, exceptions, and consequential decisions.' },
-      { question: 'Can AI automation connect to existing software?', answer: 'Yes. A workflow can connect to email, databases, CRMs, commerce platforms, logistics services, internal APIs, and other systems that provide a secure integration method.' },
+    "faqs": [
+      {
+        "question": "What does it cost?",
+        "answer": "The first conversation is free. Paid work is scoped and priced separately."
+      }
     ],
-    relatedWork: ['lanewise', 'rekkrd'],
+    "relatedWork": [
+      "lanewise"
+    ]
   },
   {
-    slug: 'mobile-app-development',
-    title: 'Mobile App Development',
-    shortTitle: 'Mobile applications',
-    description:
-      'Sweetwater Technology builds focused mobile applications for iPhone, iPad, and cross-platform product experiences using React Native, Expo, and Flutter.',
-    intro:
-      'A mobile application should use the device for a clear reason. Sweetwater Technology builds products around camera capture, field workflows, notifications, portable collections, and other experiences that benefit from being available where the user is.',
-    audience: [
-      'Product teams extending a web platform to iPhone, iPad, or Android',
-      'Businesses whose users work in stores, farms, classrooms, warehouses, or other field environments',
-      'Consumer products that depend on camera capture, notifications, offline access, or portable personal data',
-      'Founders who need one maintainable codebase across multiple mobile platforms',
+    "slug": "mobile-app-development",
+    "title": "Mobile App Development",
+    "shortTitle": "Mobile apps",
+    "description": "Useful tools for customers and crews, wherever the work happens.",
+    "intro": "A phone can help people capture a photo, update a job or find the details they need away from a desk. We build around that useful task.",
+    "audience": [
+      "Crews working on site",
+      "Businesses whose customers need a simple mobile tool",
+      "Owners with a new app idea"
     ],
-    deliverables: [
-      { title: 'Mobile product design', description: 'Touch-first navigation, device-aware workflows, and responsive layouts built for real usage conditions.' },
-      { title: 'Cross-platform development', description: 'React Native, Expo, or Flutter implementation selected for the product and existing technology stack.' },
-      { title: 'Backend integration', description: 'Secure authentication, synchronization, subscriptions, notifications, media, and API connections.' },
-      { title: 'Store preparation', description: 'Build configuration, privacy details, screenshots, release checks, and submission support for the applicable stores.' },
+    "deliverables": [
+      {
+        "title": "Easy-to-use screens",
+        "description": "Clear actions designed for a phone."
+      },
+      {
+        "title": "Shared information",
+        "description": "Keep the app and your existing business tools in step where connections are available."
+      },
+      {
+        "title": "Device testing",
+        "description": "Check the important tasks on the devices your users need."
+      },
+      {
+        "title": "Launch support",
+        "description": "Prepare the app, store listing and handover together."
+      }
     ],
-    process: [
-      { title: 'Define the mobile advantage', description: 'We establish why the experience belongs on a device and which capabilities matter to users away from a desk.' },
-      { title: 'Prototype the critical flow', description: 'The riskiest interaction is tested early on representative screen sizes.' },
-      { title: 'Build and test on devices', description: 'Development includes device behavior, permissions, connectivity changes, and platform conventions.' },
-      { title: 'Prepare the release', description: 'Store assets, privacy disclosures, production configuration, and release builds are checked together.' },
+    "process": [
+      {
+        "title": "Choose the task",
+        "description": "Find what is easier on a phone."
+      },
+      {
+        "title": "Try the idea",
+        "description": "Check the main screens before building everything."
+      },
+      {
+        "title": "Build and test",
+        "description": "Try the app on real devices."
+      },
+      {
+        "title": "Help people start",
+        "description": "Prepare launch materials and support."
+      }
     ],
-    faqs: [
-      { question: 'Do you build native or cross-platform mobile apps?', answer: 'Sweetwater Technology primarily uses React Native, Expo, and Flutter for shared mobile development. The final choice depends on device requirements, the existing product stack, and long-term maintenance needs.' },
-      { question: 'Can a mobile app share data with an existing website?', answer: 'Yes. Mobile and web applications can use the same authenticated backend so accounts, collections, subscriptions, and operational data remain synchronized.' },
-      { question: 'Can you help launch an app in the App Store?', answer: 'Yes. Store preparation can include build configuration, screenshots, privacy disclosures, listing content, testing, and submission support.' },
+    "faqs": [
+      {
+        "question": "Can an app connect to our website?",
+        "answer": "Often, yes. We check how your current website stores and shares information first."
+      },
+      {
+        "question": "Can you help with app store release?",
+        "answer": "Yes. We can help prepare the listing, testing and submission. Store approval remains with the store."
+      }
     ],
-    relatedWork: ['rekkrd'],
-  },
+    "relatedWork": [
+      "rekkrd"
+    ]
+  }
 ];
 
 export const WORK_PROFILES: WorkProfile[] = [

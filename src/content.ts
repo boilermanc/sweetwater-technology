@@ -4,7 +4,7 @@ export interface FAQItem {
   answer: string;
 }
 
-export const ABOUT_DESCRIPTION = 'Sweetwater Technology is an Atlanta software studio building custom web applications, mobile products, and AI workflow tools for businesses and founders.';
+export const ABOUT_DESCRIPTION = 'Clint and Sheree Crowe help small and growing businesses find practical uses for AI, connect their tools and build software around the way they work.';
 
 export const FAQS: FAQItem[] = [
   {

@@ -1,3 +1,4 @@
+import { FloatingAiGuide } from '../components/FloatingAiGuide';
 import { ArrowRight } from 'lucide-react';
 const experiments = [
   ['Draft an email reply', 'Make up a typical customer question. Ask for a friendly reply, then edit it to sound like you.'],
@@ -15,5 +16,5 @@ export function TryAiGuide() {
     <section className="mt-12"><h2 className="text-2xl font-black text-slate-900">What not to put in</h2><p className="mt-4 leading-8 text-slate-600">No customer, patient or client personal information. No passwords, account numbers or confidential business documents.</p></section>
     <section className="mt-10"><h2 className="text-2xl font-black text-slate-900">Check its work</h2><p className="mt-4 leading-8 text-slate-600">AI drafts. You decide. Check the facts and read everything before it goes out.</p></section>
     <section className="mt-10"><h2 className="text-2xl font-black text-slate-900">When to call someone</h2><p className="mt-4 leading-8 text-slate-600">When the task happens every day, involves several tools, or needs a consistent approach for your team. We can help you decide what’s worth changing.</p><a href="/#contact-form" className="mt-7 inline-flex min-h-12 items-center gap-3 rounded-full bg-blue-600 px-6 py-4 font-bold text-white hover:bg-blue-700">Tell us what’s slowing you down <ArrowRight size={18} aria-hidden="true" /></a><div><a href="/book" className="mt-5 inline-flex min-h-11 items-center font-bold text-blue-700 underline">Book a free 20-minute call →</a></div></section>
-  </article></main>;
+  </article><FloatingAiGuide /></main>;
 }

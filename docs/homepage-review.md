@@ -1,3 +1,5 @@
+> Historical review record. The October 18 refresh supersedes the contact activation and catalog notes below; see [current contact delivery](contact-delivery.md). The business catalog now excludes the two personal/family projects.
+
 # Homepage review
 
 Branch: feature/home-plain-english. Review branch only; no production deployment.

@@ -48,7 +48,7 @@ export function emailRequest(details: AiHelpDetails, source: string) {
 }
 
 // A dedicated endpoint must implement this contract. Do not point at sage-card-chat.
-export async function submitRequest(endpoint: string, payload: { requestId: string }) {
+export async function submitRequest<T extends { requestId: string }>(endpoint: string, payload: T) {
   const response = await fetch(endpoint, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload), signal: AbortSignal.timeout(15000),

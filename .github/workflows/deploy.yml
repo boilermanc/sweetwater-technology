@@ -19,6 +19,7 @@ jobs:
     timeout-minutes: 15
     env:
       LIVE_URL: https://sweetwater.technology
+      VITE_HOME_CONTACT_ENABLED: "true"
       VITE_BOOKING_ENABLED: ${{ vars.VITE_BOOKING_ENABLED }}
       VITE_BOOKING_TURNSTILE_SITE_KEY: ${{ vars.VITE_BOOKING_TURNSTILE_SITE_KEY }}
       VITE_PORTAL_SUPABASE_URL: ${{ vars.VITE_PORTAL_SUPABASE_URL }}

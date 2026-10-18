@@ -97,7 +97,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
     return { title: 'Client Login | Sweetwater Technology', description: 'Private Sweetwater Technology workspace.', canonical: `${SITE_URL}/portal`, type: 'website', jsonLd: [], robots: 'noindex, nofollow' };
   }
 
-  if (path === '/') return { title: 'Get Your Hours Back | Sweetwater Technology', description: HOME_DESCRIPTION, canonical: SITE_URL + '/', type: 'website', jsonLd: [organization, faqPage] };
+  if (path === '/') return { title: 'Practical AI for Your Business | Sweetwater Technology', description: HOME_DESCRIPTION, canonical: SITE_URL + '/', type: 'website', jsonLd: [organization, faqPage] };
   if (path === '/ai-help' || path === '/app-idea') return { title: (path === '/ai-help' ? 'Practical AI for your business' : 'Talk through your app idea') + ' | Sweetwater Technology', description: 'Start a conversation about your business or app idea. Explore a useful first step with Sweetwater Technology.', canonical: SITE_URL + path, type: 'website', jsonLd: [organization], robots: 'noindex, follow' };
 
   if (path === '/book/manage') return { title: 'Manage Your Booking | Sweetwater Technology', description: 'Manage your private Sweetwater call booking.', canonical: SITE_URL + '/book/manage', type: 'website', jsonLd: [], robots: 'noindex, nofollow' };
@@ -107,7 +107,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
   if (path === '/about') {
     const canonical = `${SITE_URL}/about`;
     return {
-      title: 'About Sweetwater Technology | Atlanta Software Studio',
+      title: 'Meet Clint and Sheree | Sweetwater Technology',
       description: ABOUT_DESCRIPTION,
       canonical,
       type: 'website',
@@ -298,7 +298,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
 
   if (path === '/work') {
     return {
-      title: 'Product Work & Case Studies | Sweetwater Technology',
+      title: 'Our Work | Sweetwater Technology',
       description: 'Explore Sweetwater Technology product profiles spanning AI-native consumer software, logistics automation, and specialized e-commerce.',
       canonical: `${SITE_URL}/work`,
       type: 'website',

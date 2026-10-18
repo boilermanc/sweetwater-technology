@@ -2,8 +2,8 @@ import { ArrowUpRight, Mail } from 'lucide-react';
 import { SweetwaterLogo } from './SweetwaterLogo';
 
 const groups = [
-  { title: 'Work with us', links: [['Free 20-minute call', '/book'], ['Services', '/services'], ['Custom web apps', '/services/custom-web-applications'], ['AI helpers', '/services/ai-workflow-automation'], ['Mobile apps', '/services/mobile-app-development'], ['Have an app idea?', '/app-idea?src=footer']] },
-  { title: 'Explore', links: [['About Sweetwater', '/about'], ['Our work', '/work'], ['News', '/news'], ['Headwaters', '/headwaters/'], ['Continuum', '/headwaters/continuum/']] },
+  { title: 'Work with us', links: [['Book a free 20-minute call', '/book'], ['Services', '/services'], ['Custom web apps', '/services/custom-web-applications'], ['AI helpers', '/services/ai-workflow-automation'], ['Mobile apps', '/services/mobile-app-development'], ['Have an app idea?', '/app-idea?src=footer']] },
+  { title: 'Explore', links: [['About Sweetwater', '/about'], ['Our work', '/work'], ['News', '/news'], ['Headwaters', '/headwaters/']] },
   { title: 'Start here', links: [['Free resources', '/resources'], ['Try AI This Week', '/resources/try-ai-this-week'], ['Download the free AI guide', '/downloads/try-ai-this-week.pdf'], ['Explore practical AI', '/ai-help?src=footer'], ['Client login', '/portal']] },
 ];
 

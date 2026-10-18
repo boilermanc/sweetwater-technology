@@ -2,7 +2,7 @@ import { createServer } from 'vite';
 let requests = 0;
 const server = await createServer({
   server: { host: '127.0.0.1', port: 4005, strictPort: true },
-  define: { 'import.meta.env.VITE_HOME_CONTACT_MOCK': JSON.stringify('true'), 'import.meta.env.VITE_SAGE_DISCOVERY_CONTACT_URL': JSON.stringify('/__home_contact_mock') },
+  define: { 'import.meta.env.VITE_HOME_CONTACT_MOCK': JSON.stringify('true'), 'import.meta.env.VITE_HOME_CONTACT_URL': JSON.stringify('/__home_contact_mock') },
   plugins: [{ name: 'local-contact-test', configureServer(server) {
     server.middlewares.use('/__home_contact_mock', (req, res) => {
       if (req.method !== 'POST') { res.statusCode = 405; res.end(); return; }

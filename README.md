@@ -26,7 +26,7 @@ Verified news articles live in `src/news.ts`. Adding an article there creates it
 
 Service and product-profile content lives in `src/marketing.ts`. Those entries generate `/services/:slug` and `/work/:slug` routes with Service, FAQ, SoftwareApplication, and breadcrumb structured data where applicable.
 
-Home, services, and work reuse `src/components/ServiceContactForm.tsx`. Online sending is disabled until the shared inquiry endpoint is verified; email drafts remain available. See [homepage review and contact activation](docs/homepage-review.md) for local URLs, safe form tests, and release prerequisites.
+Home, services, and work reuse `src/components/ServiceContactForm.tsx`. Production delivery uses the existing inquiry queue with server-verified Turnstile and notifications only to Clint. See [contact delivery](docs/contact-delivery.md) for activation, testing, and recovery, and [homepage review](docs/homepage-review.md) for the earlier release history.
 # QR codes
 
 Print and campaign QR codes are stored in `public/qr` as both scalable SVG and high-resolution PNG files.
