@@ -1,0 +1,259 @@
+{
+  "name": "Sweetwater Booking Reminder",
+  "nodes": [
+    {
+      "id": "b86a9543-5784-4738-8360-6c6828a467c4",
+      "name": "Every five minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "39520aa3-6721-49a0-91da-345681a6d8f0",
+      "name": "Prepare reminder window",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        300
+      ],
+      "parameters": {
+        "jsCode": "const config={\"enabled\":false,\"calendarId\":\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\",\"busyCalendarIds\":[\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\",\"boilermanc@gmail.com\"],\"timeZone\":\"America/New_York\",\"weekdays\":[\"Tue\",\"Thu\"],\"openMinute\":600,\"closeMinute\":720,\"durationMinutes\":20,\"stepMinutes\":30,\"bufferMinutes\":10,\"noticeHours\":24,\"horizonDays\":30,\"turnstileHostname\":\"sweetwater.technology\"};if(!config.enabled)return [];const now=Date.now();return [{json:{timeMin:new Date(now+23*3600000).toISOString(),timeMax:new Date(now+24*3600000).toISOString()}}];"
+      }
+    },
+    {
+      "id": "5c88d736-9c69-49b0-9de6-6e5d9856e41e",
+      "name": "List upcoming calls",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        520,
+        300
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://www.googleapis.com/calendar/v3/calendars/964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f%40group.calendar.google.com/events",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleCalendarOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "timeMin",
+              "value": "={{ $json.timeMin }}"
+            },
+            {
+              "name": "timeMax",
+              "value": "={{ $json.timeMax }}"
+            },
+            {
+              "name": "singleEvents",
+              "value": "true"
+            },
+            {
+              "name": "showDeleted",
+              "value": "false"
+            },
+            {
+              "name": "maxResults",
+              "value": "2500"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "56eb8124-b53f-4570-aa08-6e24181a3813",
+      "name": "Select reminder candidates",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        300
+      ],
+      "parameters": {
+        "jsCode": "function reminderEmail(event,config,now=Date.now()) {\n  const p=event?.extendedProperties?.private;\n  const uuid=x=>typeof x==='string'&&/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(x);\n  if(event?.status!=='confirmed'||!uuid(p?.sweetwaterRequestId)||event.id!=='5a'+p.sweetwaterRequestId.replaceAll('-','')||typeof p.sweetwaterName!=='string'||typeof p.sweetwaterEmail!=='string'||! /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(p.sweetwaterEmail))return null;\n  const start=Date.parse(event.start?.dateTime),end=Date.parse(event.end?.dateTime),remaining=start-now;\n  // The entire retry window fits inside Resend's 24-hour idempotency retention.\n  if(!Number.isFinite(start)||end-start!==20*60000||remaining>24*3600000||remaining<=23*3600000)return null;\n  const when=new Intl.DateTimeFormat('en-US',{timeZone:config.timeZone,weekday:'long',month:'long',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}).format(new Date(start));\n  const text=`Hi ${p.sweetwaterName},\\n\\nA quick reminder: your free 20-minute call with Sweetwater Technology is coming up.\\n\\n${when}\\nTime zone: ${config.timeZone}\\n\\nNo preparation is needed. We'll talk about where work gets stuck and what might make the biggest difference. Call details are sent separately; reply here if you need them.\\n\\nNeed to cancel or reschedule? Use the private link in your confirmation email, or reply to this email for help.\\n\\nClint and Sheree\\nSweetwater Technology\\nhttps://sweetwater.technology\\n\\nBooking reference: ${event.id}`;\n  const escape=s=>s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('\"','&quot;').replaceAll(\"'\",'&#39;');\n  const html=`<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Your Sweetwater call is coming up</title></head><body style=\"margin:0;background:#f1f5fb;color:#142035;font-family:Arial,sans-serif\"><table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\"><tr><td align=\"center\" style=\"padding:24px 12px\"><table role=\"presentation\" width=\"100%\" style=\"max-width:600px;background:#fff;border-radius:16px\" cellpadding=\"0\" cellspacing=\"0\"><tr><td style=\"background:#1556e8;color:#fff;padding:28px;border-radius:16px 16px 0 0\"><p>SWEETWATER TECHNOLOGY</p><h1 style=\"font-size:28px\">Your call is coming up.</h1></td></tr><tr><td style=\"padding:28px;font-size:16px;line-height:1.6\"><p>Hi ${escape(p.sweetwaterName)},</p><p>A quick reminder about your free 20-minute call.</p><p style=\"padding:18px;background:#eef4ff;border-radius:10px\"><strong>${escape(when)}</strong><br>Time zone: ${escape(config.timeZone)}</p><p>No preparation is needed. We'll talk about where work gets stuck and what might make the biggest difference.</p><p>Call details are sent separately; reply here if you need them.</p><p>Need to cancel or reschedule? Use the private link in your confirmation email, or reply to this email for help.</p><p>Clint and Sheree<br><a href=\"https://sweetwater.technology\">Sweetwater Technology</a></p><p style=\"font-size:12px;color:#536075\">Booking reference: ${escape(event.id)}</p></td></tr></table></td></tr></table></body></html>`;\n  return {key:'sweetwater-reminder/'+event.id+'/'+start,payload:{from:'Sweetwater Technology <team@sweetwater.technology>',to:[p.sweetwaterEmail],reply_to:'team@sweetwater.technology',subject:'Reminder: your Sweetwater call is coming up',html,text}};\n}\nconst r=$input.first().json;if(r.statusCode!==200||!Array.isArray(r.body?.items)||r.body.nextPageToken)throw Error(\"Reminder calendar scan incomplete\");const config={\"enabled\":false,\"calendarId\":\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\",\"busyCalendarIds\":[\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\",\"boilermanc@gmail.com\"],\"timeZone\":\"America/New_York\",\"weekdays\":[\"Tue\",\"Thu\"],\"openMinute\":600,\"closeMinute\":720,\"durationMinutes\":20,\"stepMinutes\":30,\"bufferMinutes\":10,\"noticeHours\":24,\"horizonDays\":30,\"turnstileHostname\":\"sweetwater.technology\"};return r.body.items.filter(e=>reminderEmail(e,config)).map(e=>({json:{eventId:e.id}}));"
+      }
+    },
+    {
+      "id": "167d262f-eb50-4d7c-888a-1483b9b4e055",
+      "name": "Recheck reminder event",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        300
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ \"https://www.googleapis.com/calendar/v3/calendars/964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f%40group.calendar.google.com/events/\" + $json.eventId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleCalendarOAuth2Api",
+        "options": {
+          "timeout": 10000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "c157b732-0734-4554-9f0e-d0f3be2431ea",
+      "name": "Build reminder email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1300,
+        300
+      ],
+      "parameters": {
+        "jsCode": "function reminderEmail(event,config,now=Date.now()) {\n  const p=event?.extendedProperties?.private;\n  const uuid=x=>typeof x==='string'&&/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(x);\n  if(event?.status!=='confirmed'||!uuid(p?.sweetwaterRequestId)||event.id!=='5a'+p.sweetwaterRequestId.replaceAll('-','')||typeof p.sweetwaterName!=='string'||typeof p.sweetwaterEmail!=='string'||! /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(p.sweetwaterEmail))return null;\n  const start=Date.parse(event.start?.dateTime),end=Date.parse(event.end?.dateTime),remaining=start-now;\n  // The entire retry window fits inside Resend's 24-hour idempotency retention.\n  if(!Number.isFinite(start)||end-start!==20*60000||remaining>24*3600000||remaining<=23*3600000)return null;\n  const when=new Intl.DateTimeFormat('en-US',{timeZone:config.timeZone,weekday:'long',month:'long',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}).format(new Date(start));\n  const text=`Hi ${p.sweetwaterName},\\n\\nA quick reminder: your free 20-minute call with Sweetwater Technology is coming up.\\n\\n${when}\\nTime zone: ${config.timeZone}\\n\\nNo preparation is needed. We'll talk about where work gets stuck and what might make the biggest difference. Call details are sent separately; reply here if you need them.\\n\\nNeed to cancel or reschedule? Use the private link in your confirmation email, or reply to this email for help.\\n\\nClint and Sheree\\nSweetwater Technology\\nhttps://sweetwater.technology\\n\\nBooking reference: ${event.id}`;\n  const escape=s=>s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('\"','&quot;').replaceAll(\"'\",'&#39;');\n  const html=`<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Your Sweetwater call is coming up</title></head><body style=\"margin:0;background:#f1f5fb;color:#142035;font-family:Arial,sans-serif\"><table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\"><tr><td align=\"center\" style=\"padding:24px 12px\"><table role=\"presentation\" width=\"100%\" style=\"max-width:600px;background:#fff;border-radius:16px\" cellpadding=\"0\" cellspacing=\"0\"><tr><td style=\"background:#1556e8;color:#fff;padding:28px;border-radius:16px 16px 0 0\"><p>SWEETWATER TECHNOLOGY</p><h1 style=\"font-size:28px\">Your call is coming up.</h1></td></tr><tr><td style=\"padding:28px;font-size:16px;line-height:1.6\"><p>Hi ${escape(p.sweetwaterName)},</p><p>A quick reminder about your free 20-minute call.</p><p style=\"padding:18px;background:#eef4ff;border-radius:10px\"><strong>${escape(when)}</strong><br>Time zone: ${escape(config.timeZone)}</p><p>No preparation is needed. We'll talk about where work gets stuck and what might make the biggest difference.</p><p>Call details are sent separately; reply here if you need them.</p><p>Need to cancel or reschedule? Use the private link in your confirmation email, or reply to this email for help.</p><p>Clint and Sheree<br><a href=\"https://sweetwater.technology\">Sweetwater Technology</a></p><p style=\"font-size:12px;color:#536075\">Booking reference: ${escape(event.id)}</p></td></tr></table></td></tr></table></body></html>`;\n  return {key:'sweetwater-reminder/'+event.id+'/'+start,payload:{from:'Sweetwater Technology <team@sweetwater.technology>',to:[p.sweetwaterEmail],reply_to:'team@sweetwater.technology',subject:'Reminder: your Sweetwater call is coming up',html,text}};\n}\nconst config={\"enabled\":false,\"calendarId\":\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\",\"busyCalendarIds\":[\"964091ca18c636790e17e55a0ced661c6bc59bbb70ffac35538f750515a99f4f@group.calendar.google.com\",\"boilermanc@gmail.com\"],\"timeZone\":\"America/New_York\",\"weekdays\":[\"Tue\",\"Thu\"],\"openMinute\":600,\"closeMinute\":720,\"durationMinutes\":20,\"stepMinutes\":30,\"bufferMinutes\":10,\"noticeHours\":24,\"horizonDays\":30,\"turnstileHostname\":\"sweetwater.technology\"};return $input.all().flatMap(item=>{const r=item.json;if(r.statusCode!==200)return [];const mail=reminderEmail(r.body,config);return mail?[{json:mail}]:[];});"
+      }
+    },
+    {
+      "id": "7476dd39-8b51-46f0-a36c-2de27245ac97",
+      "name": "Send Sweetwater reminder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1560,
+        300
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Idempotency-Key",
+              "value": "={{ $json.key }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.payload) }}",
+        "options": {
+          "timeout": 10000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Every five minutes": {
+      "main": [
+        [
+          {
+            "node": "Prepare reminder window",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare reminder window": {
+      "main": [
+        [
+          {
+            "node": "List upcoming calls",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List upcoming calls": {
+      "main": [
+        [
+          {
+            "node": "Select reminder candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select reminder candidates": {
+      "main": [
+        [
+          {
+            "node": "Recheck reminder event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recheck reminder event": {
+      "main": [
+        [
+          {
+            "node": "Build reminder email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build reminder email": {
+      "main": [
+        [
+          {
+            "node": "Send Sweetwater reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "none",
+    "saveDataSuccessExecution": "none",
+    "saveManualExecutions": false,
+    "executionTimeout": 90,
+    "timezone": "America/New_York"
+  }
+}
