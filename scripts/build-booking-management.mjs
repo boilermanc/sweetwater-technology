@@ -1,3 +1,4 @@
+import {addManagementEmailNodes} from '../n8n/booking/management-email.mjs';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {randomUUID} from 'node:crypto';
 const config=JSON.parse(readFileSync('n8n/booking/config.json','utf8'));
@@ -46,4 +47,5 @@ code('Confirm management result',req+op+"const r=$input.first().json,expected=op
 add('Return management response','respondToWebhook',{respondWith:'json',responseBody:'={{ $json.body }}',options:{responseCode:'={{ $json.statusCode }}',responseHeaders:{entries:[{name:'Cache-Control',value:'no-store'},{name:'Access-Control-Allow-Origin',value:'https://sweetwater.technology'},{name:'Referrer-Policy',value:'no-referrer'}]}}},1.4);
 const chain=nodes.map(n=>n.name);for(let i=0;i<chain.length-1;i++)link(chain[i],chain[i+1]);
 for(const n of nodes.filter(n=>n.type.endsWith('.if')))link(n.name,n.name==='Calendar write needed?'?'Verify management readback':'Return management response',1);
+addManagementEmailNodes({nodes,connections},config);
 writeFileSync('n8n/booking/manage-booking.json',JSON.stringify({name:'Sweetwater Manage Booking',nodes,connections,active:false,settings:{executionOrder:'v1',saveDataSuccessExecution:'none',saveDataErrorExecution:'none',saveManualExecutions:false,executionTimeout:90,timezone:config.timeZone}},null,2)+'\n');
