@@ -36,7 +36,7 @@ condition('Calendar write needed?');
 http('Recheck management availability','POST','https://www.googleapis.com/calendar/v3/freeBusy','googleCalendarOAuth2Api',"={{ JSON.stringify({timeMin:new Date().toISOString(),timeMax:new Date(Date.now()+31*86400000).toISOString(),items:"+JSON.stringify(config.busyCalendarIds.map(id=>({id})))+"}) }}");
 code('Check management availability',req+op+"try{if(request.action==='reschedule'){const busy=busyWindows($input.first().json,config);if(!slots(config,Date.now(),busy).some(s=>Date.parse(s.start)===Date.parse(operation.target_start)))return fail(409,'That time is no longer available. Please contact team@sweetwater.technology to release this pending change.');}return [{json:{proceed:true,...$('Prepare calendar change').first().json}}];}catch{return fail(503,'Availability could not be checked. Retry the same request.');}");
 condition('Management time available?');
-http('Update managed calendar event','PATCH',eventUrl.slice(0,-3)+" + '?sendUpdates=all' }}",'googleCalendarOAuth2Api','={{ JSON.stringify($json.patch) }}',[{name:'If-Match',value:'={{ $json.etag }}'}]);
+http('Update managed calendar event','PATCH',eventUrl.slice(0,-3)+" + '?conferenceDataVersion=1&sendUpdates=all' }}",'googleCalendarOAuth2Api','={{ JSON.stringify($json.patch) }}',[{name:'If-Match',value:'={{ $json.etag }}'}]);
 // A failed/uncertain HTTP write still goes through readback. Never release a claim on timeout alone.
 nodes.at(-1).onError='continueRegularOutput';
 http('Verify managed calendar change','GET',eventUrl,'googleCalendarOAuth2Api');

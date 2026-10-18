@@ -1,3 +1,4 @@
+import {googleMeetUrl} from '../n8n/booking/meet.mjs';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {randomUUID} from 'node:crypto';
 import {reminderEmail} from '../n8n/booking/reminder.mjs';
@@ -10,9 +11,9 @@ code('Prepare reminder window','const config='+JSON.stringify(config)+';if(!conf
 const root='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(config.calendarId)+'/events';
 const options={timeout:10000,response:{response:{fullResponse:true,neverError:true,responseFormat:'json'}}};
 add('List upcoming calls','httpRequest',{method:'GET',url:root,authentication:'predefinedCredentialType',nodeCredentialType:'googleCalendarOAuth2Api',sendQuery:true,queryParameters:{parameters:[{name:'timeMin',value:'={{ $json.timeMin }}'},{name:'timeMax',value:'={{ $json.timeMax }}'},{name:'singleEvents',value:'true'},{name:'showDeleted',value:'false'},{name:'maxResults',value:'2500'}]},options},4.2);
-code('Select reminder candidates',reminderEmail.toString()+'\nconst r=$input.first().json;if(r.statusCode!==200||!Array.isArray(r.body?.items)||r.body.nextPageToken)throw Error("Reminder calendar scan incomplete");const config='+JSON.stringify(config)+';return r.body.items.filter(e=>reminderEmail(e,config)).map(e=>({json:{eventId:e.id}}));');
+code('Select reminder candidates',googleMeetUrl.toString()+'\n'+reminderEmail.toString()+'\nconst r=$input.first().json;if(r.statusCode!==200||!Array.isArray(r.body?.items)||r.body.nextPageToken)throw Error("Reminder calendar scan incomplete");const config='+JSON.stringify(config)+';return r.body.items.filter(e=>reminderEmail(e,config)).map(e=>({json:{eventId:e.id}}));');
 add('Recheck reminder event','httpRequest',{method:'GET',url:'={{ '+JSON.stringify(root+'/')+' + $json.eventId }}',authentication:'predefinedCredentialType',nodeCredentialType:'googleCalendarOAuth2Api',options},4.2);
-code('Build reminder email',reminderEmail.toString()+'\nconst config='+JSON.stringify(config)+';return $input.all().flatMap(item=>{const r=item.json;if(r.statusCode!==200)return [];const mail=reminderEmail(r.body,config);return mail?[{json:mail}]:[];});');
+code('Build reminder email',googleMeetUrl.toString()+'\n'+reminderEmail.toString()+'\nconst config='+JSON.stringify(config)+';return $input.all().flatMap(item=>{const r=item.json;if(r.statusCode!==200)return [];const mail=reminderEmail(r.body,config);return mail?[{json:mail}]:[];});');
 add('Send Sweetwater reminder','httpRequest',{method:'POST',url:'https://api.resend.com/emails',authentication:'genericCredentialType',genericAuthType:'httpHeaderAuth',sendHeaders:true,headerParameters:{parameters:[{name:'Idempotency-Key',value:'={{ $json.key }}'}]},sendBody:true,specifyBody:'json',jsonBody:'={{ JSON.stringify($json.payload) }}',options:{timeout:10000,response:{response:{fullResponse:true,responseFormat:'json'}}}},4.2,{retryOnFail:true,maxTries:3,waitBetweenTries:1000,onError:'continueRegularOutput'});
 for(let i=0;i<nodes.length-1;i++)connections[nodes[i].name]={main:[[{node:nodes[i+1].name,type:'main',index:0}]]};
 writeFileSync('n8n/booking/reminder.json',JSON.stringify({name:'Sweetwater Booking Reminder',nodes,connections,active:false,settings:{executionOrder:'v1',saveDataErrorExecution:'none',saveDataSuccessExecution:'none',saveManualExecutions:false,executionTimeout:90,timezone:config.timeZone}},null,2)+'\n');

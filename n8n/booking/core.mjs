@@ -47,8 +47,9 @@ export function confirmation(event, booking) {
 export function eventBody(booking, config) {
   const escape = s => s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
   return { id: booking.eventId, summary: 'Sweetwater introductory call — ' + booking.name,
-    description: 'Free 20-minute introductory call.\nTopic: ' + escape(booking.topic) + '\nSweetwater will contact you to arrange call details.',
+    description: 'Free 20-minute introductory call.\nTopic: ' + escape(booking.topic) + '\nJoin using the Google Meet link on this invitation.',
     start: {dateTime: booking.start,timeZone:config.timeZone}, end: {dateTime:booking.end,timeZone:config.timeZone},
+    conferenceData:{createRequest:{requestId:booking.requestId,conferenceSolutionKey:{type:'hangoutsMeet'}}},
     visibility:'private', transparency:'opaque', attendees:[{email:booking.email,displayName:booking.name}],
     guestsCanModify:false,guestsCanInviteOthers:false,guestsCanSeeOtherGuests:false,
     extendedProperties:{private:{sweetwaterRequestId:booking.requestId,sweetwaterEmail:booking.email,sweetwaterName:booking.name,sweetwaterTopic:booking.topic}}
