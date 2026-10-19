@@ -16,13 +16,13 @@ const sectionClass = 'mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-20';
 
 export function HomeSections({ onSelectApp }: { onSelectApp: (app: AppProject) => void }) {
   return <>
-    <section id="portfolio" className="scroll-mt-24 border-y border-blue-100 bg-blue-50" aria-labelledby="proof-title"><div className={sectionClass}>
-      <div className="flex flex-wrap items-end justify-between gap-5"><div><p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-700">Ideas put into practice</p><h2 id="proof-title" className="mt-4 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Real products. Built around real work.</h2></div><a href="/work" className="font-bold text-blue-700 hover:underline">See all our work →</a></div>
-      <p className="mt-5 leading-7 text-slate-600">We don’t just advise on AI. We build with it every day.</p><div className="mt-8 grid gap-6 md:grid-cols-3">{featured.map(item => {
+    <section id="portfolio" className="scroll-mt-24 border-y border-slate-800 bg-slate-950" aria-labelledby="proof-title"><div className={sectionClass}>
+      <div className="flex flex-wrap items-end justify-between gap-5"><div><p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-300">Ideas put into practice</p><h2 id="proof-title" className="mt-4 text-3xl font-black tracking-tight text-white sm:text-4xl">Real products. Built around real work.</h2></div><a href="/work" className="font-bold text-blue-300 hover:underline">See all our work →</a></div>
+      <p className="mt-5 leading-7 text-slate-300">We don’t just advise on AI. We build with it every day.</p><div className="mt-8 grid gap-6 md:grid-cols-3">{featured.map(item => {
         const project = PROJECTS.find(app => app.id === item.id)!;
-        return <article key={item.id} className="flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white/85 shadow-sm">
+        return <article key={item.id} className="flex flex-col overflow-hidden rounded-3xl border border-slate-700 bg-slate-900 shadow-sm">
           <div className="flex aspect-[16/10] items-center justify-center bg-slate-50 p-8"><img src={item.logo} alt={project.title + ' logo'} width={item.logoWidth} height={item.logoHeight} loading="lazy" className={item.id === 'lanewise' ? 'h-28 w-28 object-contain' : 'h-auto max-h-32 w-full max-w-64 object-contain'} /></div>
-          <div className="flex flex-1 flex-col p-6"><p className="mb-3 text-xs font-bold uppercase tracking-widest text-blue-700">{item.type}{item.id !== 'sproutify-farm' && ' · Early access'}</p><h3 className="text-xl font-black text-slate-900">{project.title}</h3><p className="mt-3 flex-1 leading-7 text-slate-600">{item.copy}</p><button onClick={() => onSelectApp(project)} className="mt-5 inline-flex min-h-11 items-center gap-2 self-start rounded-lg font-bold text-blue-700 hover:underline focus-visible:outline-2 focus-visible:outline-blue-600" aria-label={'Learn more about ' + project.title}>Learn more <ArrowRight size={18} aria-hidden="true" /></button></div>
+          <div className="flex flex-1 flex-col p-6"><p className="mb-3 text-xs font-bold uppercase tracking-widest text-blue-300">{item.type}{item.id !== 'sproutify-farm' && ' · Early access'}</p><h3 className="text-xl font-black text-white">{project.title}</h3><p className="mt-3 flex-1 leading-7 text-slate-300">{item.copy}</p><button onClick={() => onSelectApp(project)} className="mt-5 inline-flex min-h-11 items-center gap-2 self-start rounded-lg font-bold text-blue-300 hover:underline focus-visible:outline-2 focus-visible:outline-blue-300" aria-label={'Learn more about ' + project.title}>Learn more <ArrowRight size={18} aria-hidden="true" /></button></div>
         </article>;
       })}</div>
     </div></section>
