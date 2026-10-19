@@ -29,7 +29,19 @@ export function ownerNotification(event,context,config,now=Date.now()) {
   const text=lines.join('\n');
   const escape=s=>s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
   const topic=typeof p.sweetwaterTopic==='string'?p.sweetwaterTopic:'';
-  const html='<!doctype html><html lang="en"><head><meta charset="utf-8"><title>'+title+'</title></head><body style="font-family:Arial,sans-serif;color:#142035;line-height:1.6"><h1 style="color:#1556e8">'+title+'</h1><p>'+escape(lines.slice(2).join('\n')).replaceAll('\n','<br>')+'</p>'+(topic?'<h2>What they want to discuss</h2><p>'+escape(topic)+'</p>':'')+'</body></html>';
+  const heading={booked:'A new call is booked.',rescheduled:'A call has been rescheduled.',cancelled:'A call has been cancelled.'}[action];
+  const summary={booked:'Here are the details for your next conversation.',rescheduled:'The appointment has moved. The updated time is below.',cancelled:'This appointment has been cancelled. You do not need to join the call.'}[action];
+  const html=`<!doctype html><html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${title}</title></head>
+<body style="margin:0;padding:20px 12px;background:#f1f5fb;color:#142035;font-family:Arial,sans-serif;line-height:1.6">
+<table lang="en" dir="ltr" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;margin:auto;background:#ffffff;border-radius:16px;overflow:hidden">
+<tr><td style="padding:28px;background:#1556e8;color:#ffffff"><p style="margin:0 0 16px;font-size:16px;font-weight:bold;letter-spacing:0.4px">Sweetwater Technology</p><h1 style="margin:0;font-size:28px;line-height:1.25">${heading}</h1><p style="margin:12px 0 0;color:#ffffff">Free 20-minute call &middot; Notification for Clint</p></td></tr>
+<tr><td style="padding:28px"><p style="margin:0 0 24px">${summary}</p>
+<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#eef4ff;border-radius:10px"><tr><td style="padding:20px"><p style="margin:0 0 6px;font-size:14px;font-weight:bold">${action==='cancelled'?'Cancelled appointment':'Appointment'}</p><p style="margin:0;font-size:20px;line-height:1.4;font-weight:bold">${escape(when(start))}</p><p style="margin:8px 0 0;font-size:14px">${escape(config.timeZone)}</p>${action==='rescheduled'?'<p style="margin:16px 0 0;font-size:14px">Previous time: '+escape(when(oldStart))+'</p>':''}</td></tr></table>
+<h2 style="margin:24px 0 8px;font-size:18px">Guest details</h2><p style="margin:0;overflow-wrap:anywhere">${escape(p.sweetwaterName)}<br>${escape(p.sweetwaterEmail)}</p>
+${topic?'<h2 style="margin:24px 0 8px;font-size:18px">What they want to discuss</h2><p style="margin:0;white-space:pre-line;overflow-wrap:anywhere">'+escape(topic)+'</p>':''}
+${meet?'<p style="margin:28px 0"><a href="'+escape(meet)+'" style="display:inline-block;background:#1556e8;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:bold">Join Google Meet</a></p>':action!=='cancelled'?'<p style="margin:24px 0">Google Meet link is not available yet. Check the calendar before the call.</p>':''}
+<p style="margin:24px 0 0">Reply to this email to contact the guest.</p></td></tr>
+<tr><td style="padding:20px 28px;border-top:1px solid #dce4f0;color:#526078;font-size:12px;overflow-wrap:anywhere"><p style="margin:0 0 8px;font-weight:bold">Sweetwater Technology</p><p style="margin:0">Booking reference: ${escape(event.id)}<br>Notification reference: ${escape(id)}</p></td></tr></table></body></html>`;
   return {key:'sweetwater-owner/'+action+'/'+id,payload:{from:'Sweetwater Technology <team@sweetwater.technology>',to:[config.ownerEmail],reply_to:p.sweetwaterEmail,subject:title+' — '+when(start),text:text+(topic?'\n\nWhat they want to discuss:\n'+topic:''),html},slack:{channel:config.ownerSlackUserId,text,mrkdwn:false,parse:'none',unfurl_links:false,unfurl_media:false}};
 }
 

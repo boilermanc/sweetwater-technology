@@ -12,3 +12,20 @@ test('reschedule and cancel alerts describe verified change without leaking priv
 test('unverified, stale, pending and mismatched records never notify owner',()=>{for(const e of [{...event,status:'cancelled'},{...event,id:'wrong'},{...event,created:new Date(now-24*3600000).toISOString()}])assert.equal(ownerNotification(e,{kind:'booking',booking:b},config,now),null);const c=change();c.context.response.body.pending=true;assert.equal(ownerNotification(c.event,c.context,config,now),null);assert.equal(ownerNotification(event,{kind:'unknown'},config,now),null);});
 test('Slack only follows a positively acknowledged first email delivery, never a replay or ambiguity',()=>{const ack={statusCode:200,body:{id:'12345678-1234-4123-8123-123456789abc'},headers:{'idempotent-replayed':'false'}};assert.equal(firstOwnerDelivery(ack),true);for(const r of [{...ack,statusCode:500},{...ack,headers:{}},{...ack,headers:{'idempotent-replayed':'true'}},{...ack,body:{}},{error:'timeout'}])assert.equal(firstOwnerDelivery(r),false);});
 test('owner branches preserve guest delivery, fail softly, use separate dedupe keys and never write calendar',()=>{for(const file of ['create-booking','manage-booking']){const w=JSON.parse(readFileSync('n8n/booking/'+file+'.json'));const source=file==='create-booking'?'Return public response':'Return management response';assert.equal(w.connections[source].main[0].length,2);assert.equal(w.connections[source].main[0][0].node,'Verified owner notification only');const owner=w.nodes.slice(w.nodes.findIndex(n=>n.name==='Verified owner notification only'));for(const n of owner){if(n.type.endsWith('.code'))new Function('$input','$',n.parameters.jsCode);if(n.type.endsWith('.httpRequest'))assert.equal(n.onError,'continueRegularOutput');}const slack=owner.find(n=>n.name==='DM Clint booking notification');assert.equal(slack.retryOnFail,undefined);assert.equal(slack.parameters.url,'https://slack.com/api/chat.postMessage');assert.ok(!owner.some(n=>n.parameters.method==='PATCH'));assert.equal(w.nodes.find(n=>n.name==='Email Clint booking notification').parameters.headerParameters.parameters[0].value,'={{ $json.key }}');}});
+
+test('owner templates are branded and retain action-specific details',()=>{
+  const alerts=[ownerNotification(event,{kind:'booking',booking:b},config,now),...['reschedule','cancel'].map(action=>{const c=change(action);return ownerNotification(c.event,c.context,config,now);})];
+  for(const alert of alerts){
+    assert.match(alert.payload.html,/background:#1556e8;color:#ffffff/);
+    assert.match(alert.payload.html,/<html lang="en" dir="ltr">/);
+    assert.match(alert.payload.html,/role="presentation"/);
+    assert.match(alert.payload.html,/Guest details/);
+    assert.match(alert.payload.html,/&lt;b&gt;Important&lt;\/b&gt;/);
+    assert.equal((alert.payload.html.match(/<h1 /g)||[]).length,1);
+    assert.ok(!alert.payload.html.includes(token));
+  }
+  assert.match(alerts[0].payload.html,/Join Google Meet/);
+  assert.match(alerts[1].payload.html,/Previous time:.*10:00 AM EDT/);
+  assert.match(alerts[2].payload.html,/You do not need to join the call/);
+  assert.ok(!alerts[2].payload.html.includes('Join Google Meet'));
+});
