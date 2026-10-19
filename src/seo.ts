@@ -31,7 +31,7 @@ const organization = {
   logo: `${SITE_URL}/images/sweetwater-mark.png`,
   image: SOCIAL_IMAGE,
   description:
-    'Sweetwater Technology builds custom web applications, AI-driven workflow automation, and digital products for businesses.',
+    'Sweetwater Technology builds custom web applications, practical AI and connected tools, and digital products for businesses.',
   founder: {
     '@type': 'Person',
     name: 'Clint Crowe',
@@ -102,7 +102,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
 
   if (path === '/book/manage') return { title: 'Manage Your Booking | Sweetwater Technology', description: 'Manage your private Sweetwater call booking.', canonical: SITE_URL + '/book/manage', type: 'website', jsonLd: [], robots: 'noindex, nofollow' };
 
-  if (path === '/book') return { title: 'Free 20-Minute Introductory Call | Sweetwater Technology', description: 'Book a free 20-minute call to talk through your business workflow, connected systems, and practical next steps with Sweetwater Technology.', canonical: SITE_URL + '/book', type: 'website', jsonLd: [organization] };
+  if (path === '/book') return { title: 'Free 20-Minute Introductory Call | Sweetwater Technology', description: 'Book a free 20-minute call to talk through how your business works, connected tools, and practical next steps with Sweetwater Technology.', canonical: SITE_URL + '/book', type: 'website', jsonLd: [organization] };
 
   if (path === '/about') {
     const canonical = `${SITE_URL}/about`;

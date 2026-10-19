@@ -67,7 +67,7 @@ const YOUTUBE_DEFAULT = {
 const SUBSTACK_LANDING: Partial<Record<YouTubeInterest, { heroHeadline: string; heroSub: string; portfolioOrder: string[] }>> = {
   'custom-app': {
     heroHeadline: 'Let’s turn the idea into something useful',
-    heroSub: 'Move from an interesting concept to focused software built around the people, decisions, and workflow that matter.',
+    heroSub: 'Move from an interesting concept to focused software built around the people and everyday work that matter.',
     portfolioOrder: ['sproutify', 'spectiq', 'lanewise', 'rejoice', 'rekkrd'],
   },
   automation: {
@@ -77,7 +77,7 @@ const SUBSTACK_LANDING: Partial<Record<YouTubeInterest, { heroHeadline: string; 
   },
   portfolio: {
     heroHeadline: 'Here’s what we’re building',
-    heroSub: 'Explore the products behind Sweetwater Technology’s posts—from growing and logistics to inspection workflows and consumer apps.',
+    heroSub: 'Explore the products behind Sweetwater Technology’s posts—from growing and logistics to inspection businesses and consumer apps.',
     portfolioOrder: ['sproutify', 'spectiq', 'lanewise', 'rejoice', 'rekkrd'],
   },
   contact: {
@@ -244,7 +244,7 @@ export function CardLanding({ aiHelp = false, appIdea = false }: { aiHelp?: bool
 
         <section className="border-y border-[#1e2c52] bg-[#101a30]/70"><div className="mx-auto flex max-w-6xl items-center justify-center gap-3 px-5 py-6 text-center text-sm font-semibold text-[#b7c5e6]"><Check size={18} className="text-[#6f91ec]" /> Built and shipped from Atlanta. Live products, real customers.</div></section>
 
-        <section className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28"><div className="relative overflow-hidden rounded-[2rem] border border-[#2a3c68] bg-[#101a30] p-7 sm:p-12"><div className="absolute right-0 top-0 h-64 w-64 translate-x-1/3 -translate-y-1/3 rounded-full bg-[#2e5ce6]/20 blur-3xl" /><p className="text-xs font-bold uppercase tracking-[.22em] text-[#7897ea]">Custom apps and automation</p><h2 className="mt-4 max-w-2xl text-3xl font-bold tracking-tight sm:text-5xl">Have a workflow that should feel easier?</h2><p className="mt-5 max-w-2xl leading-7 text-[#9cafda]">We turn operational friction, ambitious product ideas, and repetitive work into software your team can rely on.</p><div className="relative mt-8 flex flex-wrap gap-3"><a href="mailto:clint@sweetwater.technology" className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-[#0c1322]"><Mail size={17} /> Email Clint</a><a href="/book" className="inline-flex items-center gap-2 rounded-full border border-[#3b4f7c] px-5 py-3 text-sm font-bold text-white"><PhoneCall size={17} /> Book a free call</a><button onClick={() => setOpenSignal((value) => value + 1)} className="inline-flex items-center gap-2 rounded-full border border-[#3b4f7c] px-5 py-3 text-sm font-bold text-white"><Bot size={17} /> Ask Sage</button></div></div></section>
+        <section className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28"><div className="relative overflow-hidden rounded-[2rem] border border-[#2a3c68] bg-[#101a30] p-7 sm:p-12"><div className="absolute right-0 top-0 h-64 w-64 translate-x-1/3 -translate-y-1/3 rounded-full bg-[#2e5ce6]/20 blur-3xl" /><p className="text-xs font-bold uppercase tracking-[.22em] text-[#7897ea]">Custom apps and automation</p><h2 className="mt-4 max-w-2xl text-3xl font-bold tracking-tight sm:text-5xl">What part of your work should feel easier?</h2><p className="mt-5 max-w-2xl leading-7 text-[#9cafda]">We help connect your tools, reduce repetitive work and turn useful ideas into software your team can use.</p><div className="relative mt-8 flex flex-wrap gap-3"><a href="mailto:clint@sweetwater.technology" className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-[#0c1322]"><Mail size={17} /> Email Clint</a><a href="/book" className="inline-flex items-center gap-2 rounded-full border border-[#3b4f7c] px-5 py-3 text-sm font-bold text-white"><PhoneCall size={17} /> Book a free 20-minute call</a><button onClick={() => setOpenSignal((value) => value + 1)} className="inline-flex items-center gap-2 rounded-full border border-[#3b4f7c] px-5 py-3 text-sm font-bold text-white"><Bot size={17} /> Ask Sage</button></div></div></section>
       </main>
 
       <footer className="relative z-10 border-t border-[#1e2c52] px-5 py-8 text-center text-xs text-[#6578a3]">© {new Date().getFullYear()} Sweetwater Technology. Atlanta, Georgia.</footer>

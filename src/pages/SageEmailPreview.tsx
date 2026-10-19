@@ -13,7 +13,7 @@ export function SageEmailPreview() {
         <section className="mb-4 overflow-hidden rounded-2xl border border-[#d8e1ef] bg-white text-slate-800 shadow-lg shadow-slate-300/30">
           <div className="grid gap-1 px-5 py-4 text-sm sm:grid-cols-[4rem_1fr] sm:px-7">
             <span className="text-slate-400">From</span><span className="font-semibold">Clint at Sweetwater Technology &lt;clint@sweetwater.technology&gt;</span>
-            <span className="text-slate-400">Subject</span><span className="font-semibold">Jordan, here’s the workflow Sage recommended</span>
+            <span className="text-slate-400">Subject</span><span className="font-semibold">Jordan, here’s the next step Sage suggested</span>
           </div>
         </section>
 
@@ -57,7 +57,7 @@ export function SageEmailPreview() {
             <section className="mt-8 rounded-2xl border border-[#d9e3fa] bg-[#f4f7ff] p-5 text-slate-900 sm:p-6">
               <p className="text-xs font-extrabold uppercase tracking-[.18em] text-[#2e5ce6]">Want to talk it through?</p>
               <h2 className="mt-3 text-2xl font-black tracking-tight">Reply directly to Clint.</h2>
-              <p className="mt-3 text-sm leading-6 text-slate-600">Share the workflow that is slowing your team down, and we’ll figure out the most useful next step together.</p>
+              <p className="mt-3 text-sm leading-6 text-slate-600">Tell us what is slowing your team down, and we’ll figure out the most useful next step together.</p>
               <div className="mt-5 flex flex-col gap-3 sm:flex-row">
                 <a href="mailto:clint@sweetwater.technology" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#2e5ce6] px-5 py-3 text-sm font-bold text-white"><Mail size={17} /> Reply to Clint</a>
               </div>

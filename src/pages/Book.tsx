@@ -8,7 +8,7 @@ export function Book() {
       <div>
         <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-700">A simple first step</p>
         <h1 className="mt-5 text-4xl font-black leading-tight tracking-tight text-slate-900 sm:text-6xl">Let’s talk.<br /><span className="text-blue-600">20 minutes. Free.</span></h1>
-        <p className="mt-6 text-lg leading-8 text-slate-600">Tell us where work gets stuck. We’ll talk through your workflow, the tools you use, and what might make the biggest difference.</p>
+        <p className="mt-6 text-lg leading-8 text-slate-600">Tell us where work gets stuck. We’ll talk through how you work, the tools you use, and what might make the biggest difference.</p>
         <h2 className="mt-9 text-xl font-bold text-slate-900">What we’ll cover</h2>
         <ul className="mt-4 list-disc space-y-3 pl-5 leading-7 text-slate-600">
           <li>What’s taking too much time or slipping through the cracks.</li>
@@ -20,7 +20,7 @@ export function Book() {
       </div>
       {live ? <section aria-label="Book your introductory call"><BookingPicker /></section> : <section aria-labelledby="call-request-title">
         <h2 id="call-request-title" className="text-2xl font-black text-slate-900">Request your free call</h2>
-        <p className="mb-6 mt-3 leading-7 text-slate-600">Add a little about your business and a couple of times that work for you, including your time zone. Clint or Sheree will follow up to agree a time. Your appointment is only booked once we confirm it with you.</p>
+        <p className="mb-6 mt-3 leading-7 text-slate-600">Add a little about your business and a couple of times that work for you, including your time zone. Clint will follow up to agree a time. Your appointment is only booked once we confirm it with you.</p>
         <ContactForm initialMessage="I’d like a free 20-minute introductory call.
 
 What I’d like to discuss:

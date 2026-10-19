@@ -30,7 +30,7 @@ export function ServicesPage() {
           ['Custom web apps', 'Keep jobs, customers and paperwork in one place.', 'custom-web-applications'],
           ['AI helpers', 'Get quotes and replies ready faster. You approve what goes out.', 'ai-workflow-automation'],
           ['Mobile apps', 'Help customers request work and your crew update jobs on the go.', 'mobile-app-development'],
-        ].map(([title, detail, slug]) => <article key={slug} className={`${card} flex flex-col`}><h3 className="text-2xl font-black text-slate-900">{title}</h3><p className="mt-4 flex-1 leading-7 text-slate-600">{detail}</p><a href={`/services/${slug}`} className="mt-6 inline-flex items-center gap-2 font-bold text-blue-600 hover:text-blue-700">Learn more<span className="sr-only"> about {title.toLowerCase()}</span><ArrowRight aria-hidden="true" size={18} /></a></article>)}
+        ].map(([title, detail, slug]) => <article key={slug} className={`${card} flex flex-col`}><h3 className="text-2xl font-black text-slate-900">{title}</h3><p className="mt-4 flex-1 leading-7 text-slate-600">{detail}</p><a href={`/services/${slug}`} className="mt-6 inline-flex items-center gap-2 font-bold text-blue-600 hover:text-blue-700">Learn more<span className="sr-only"> about {title}</span><ArrowRight aria-hidden="true" size={18} /></a></article>)}
       </div>
     </section>
     <section className="mt-20 rounded-[2rem] bg-slate-900 p-8 text-white sm:p-12" aria-labelledby="ai-worries">
