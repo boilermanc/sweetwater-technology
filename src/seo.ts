@@ -90,7 +90,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
   const path = normalizePath(requestedPath);
 
   if (path === '/terms' || path === '/privacy') {
-    return { title: (path === '/terms' ? 'Website Terms' : 'Privacy Notice') + ' — Draft for Review | Sweetwater Technology', description: 'Unapproved draft for business and legal review. No effective date has been assigned.', canonical: SITE_URL + path, type: 'website', jsonLd: [organization], robots: 'noindex, follow' };
+    return { title: (path === '/terms' ? 'Website Terms' : 'Privacy Notice') + ' | Sweetwater Technology', description: path === '/terms' ? 'Terms for the Sweetwater Technology website, free resources and introductory calls.' : 'How Sweetwater Technology handles inquiries, bookings, conversations and your privacy choices.', canonical: SITE_URL + path, type: 'website', jsonLd: [organization] };
   }
 
   if (path === '/portal') {

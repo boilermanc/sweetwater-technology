@@ -21,7 +21,7 @@ export function Footer() {
       </div>
       <div className="mt-10 flex flex-col gap-4 border-t border-slate-200 pt-6 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
         <p>© {new Date().getFullYear()} Sweetwater Technology LP. All rights reserved.</p>
-        <nav aria-label="Legal" className="flex flex-wrap gap-x-6 gap-y-2"><a href="/terms" className="inline-flex min-h-10 items-center hover:text-blue-700 hover:underline">Terms <span className="ml-1">(draft)</span></a><a href="/privacy" className="inline-flex min-h-10 items-center hover:text-blue-700 hover:underline">Privacy <span className="ml-1">(draft)</span></a></nav>
+        <nav aria-label="Legal" className="flex flex-wrap gap-x-6 gap-y-2"><a href="/terms" className="inline-flex min-h-10 items-center hover:text-blue-700 hover:underline">Terms</a><a href="/privacy" className="inline-flex min-h-10 items-center hover:text-blue-700 hover:underline">Privacy</a></nav>
       </div>
     </div>
   </footer>;

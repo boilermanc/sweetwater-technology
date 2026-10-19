@@ -36,7 +36,7 @@ test('prerendered homepage, guide and catalog preserve the agreed journeys', () 
   assert.ok(!/>7<|>21<|>33<|>44<|>9</.test(work), 'Stray lottery numbers remain');
 });
 
-test('footer destinations, legal drafts and the printable guide are available', () => {
+test('footer destinations, published legal pages and the printable guide are available', () => {
   const html = file => readFileSync(new URL('../dist/' + file, import.meta.url), 'utf8');
   const home = html('index.html');
   for (const link of ['/terms', '/privacy', '/#contact-form', '/portal', '/headwaters/', '/downloads/try-ai-this-week.pdf']) assert.ok(home.includes('href="' + link + '"'), link);
@@ -46,8 +46,10 @@ test('footer destinations, legal drafts and the printable guide are available', 
   assert.equal(readFileSync(new URL('../dist/downloads/try-ai-this-week.pdf', import.meta.url)).subarray(0,5).toString(), '%PDF-');
   for (const route of ['terms', 'privacy']) {
     const draft = html(route + '/index.html');
-    assert.ok(draft.includes('Draft for review')); assert.ok(draft.includes('noindex, follow'));
-    assert.ok(!html('sitemap.xml').includes('/' + route + '</loc>'));
+    assert.ok(!draft.includes('Draft for review')); assert.ok(!draft.includes('noindex, follow'));
+    assert.ok(draft.includes('2026-10-18'));
+    assert.ok(draft.includes('1295 Smithdale Heights Drive'));
+    assert.ok(html('sitemap.xml').includes('/' + route + '</loc>'));
   }
 });
 

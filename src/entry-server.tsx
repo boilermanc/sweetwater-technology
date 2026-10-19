@@ -10,6 +10,8 @@ export const prerenderRoutes = PRERENDER_ROUTES;
 export const sitemapEntries = [
   { path: '/', priority: '1.0' },
   { path: '/book', priority: '0.8' },
+  { path: '/terms', priority: '0.3', lastmod: '2026-10-18' },
+  { path: '/privacy', priority: '0.3', lastmod: '2026-10-18' },
   { path: '/about', priority: '0.8' },
   { path: '/headwaters/', priority: '0.8' },
   { path: '/headwaters/continuum/', priority: '0.7' },
