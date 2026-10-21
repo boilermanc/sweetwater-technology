@@ -2,7 +2,7 @@ import { createElement, useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, Check, Download, ExternalLink, Monitor, Usb } from 'lucide-react';
 import type { Resource } from '../resources';
 
-const ASSETS = '/downloads/crowes-nest/0.3.0-preview.2';
+const ASSETS = '/downloads/crowes-nest/0.3.0-preview.3';
 const steps = ['Before you begin', 'Connect & install', 'Connect Codex', 'Make it yours'];
 const buttonClass = 'inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-bold text-white hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-600 disabled:cursor-not-allowed disabled:opacity-45';
 const secondaryClass = 'inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-300 px-5 py-3 font-bold text-slate-700 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-600';
@@ -76,7 +76,7 @@ export function CrowesNestSetup({ resource }: { resource: Resource }) {
     </div>
 
     <div className="mt-12 rounded-3xl border border-slate-200 bg-white shadow-sm" id="setup">
-      <div className="border-b border-slate-200 px-6 py-5 sm:px-9"><p className="font-bold text-slate-900">Let’s set up your Nest</p><p className="mt-1 text-sm text-slate-500">Preview release 0.3.0-preview.2 · For the ESP32-2432S028R only</p></div>
+      <div className="border-b border-slate-200 px-6 py-5 sm:px-9"><p className="font-bold text-slate-900">Let’s set up your Nest</p><p className="mt-1 text-sm text-slate-500">Preview release 0.3.0-preview.3 · For the ESP32-2432S028R only</p></div>
       <div className="grid lg:grid-cols-[230px_1fr]">
         <nav aria-label="Setup steps" className="border-b border-slate-200 p-4 lg:border-b-0 lg:border-r lg:p-6">
           <ol className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">{steps.map((label, index) => <li key={label}><button type="button" onClick={() => navigate(index)} aria-current={step === index ? 'step' : undefined} className={`flex min-h-14 w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-bold focus-visible:outline-2 focus-visible:outline-blue-600 ${step === index ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50'}`}><span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full ${step === index ? 'bg-blue-600 text-white' : 'bg-slate-100'}`}>{index + 1}</span>{label}</button></li>)}</ol>
@@ -130,6 +130,7 @@ export function CrowesNestSetup({ resource }: { resource: Resource }) {
       <div className="space-y-3">{[
         ['No USB device appears', 'Try another USB data cable and a direct USB port. Check Windows Device Manager. If a serial driver is missing, use the driver specified by your board vendor for its USB chip.'],
         ['The installer cannot connect', 'Stop the desktop helper and close all serial tools. Check the selected port. If necessary, hold BOOT while connecting, then release it once flashing starts.'],
+        ['I swapped boards on the same USB port', 'Preview 3 recognizes a different compatible CYD and opens setup. Choose Connect this board to verify and connect it. If you dismiss setup without switching, reconnecting the previous board resumes its connection. If Windows assigns a different COM port, stop the helper, refresh the port list, and verify that port.'],
         ['The helper cannot connect', 'Close the browser installer and serial console. Stop any older USB helper before starting this one. Reopen the setup app and refresh the ports if you moved the USB cable.'],
         ['USB is connected, but chats are missing or stale', 'Keep Codex desktop open on the same Windows account. Start a local chat and check the helper status. Stale or Unknown means current status is unavailable, not that a task has finished.'],
         ['I want to update or remove the helper', 'Stop the helper in its setup window before updating. To remove it, first uncheck sign-in startup and save, then stop the helper and close the app. Delete the Sweetwater/CrowesNest folder under your Windows LocalAppData folder.'],
