@@ -1,3 +1,4 @@
+import { CrowesNestSetup } from './CrowesNestSetup';
 import { TryAiGuide } from './TryAiGuide';
 import { useState, type FormEvent } from 'react';
 import { ArrowRight, Bot, Download, FileArchive, Github, Monitor, Send } from 'lucide-react';
@@ -26,6 +27,7 @@ export function ResourcesIndex() {
 }
 
 function OpenSourceResource({ resource }: { resource: Resource }) {
+  if (resource.slug === 'codex-cyd-dashboard') return <CrowesNestSetup resource={resource} />;
   return <main className="relative z-10 mx-auto min-h-screen max-w-5xl px-4 pb-24 pt-32 sm:px-6">
     <nav aria-label="Breadcrumb" className="mb-8 text-sm font-semibold text-slate-500"><a href="/resources" className="hover:text-blue-600">Resources</a> <span aria-hidden="true">/</span> {resource.title}</nav>
     <p className="text-xs font-bold uppercase tracking-[0.3em] text-blue-600">{resource.kind}</p>
