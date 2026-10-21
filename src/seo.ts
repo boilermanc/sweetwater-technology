@@ -102,6 +102,17 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
 
   if (path === '/book') return { title: 'Free 20-Minute Introductory Call | Sweetwater Technology', description: 'Request a free 20-minute call to talk through your business workflow, connected systems, and practical next steps with Sweetwater Technology.', canonical: SITE_URL + '/book', type: 'website', jsonLd: [organization] };
 
+  if (path === '/portfolio') {
+    return {
+      title: 'Our Work | Sweetwater Technology',
+      description: 'Explore the Sweetwater Technology portfolio: apps, businesses, and everyday ideas brought to life, from growing and logistics to music and creative tools.',
+      canonical: `${SITE_URL}/portfolio`,
+      type: 'website',
+      jsonLd: [organization],
+      robots: 'noindex, follow',
+    };
+  }
+
   if (path === '/about') {
     const canonical = `${SITE_URL}/about`;
     return {
@@ -388,6 +399,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
 };
 
 export const PRERENDER_ROUTES = [
+  '/portfolio',
   '/book',
   '/terms',
   '/privacy',

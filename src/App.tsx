@@ -23,6 +23,8 @@ import { SageEmailPreview } from './pages/SageEmailPreview';
 import { ResourcesIndex, ResourceDetail, ResourceDownload } from './pages/Resources';
 import { findResource } from './resources';
 import { About } from './pages/About';
+import { Portfolio } from './pages/Portfolio';
+import { SweetwaterLogo } from './components/SweetwaterLogo';
 
 const Portal = lazy(() => import('./portal/Portal'));
 const AppDetail = lazy(() => import('./components/AppDetail').then((module) => ({ default: module.AppDetail })));
@@ -90,7 +92,7 @@ const App: React.FC<AppProps> = ({ path }) => {
     <div className="relative min-h-screen selection:bg-blue-100 selection:text-blue-800 transition-colors duration-700">
       <AnimatedBackground texture="flow" />
 
-      <Header />
+      {currentPath !== '/portfolio' && <Header />}
 
       {currentPath === '/' ? (
         <main className="relative z-10">
@@ -103,6 +105,8 @@ const App: React.FC<AppProps> = ({ path }) => {
         <LegalDraft kind={currentPath === '/terms' ? 'terms' : 'privacy'} />
       ) : currentPath === '/book' ? (
         <Book />
+      ) : currentPath === '/portfolio' ? (
+        <Portfolio onSelectApp={setSelectedApp} />
       ) : currentPath === '/about' ? (
         <About />
       ) : currentPath === '/headwaters' ? (
@@ -131,7 +135,14 @@ const App: React.FC<AppProps> = ({ path }) => {
         <NotFound />
       )}
 
-      <Footer />
+      {currentPath === '/portfolio' ? (
+        <footer className="relative z-10 border-t border-slate-100 bg-white/50 px-4 py-8 sm:px-6 sm:py-12">
+          <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 md:flex-row">
+            <SweetwaterLogo markClassName="h-8 w-8" />
+            <p className="text-center text-xs text-slate-500 sm:text-sm">© {new Date().getFullYear()} Sweetwater Technology. All rights reserved.</p>
+          </div>
+        </footer>
+      ) : <Footer />}
 
       <Suspense fallback={null}>
         <AnimatePresence>
