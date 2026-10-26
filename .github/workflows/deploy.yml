@@ -72,7 +72,7 @@ jobs:
           test -n "$VITE_PORTAL_SUPABASE_PUBLISHABLE_KEY"
           npm run build
           npm run lint
-          node --test scripts/portal.test.mjs scripts/guided-portal.test.mjs
+          node --test scripts/portal.test.mjs scripts/guided-portal.test.mjs scripts/signalscout.test.mjs
           npm run audit:html
           echo "commit=${GITHUB_SHA}" > dist/build-info.txt
           date -u +"built_utc=%Y-%m-%dT%H:%M:%SZ" >> dist/build-info.txt

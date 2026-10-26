@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { ArrowLeft, ArrowUpRight, Check, ChevronRight, Clock3, FileText, LayoutDashboard, LockKeyhole, LogOut, Plus, Search, ShieldCheck, Waves } from 'lucide-react';
 import { SweetwaterLogo } from '../components/SweetwaterLogo';
@@ -7,6 +7,8 @@ import { deliveryEconomics, editableEngagement, newEngagement, stages, validateE
 import type { Engagement } from './model';
 import './portal.css';
 import SavedDiscovery from './SavedDiscovery';
+
+const SignalScout = lazy(() => import('./signalscout/SignalScout'));
 
 const money = (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
 type Draft = Omit<Engagement, 'id' | 'updated_at'>;
@@ -22,6 +24,7 @@ export default function Portal() {
   const [filter, setFilter] = useState('All');
   const [editing, setEditing] = useState<Engagement | 'new' | null>(null);
   const [showRecords, setShowRecords] = useState(false);
+  const [showScout, setShowScout] = useState(false);
 
   useEffect(() => {
     document.title = 'Private workspace | Sweetwater Technology';
@@ -100,7 +103,9 @@ export default function Portal() {
   const today = new Date().toLocaleDateString('en-CA');
   const overdue = activeItems.filter(item => item.due_date && item.due_date < today);
 
-  if (access === 'member' && !showRecords) return <SavedDiscovery onRecords={() => setShowRecords(true)} onChanged={item => setItems(current => [item, ...current.filter(other => other.id !== item.id)])} />;
+  if (access === 'member' && showScout) return <Suspense fallback={<main role="status">Loading SignalScout…</main>}><SignalScout onBack={() => setShowScout(false)} onSignOut={() => void signOut()} /></Suspense>;
+
+  if (access === 'member' && !showRecords) return <SavedDiscovery onScout={() => setShowScout(true)} onSignOut={() => void signOut()} onRecords={() => setShowRecords(true)} onChanged={item => setItems(current => [item, ...current.filter(other => other.id !== item.id)])} />;
 
   return <div className="sw-portal">
     {access !== 'member' ? <>
@@ -115,7 +120,7 @@ export default function Portal() {
       </main><footer className="login-footer">SWEETWATER TECHNOLOGY <span>Thoughtful systems. Practical progress.</span></footer>
     </> : <div className="workspace-layout">
       <aside className="portal-sidebar"><a href="/" aria-label="Sweetwater Technology home"><SweetwaterLogo /></a><p className="eyebrow">CLIENT DELIVERY</p><button className="nav-active" onClick={() => { setEditing(null); setFilter('All'); }}><LayoutDashboard size={18} /> Engagements</button><a href="/" className="quiet-link"><ArrowUpRight size={18} /> Public website</a><div className="sidebar-bottom"><ShieldCheck size={18} /><p>Private workspace<br /><strong>{identity}</strong></p><button aria-label="Sign out" onClick={signOut}><LogOut size={18} /></button></div></aside>
-      <main className="workspace-main"><div className="workspace-top"><button className="quiet-link" onClick={() => setShowRecords(false)}><ArrowLeft size={14} /> Back to guided discovery</button><span className="team-badge">Sweetwater team</span></div>
+      <main className="workspace-main"><div className="workspace-top"><button className="quiet-link" onClick={() => setShowRecords(false)}><ArrowLeft size={14} /> Back to guided discovery</button><button className="quiet-link" onClick={() => setShowScout(true)}>SignalScout · Prospect queue</button><span className="team-badge">Sweetwater team</span></div>
         <header className="workspace-heading"><div><p className="eyebrow">KEEP THE WORK MOVING</p><h1>{editing ? editing === 'new' ? 'A new engagement.' : editing.client : 'Every engagement. One view.'}</h1><p>{editing ? 'Keep the scope clear and the next step useful.' : 'The people, decisions, and details behind good delivery.'}</p></div>{!editing && <button className="primary" onClick={() => { setMessage(''); setEditing('new'); }}><Plus size={18} /> New engagement</button>}</header>
         {message && <div className="notice" role="status">{message}</div>}
         {editing ? <EngagementEditor key={editing === 'new' ? 'new' : editing.id} item={editing === 'new' ? newEngagement() : editing} onSave={save} onCancel={() => { setEditing(null); setMessage(''); }} busy={busy} /> : <>
