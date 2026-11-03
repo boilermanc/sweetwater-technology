@@ -21,11 +21,7 @@ export function Book() {
       {live ? <section aria-label="Book your introductory call"><BookingPicker /></section> : <section aria-labelledby="call-request-title">
         <h2 id="call-request-title" className="text-2xl font-black text-slate-900">Request your free call</h2>
         <p className="mb-6 mt-3 leading-7 text-slate-600">Add a little about your business and a couple of times that work for you, including your time zone. Clint will follow up to agree a time. Your appointment is only booked once we confirm it with you.</p>
-        <ContactForm initialMessage="I’d like a free 20-minute introductory call.
-
-What I’d like to discuss:
-
-Times that work for me (with time zone): " />
+        <ContactForm booking />
       </section>}
     </div>
   </main>;
