@@ -15,7 +15,7 @@ export const RESOURCES: Resource[] = [
   { slug: 'try-ai-this-week', title: 'Try AI This Week', description: 'A simple starter guide for small businesses. Five practical experiments using fictional examples or public information.', kind: 'Guide', article: true },
   {
     slug: 'codex-cyd-dashboard',
-    title: 'Codex CYD Dashboard',
+    title: "Crowe’s Nest",
     description: 'Turn an ESP32 Cheap Yellow Display into a touchscreen dashboard for your local Codex chats. See live status and tap a card to open its exact chat.',
     kind: 'Open-source hardware project',
     repository: 'https://github.com/boilermanc/codex-cyd-dashboard',

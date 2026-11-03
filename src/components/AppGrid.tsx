@@ -5,12 +5,13 @@ import { AppCardRenderer } from './AppCardRenderer';
 
 interface AppGridProps {
   onSelectApp: (app: AppProject) => void;
+  projects?: AppProject[];
 }
 
-export const AppGrid: React.FC<AppGridProps> = ({ onSelectApp }) => {
+export const AppGrid: React.FC<AppGridProps> = ({ onSelectApp, projects = PROJECTS }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
-      {PROJECTS.map((app, index) => (
+      {projects.map((app, index) => (
         <AppCardRenderer
           key={app.id}
           app={app}

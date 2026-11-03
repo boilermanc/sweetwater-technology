@@ -22,6 +22,8 @@ npm run build
 
 Portfolio content lives in `src/constants.tsx`. Product-specific card designs live in `src/components/cards/`, while the reusable project detail dialog is in `src/components/AppDetail.tsx`.
 
+The standalone `/portfolio` landing page shares that full project catalog and detail dialogs. It is designed for direct links from other sites, with no main-site navigation link. It is prerendered with social sharing metadata, marked `noindex, follow`, and omitted from the sitemap. Edit its introduction and contact call to action in `src/pages/Portfolio.tsx`.
+
 Verified news articles live in `src/news.ts`. Adding an article there creates its `/news/:slug` page, route-specific metadata, `NewsArticle` and breadcrumb structured data, and dated sitemap entry during `npm run build`.
 
 Service and product-profile content lives in `src/marketing.ts`. Those entries generate `/services/:slug` and `/work/:slug` routes with Service, FAQ, SoftwareApplication, and breadcrumb structured data where applicable.
