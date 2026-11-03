@@ -17,7 +17,7 @@ const plainText = (html) => html
   .replace(/<[^>]+>/g, ' ')
   .replace(/\s+/g, ' ').trim();
 const requiredCopy = new Map([
-  ['/', 'Get your'],
+  ['/', 'Find better ways to use'],
   ['/services/custom-web-applications', 'Custom Web Application Development'],
   ['/services/ai-workflow-automation', 'AI does the busywork. You make the calls.'],
   ['/services/mobile-app-development', 'Mobile App Development'],

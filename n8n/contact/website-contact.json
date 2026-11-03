@@ -1,0 +1,350 @@
+{
+  "name": "Sweetwater Website Contact Capture",
+  "active": false,
+  "nodes": [
+    {
+      "id": "234500f3-d175-45c1-a36b-da948539a7af",
+      "name": "Sweetwater Inquiry Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        240
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "4a7ce38b-f497-424f-9936-f636f5b68514",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "https://sweetwater.technology"
+        }
+      }
+    },
+    {
+      "id": "e877fa2e-2ee9-4fa4-b06f-8de4a633f265",
+      "name": "Validate Inquiry",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        230,
+        240
+      ],
+      "parameters": {
+        "jsCode": "function normalizeContact(body) {\n  if (!body || typeof body !== 'object' || Array.isArray(body) || JSON.stringify(body).length > 12000 || body.website) throw new Error('Invalid request');\n  if (typeof body.requestId !== 'string' || !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(body.requestId)) throw new Error('Invalid request ID');\n  const field = (value,max,required=false) => { if (typeof value !== 'string' || value.length > max || (required && !value.trim())) throw new Error('Invalid field'); return value.trim(); };\n  const name=field(body.contact?.name,100,true),email=field(body.contact?.email ?? '',254).toLowerCase(),phone=field(body.contact?.phone ?? '',30);\n  const business=field(body.context?.business ?? '',120),message=field(body.context?.summary,1000,true);\n  if (!email && !phone) throw new Error('Contact details required');\n  if (email && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) throw new Error('Invalid email');\n  if (phone && (!/^\\+?[\\d\\s().-]+$/.test(phone) || phone.replace(/\\D/g,'').length<7 || phone.replace(/\\D/g,'').length>15)) throw new Error('Invalid phone');\n  if (body.event!=='intro_contact_request' || body.intent!=='website-contact' || body.consent?.marketing!==false) throw new Error('Invalid purpose');\n  const source=field(body.source,120,true);\n  if (source!=='homepage-contact' && !/^website:\\/[a-z0-9/-]*$/.test(source)) throw new Error('Invalid source');\n  const scrub=v=>v.replace(/\\b\\d{3}-\\d{2}-\\d{4}\\b/g,'[redacted]').replace(/\\b(?:\\d[ -]*?){13,19}\\b/g,'[redacted]').replace(/\\b(?:sk-|sb_secret_)[a-zA-Z0-9_-]{16,}\\b/g,'[redacted]');\n  return {requestId:body.requestId.toLowerCase(),event:'intro_contact_request',intent:'website-contact',source,contactMethod:email?'email':'callback',contact:{name,email:email||null,phone:phone||null},context:{business:scrub(business),summary:scrub(message)},messages:[{role:'user',content:scrub(message)}],consent:{marketing:false},testMode:false};\n}\nfunction humanVerified(response) {\n  return response.statusCode===200 && response.body?.success===true && response.body.hostname==='sweetwater.technology' && response.body.action==='sweetwater-contact';\n}\nfunction savedResponse(response,payload) {\n  return response.statusCode===200 && response.body?.accepted===true && response.body.requestId===payload.requestId\n    ? {statusCode:200,body:{accepted:true,requestId:payload.requestId}}\n    : {statusCode:503,body:{accepted:false,message:'We could not confirm receipt. Please retry with the same details.'}};\n}\r\n\nconst fail=(statusCode,message)=>[{json:{proceed:false,statusCode,body:{accepted:false,message}}}];\nconst req=$input.first().json;\nif(req.headers?.origin!=='https://sweetwater.technology')return fail(403,'Request not allowed.');\ntry {const payload=normalizeContact(req.body); const token=req.body.turnstileToken;if(typeof token!=='string'||!token||token.length>2048)return fail(400,'Please complete the security check.');return [{json:{proceed:true,payload,token}}];}catch{return fail(400,'Please check your message and contact details.');}"
+      }
+    },
+    {
+      "id": "f7a53400-c5b2-494b-a225-d7255704f13c",
+      "name": "Valid inquiry?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        460,
+        240
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b3916b78-2b1a-45c5-ae7c-78b42d1e37ae",
+              "leftValue": "={{ $json.proceed === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "db7cb5db-d14b-43bb-8a73-7bf2953f0ecd",
+      "name": "Verify contact security",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        690,
+        240
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "response",
+              "value": "={{ $json.token }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "jXKnf5PVhxWp9AwE",
+          "name": "Sweetwater Booking Turnstile"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "39d53640-89f3-4574-91b4-a5cb0894afa4",
+      "name": "Check contact security",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        920,
+        240
+      ],
+      "parameters": {
+        "jsCode": "function normalizeContact(body) {\n  if (!body || typeof body !== 'object' || Array.isArray(body) || JSON.stringify(body).length > 12000 || body.website) throw new Error('Invalid request');\n  if (typeof body.requestId !== 'string' || !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(body.requestId)) throw new Error('Invalid request ID');\n  const field = (value,max,required=false) => { if (typeof value !== 'string' || value.length > max || (required && !value.trim())) throw new Error('Invalid field'); return value.trim(); };\n  const name=field(body.contact?.name,100,true),email=field(body.contact?.email ?? '',254).toLowerCase(),phone=field(body.contact?.phone ?? '',30);\n  const business=field(body.context?.business ?? '',120),message=field(body.context?.summary,1000,true);\n  if (!email && !phone) throw new Error('Contact details required');\n  if (email && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) throw new Error('Invalid email');\n  if (phone && (!/^\\+?[\\d\\s().-]+$/.test(phone) || phone.replace(/\\D/g,'').length<7 || phone.replace(/\\D/g,'').length>15)) throw new Error('Invalid phone');\n  if (body.event!=='intro_contact_request' || body.intent!=='website-contact' || body.consent?.marketing!==false) throw new Error('Invalid purpose');\n  const source=field(body.source,120,true);\n  if (source!=='homepage-contact' && !/^website:\\/[a-z0-9/-]*$/.test(source)) throw new Error('Invalid source');\n  const scrub=v=>v.replace(/\\b\\d{3}-\\d{2}-\\d{4}\\b/g,'[redacted]').replace(/\\b(?:\\d[ -]*?){13,19}\\b/g,'[redacted]').replace(/\\b(?:sk-|sb_secret_)[a-zA-Z0-9_-]{16,}\\b/g,'[redacted]');\n  return {requestId:body.requestId.toLowerCase(),event:'intro_contact_request',intent:'website-contact',source,contactMethod:email?'email':'callback',contact:{name,email:email||null,phone:phone||null},context:{business:scrub(business),summary:scrub(message)},messages:[{role:'user',content:scrub(message)}],consent:{marketing:false},testMode:false};\n}\nfunction humanVerified(response) {\n  return response.statusCode===200 && response.body?.success===true && response.body.hostname==='sweetwater.technology' && response.body.action==='sweetwater-contact';\n}\nfunction savedResponse(response,payload) {\n  return response.statusCode===200 && response.body?.accepted===true && response.body.requestId===payload.requestId\n    ? {statusCode:200,body:{accepted:true,requestId:payload.requestId}}\n    : {statusCode:503,body:{accepted:false,message:'We could not confirm receipt. Please retry with the same details.'}};\n}\r\n\nconst fail=(statusCode,message)=>[{json:{proceed:false,statusCode,body:{accepted:false,message}}}];\nif(!humanVerified($input.first().json))return fail(400,'Please retry the security check.');return [{json:{proceed:true,p_payload:$('Validate Inquiry').first().json.payload}}];"
+      }
+    },
+    {
+      "id": "d3c1ab44-3608-4d2e-9cca-ee0c3d7b515e",
+      "name": "Contact verified?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1150,
+        240
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "26eaf157-6187-4533-bda6-f0094bab6b51",
+              "leftValue": "={{ $json.proceed === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "4bd04fbe-c92c-489a-b41a-727eafa19c2a",
+      "name": "Save Inquiry",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1380,
+        240
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://horvjqqifgrzxesuxtfm.supabase.co/rest/v1/rpc/capture_sweetwater_inquiry",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {p_payload:$json.p_payload} }}",
+        "options": {
+          "timeout": 10000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "credentials": {
+        "supabaseApi": {
+          "id": "IkIpi5m4OmJ9DvBS",
+          "name": "Sproutify Trellis"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "f4e3c923-2ef2-441b-a997-73d6ce034032",
+      "name": "Check saved inquiry",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1610,
+        240
+      ],
+      "parameters": {
+        "jsCode": "function normalizeContact(body) {\n  if (!body || typeof body !== 'object' || Array.isArray(body) || JSON.stringify(body).length > 12000 || body.website) throw new Error('Invalid request');\n  if (typeof body.requestId !== 'string' || !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(body.requestId)) throw new Error('Invalid request ID');\n  const field = (value,max,required=false) => { if (typeof value !== 'string' || value.length > max || (required && !value.trim())) throw new Error('Invalid field'); return value.trim(); };\n  const name=field(body.contact?.name,100,true),email=field(body.contact?.email ?? '',254).toLowerCase(),phone=field(body.contact?.phone ?? '',30);\n  const business=field(body.context?.business ?? '',120),message=field(body.context?.summary,1000,true);\n  if (!email && !phone) throw new Error('Contact details required');\n  if (email && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) throw new Error('Invalid email');\n  if (phone && (!/^\\+?[\\d\\s().-]+$/.test(phone) || phone.replace(/\\D/g,'').length<7 || phone.replace(/\\D/g,'').length>15)) throw new Error('Invalid phone');\n  if (body.event!=='intro_contact_request' || body.intent!=='website-contact' || body.consent?.marketing!==false) throw new Error('Invalid purpose');\n  const source=field(body.source,120,true);\n  if (source!=='homepage-contact' && !/^website:\\/[a-z0-9/-]*$/.test(source)) throw new Error('Invalid source');\n  const scrub=v=>v.replace(/\\b\\d{3}-\\d{2}-\\d{4}\\b/g,'[redacted]').replace(/\\b(?:\\d[ -]*?){13,19}\\b/g,'[redacted]').replace(/\\b(?:sk-|sb_secret_)[a-zA-Z0-9_-]{16,}\\b/g,'[redacted]');\n  return {requestId:body.requestId.toLowerCase(),event:'intro_contact_request',intent:'website-contact',source,contactMethod:email?'email':'callback',contact:{name,email:email||null,phone:phone||null},context:{business:scrub(business),summary:scrub(message)},messages:[{role:'user',content:scrub(message)}],consent:{marketing:false},testMode:false};\n}\nfunction humanVerified(response) {\n  return response.statusCode===200 && response.body?.success===true && response.body.hostname==='sweetwater.technology' && response.body.action==='sweetwater-contact';\n}\nfunction savedResponse(response,payload) {\n  return response.statusCode===200 && response.body?.accepted===true && response.body.requestId===payload.requestId\n    ? {statusCode:200,body:{accepted:true,requestId:payload.requestId}}\n    : {statusCode:503,body:{accepted:false,message:'We could not confirm receipt. Please retry with the same details.'}};\n}\r\n\nreturn [{json:savedResponse($input.first().json,$('Validate Inquiry').first().json.payload)}];"
+      }
+    },
+    {
+      "id": "ea0e6100-dfa2-4de3-84e1-7780687e0a07",
+      "name": "Confirm Saved Inquiry",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1840,
+        240
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.body }}",
+        "options": {
+          "responseCode": "={{ $json.statusCode }}",
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Cache-Control",
+                "value": "no-store"
+              },
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "https://sweetwater.technology"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Sweetwater Inquiry Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Inquiry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Inquiry": {
+      "main": [
+        [
+          {
+            "node": "Valid inquiry?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid inquiry?": {
+      "main": [
+        [
+          {
+            "node": "Verify contact security",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Confirm Saved Inquiry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify contact security": {
+      "main": [
+        [
+          {
+            "node": "Check contact security",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check contact security": {
+      "main": [
+        [
+          {
+            "node": "Contact verified?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contact verified?": {
+      "main": [
+        [
+          {
+            "node": "Save Inquiry",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Confirm Saved Inquiry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Inquiry": {
+      "main": [
+        [
+          {
+            "node": "Check saved inquiry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check saved inquiry": {
+      "main": [
+        [
+          {
+            "node": "Confirm Saved Inquiry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "none",
+    "saveManualExecutions": false,
+    "executionTimeout": 45
+  }
+}

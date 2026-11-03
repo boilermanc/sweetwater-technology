@@ -74,7 +74,7 @@ export const RekkrdDetail: React.FC<RekkrdDetailProps> = ({ app, onClose }) => {
         <div className="md:w-1/2 p-5 sm:p-8 md:p-12 overflow-y-auto">
           <div className="space-y-6 sm:space-y-8">
             <div>
-              <h3 className="text-xs font-black text-[#dd6e42] uppercase tracking-widest mb-4">The Vision</h3>
+              <h3 className="text-xs font-black text-[#dd6e42] uppercase tracking-widest mb-4">What it helps with</h3>
               <p className="text-base sm:text-lg md:text-xl text-[#c0d6df] leading-relaxed font-medium">
                 {app.longDescription}
               </p>
@@ -84,12 +84,12 @@ export const RekkrdDetail: React.FC<RekkrdDetailProps> = ({ app, onClose }) => {
               <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
                 <Disc3 className="text-[#dd6e42] w-6 h-6 mb-3" />
                 <h4 className="font-bold text-[#e8e2d6] mb-1 text-sm">AI Recognition</h4>
-                <p className="text-xs text-[#7d9199]">Gemini Vision identifies albums from camera scans instantly.</p>
+                <p className="text-xs text-[#7d9199]">AI helps identify albums from photos of their covers.</p>
               </div>
               <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
                 <Cpu className="text-[#4f6d7a] w-6 h-6 mb-3" />
-                <h4 className="font-bold text-[#e8e2d6] mb-1 text-sm">Tech Stack</h4>
-                <p className="text-xs text-[#7d9199]">React, TypeScript, Supabase, Gemini AI, Tailwind CSS.</p>
+                <h4 className="font-bold text-[#e8e2d6] mb-1 text-sm">Your collection, organized</h4>
+                <p className="text-xs text-[#7d9199]">Keep album details, track listings and notes together.</p>
               </div>
               <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
                 <Globe className="text-[#dd6e42] w-6 h-6 mb-3" />

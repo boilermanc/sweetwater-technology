@@ -1,0 +1,24 @@
+import {readFileSync,writeFileSync} from 'node:fs';
+import {randomUUID} from 'node:crypto';
+const core=readFileSync('n8n/contact/core.mjs','utf8').replaceAll('export function','function');
+const nodes=[],connections={};
+function add(name,type,parameters,version=2,extra={}) {nodes.push({id:randomUUID(),name,type:'n8n-nodes-base.'+type,typeVersion:version,position:[nodes.length*230,240],parameters,...extra});}
+const code=(name,js)=>add(name,'code',{jsCode:core+'\n'+js});
+const link=(from,to,index=0)=>{const c=connections[from]??={main:[]};c.main[index]??=[];c.main[index].push({node:to,type:'main',index:0});};
+const condition=name=>add(name,'if',{conditions:{options:{caseSensitive:true,leftValue:'',typeValidation:'strict',version:2},conditions:[{id:randomUUID(),leftValue:'={{ $json.proceed === true }}',rightValue:'',operator:{type:'boolean',operation:'true',singleValue:true}}],combinator:'and'},options:{}},2.2);
+const fail="const fail=(statusCode,message)=>[{json:{proceed:false,statusCode,body:{accepted:false,message}}}];\n";
+add('Sweetwater Inquiry Webhook','webhook',{httpMethod:'POST',path:'4a7ce38b-f497-424f-9936-f636f5b68514',responseMode:'responseNode',options:{allowedOrigins:'https://sweetwater.technology'}},2.1);
+code('Validate Inquiry',fail+`const req=$input.first().json;
+if(req.headers?.origin!=='https://sweetwater.technology')return fail(403,'Request not allowed.');
+try {const payload=normalizeContact(req.body); const token=req.body.turnstileToken;if(typeof token!=='string'||!token||token.length>2048)return fail(400,'Please complete the security check.');return [{json:{proceed:true,payload,token}}];}catch{return fail(400,'Please check your message and contact details.');}`);
+condition('Valid inquiry?');
+add('Verify contact security','httpRequest',{method:'POST',url:'https://challenges.cloudflare.com/turnstile/v0/siteverify',authentication:'genericCredentialType',genericAuthType:'httpCustomAuth',sendBody:true,contentType:'form-urlencoded',bodyParameters:{parameters:[{name:'response',value:'={{ $json.token }}'}]},options:{timeout:10000,response:{response:{fullResponse:true,neverError:true,responseFormat:'json'}}}},4.2,{credentials:{httpCustomAuth:{id:'jXKnf5PVhxWp9AwE',name:'Sweetwater Booking Turnstile'}},onError:'continueRegularOutput'});
+code('Check contact security',fail+`if(!humanVerified($input.first().json))return fail(400,'Please retry the security check.');return [{json:{proceed:true,p_payload:$('Validate Inquiry').first().json.payload}}];`);
+condition('Contact verified?');
+add('Save Inquiry','httpRequest',{method:'POST',url:'https://horvjqqifgrzxesuxtfm.supabase.co/rest/v1/rpc/capture_sweetwater_inquiry',authentication:'predefinedCredentialType',nodeCredentialType:'supabaseApi',sendBody:true,specifyBody:'json',jsonBody:'={{ {p_payload:$json.p_payload} }}',options:{timeout:10000,response:{response:{fullResponse:true,neverError:true,responseFormat:'json'}}}},4.2,{credentials:{supabaseApi:{id:'IkIpi5m4OmJ9DvBS',name:'Sproutify Trellis'}},onError:'continueRegularOutput'});
+code('Check saved inquiry',`return [{json:savedResponse($input.first().json,$('Validate Inquiry').first().json.payload)}];`);
+add('Confirm Saved Inquiry','respondToWebhook',{respondWith:'json',responseBody:'={{ $json.body }}',options:{responseCode:'={{ $json.statusCode }}',responseHeaders:{entries:[{name:'Cache-Control',value:'no-store'},{name:'Access-Control-Allow-Origin',value:'https://sweetwater.technology'}]}}},1.4);
+const chain=['Sweetwater Inquiry Webhook','Validate Inquiry','Valid inquiry?','Verify contact security','Check contact security','Contact verified?','Save Inquiry','Check saved inquiry','Confirm Saved Inquiry'];
+chain.slice(0,-1).forEach((name,i)=>link(name,chain[i+1]));
+link('Valid inquiry?','Confirm Saved Inquiry',1);link('Contact verified?','Confirm Saved Inquiry',1);
+writeFileSync('n8n/contact/website-contact.json',JSON.stringify({name:'Sweetwater Website Contact Capture',active:false,nodes,connections,settings:{executionOrder:'v1',saveDataSuccessExecution:'none',saveDataErrorExecution:'none',saveManualExecutions:false,executionTimeout:45}},null,2)+'\n');

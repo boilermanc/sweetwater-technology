@@ -30,7 +30,7 @@ export function ServicesPage() {
           ['Custom web apps', 'Keep jobs, customers and paperwork in one place.', 'custom-web-applications'],
           ['AI helpers', 'Get quotes and replies ready faster. You approve what goes out.', 'ai-workflow-automation'],
           ['Mobile apps', 'Help customers request work and your crew update jobs on the go.', 'mobile-app-development'],
-        ].map(([title, detail, slug]) => <article key={slug} className={`${card} flex flex-col`}><h3 className="text-2xl font-black text-slate-900">{title}</h3><p className="mt-4 flex-1 leading-7 text-slate-600">{detail}</p><a href={`/services/${slug}`} className="mt-6 inline-flex items-center gap-2 font-bold text-blue-600 hover:text-blue-700">Learn more<span className="sr-only"> about {title.toLowerCase()}</span><ArrowRight aria-hidden="true" size={18} /></a></article>)}
+        ].map(([title, detail, slug]) => <article key={slug} className={`${card} flex flex-col`}><h3 className="text-2xl font-black text-slate-900">{title}</h3><p className="mt-4 flex-1 leading-7 text-slate-600">{detail}</p><a href={`/services/${slug}`} className="mt-6 inline-flex items-center gap-2 font-bold text-blue-600 hover:text-blue-700">Learn more<span className="sr-only"> about {title}</span><ArrowRight aria-hidden="true" size={18} /></a></article>)}
       </div>
     </section>
     <section className="mt-20 rounded-[2rem] bg-slate-900 p-8 text-white sm:p-12" aria-labelledby="ai-worries">
@@ -38,7 +38,7 @@ export function ServicesPage() {
       <dl className="mt-8 grid gap-8 md:grid-cols-3">
         {[
           ['Too expensive?', 'We start small. You know the cost before we begin.'],
-          ['Replace my people?', 'No. It handles the repetitive stuff. Your people handle the rest.'],
+          ['Replace my people?', 'We focus on helping your team with repetitive work. You decide what changes.'],
           ['Not a tech person?', "You don't need to be. Just tell us the problem."],
         ].map(([question, answer]) => <div key={question}><dt className="text-lg font-bold">{question}</dt><dd className="mt-3 leading-7 text-slate-300">{answer}</dd></div>)}
       </dl>
@@ -61,9 +61,9 @@ export function AiServicesPage() {
     <section className="mt-20" aria-labelledby="what-you-get">
       <h2 id="what-you-get" className={heading}>What you get</h2>
       <div className="mt-8 grid gap-5 md:grid-cols-3">{[
-        ['Time back', 'Your team stops starting from scratch.'],
+        ['Less starting from scratch', 'Useful drafts give your team something to review and improve.'],
         ['Fewer mistakes', 'Less retyping. Fewer chances to miss a detail.'],
-        ['You stay in control', "Nothing is sent, charged or changed without a person's OK."],
+        ['You stay in control', "We agree which steps need your approval and build in those checks."],
       ].map(([title, detail]) => <article key={title} className={card}><h3 className="text-xl font-black text-slate-900">{title}</h3><p className="mt-3 leading-7 text-slate-600">{detail}</p></article>)}</div>
     </section>
     <section className="mt-20" aria-labelledby="how-it-works">

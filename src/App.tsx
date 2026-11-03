@@ -9,7 +9,8 @@ import { AnimatedBackground } from './components/AnimatedBackground';
 import type { AppProject } from './types';
 import { Footer } from './components/Footer';
 import { Book } from './pages/Book';
-import { LegalDraft } from './pages/LegalDraft';
+import { ManageBooking } from './pages/ManageBooking';
+import { LegalPage } from './pages/LegalPage';
 import { NewsDetail, NewsIndex, NotFound } from './components/News';
 import { findNewsArticle } from './news';
 import { normalizePath } from './seo';
@@ -102,7 +103,9 @@ const App: React.FC<AppProps> = ({ path }) => {
           <FloatingAiGuide />
         </main>
       ) : currentPath === '/terms' || currentPath === '/privacy' ? (
-        <LegalDraft kind={currentPath === '/terms' ? 'terms' : 'privacy'} />
+        <LegalPage kind={currentPath === '/terms' ? 'terms' : 'privacy'} />
+      ) : currentPath === '/book/manage' ? (
+        <ManageBooking />
       ) : currentPath === '/book' ? (
         <Book />
       ) : currentPath === '/portfolio' ? (

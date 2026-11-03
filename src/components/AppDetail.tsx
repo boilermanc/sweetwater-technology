@@ -78,24 +78,10 @@ export const AppDetail: React.FC<AppDetailProps> = ({ app, onClose }) => {
         <div className="md:w-1/2 p-5 sm:p-8 md:p-16 overflow-y-auto">
           <div className="space-y-6 sm:space-y-10">
             <div>
-              <h3 className="text-xs font-black text-blue-600 uppercase tracking-widest mb-4">The Vision</h3>
+              <h3 className="text-xs font-black text-blue-600 uppercase tracking-widest mb-4">What it helps with</h3>
               <p className="text-base sm:text-xl md:text-2xl text-slate-800 leading-relaxed font-semibold">
                 {app.longDescription}
               </p>
-            </div>
-
-            <div>
-              <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Tech Stack</h3>
-              <div className="flex flex-wrap gap-2">
-                {app.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-100 text-sm font-semibold text-slate-700"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
             </div>
 
             <div className="pt-6">
@@ -105,7 +91,7 @@ export const AppDetail: React.FC<AppDetailProps> = ({ app, onClose }) => {
                 rel="noopener noreferrer"
                 className="w-full py-5 rounded-2xl bg-slate-900 text-white font-bold text-lg shadow-xl shadow-slate-200 hover:bg-slate-800 transition-all flex items-center justify-center gap-3"
               >
-                Launch Application
+                Visit project
                 <ExternalLink className="w-5 h-5" />
               </a>
             </div>

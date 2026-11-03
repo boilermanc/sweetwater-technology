@@ -31,7 +31,7 @@ const organization = {
   logo: `${SITE_URL}/images/sweetwater-mark.png`,
   image: SOCIAL_IMAGE,
   description:
-    'Sweetwater Technology builds custom web applications, AI-driven workflow automation, and digital products for businesses.',
+    'Sweetwater Technology builds custom web applications, practical AI and connected tools, and digital products for businesses.',
   founder: {
     '@type': 'Person',
     name: 'Clint Crowe',
@@ -90,17 +90,19 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
   const path = normalizePath(requestedPath);
 
   if (path === '/terms' || path === '/privacy') {
-    return { title: (path === '/terms' ? 'Website Terms' : 'Privacy Notice') + ' — Draft for Review | Sweetwater Technology', description: 'Unapproved draft for business and legal review. No effective date has been assigned.', canonical: SITE_URL + path, type: 'website', jsonLd: [organization], robots: 'noindex, follow' };
+    return { title: (path === '/terms' ? 'Website Terms' : 'Privacy Notice') + ' | Sweetwater Technology', description: path === '/terms' ? 'Terms for the Sweetwater Technology website, free resources and introductory calls.' : 'How Sweetwater Technology handles inquiries, bookings, conversations and your privacy choices.', canonical: SITE_URL + path, type: 'website', jsonLd: [organization] };
   }
 
   if (path === '/portal') {
     return { title: 'Client Login | Sweetwater Technology', description: 'Private Sweetwater Technology workspace.', canonical: `${SITE_URL}/portal`, type: 'website', jsonLd: [], robots: 'noindex, nofollow' };
   }
 
-  if (path === '/') return { title: 'Get Your Hours Back | Sweetwater Technology', description: HOME_DESCRIPTION, canonical: SITE_URL + '/', type: 'website', jsonLd: [organization, faqPage] };
+  if (path === '/') return { title: 'Practical AI for Your Business | Sweetwater Technology', description: HOME_DESCRIPTION, canonical: SITE_URL + '/', type: 'website', jsonLd: [organization, faqPage] };
   if (path === '/ai-help' || path === '/app-idea') return { title: (path === '/ai-help' ? 'Practical AI for your business' : 'Talk through your app idea') + ' | Sweetwater Technology', description: 'Start a conversation about your business or app idea. Explore a useful first step with Sweetwater Technology.', canonical: SITE_URL + path, type: 'website', jsonLd: [organization], robots: 'noindex, follow' };
 
-  if (path === '/book') return { title: 'Free 20-Minute Introductory Call | Sweetwater Technology', description: 'Request a free 20-minute call to talk through your business workflow, connected systems, and practical next steps with Sweetwater Technology.', canonical: SITE_URL + '/book', type: 'website', jsonLd: [organization] };
+  if (path === '/book/manage') return { title: 'Manage Your Booking | Sweetwater Technology', description: 'Manage your private Sweetwater call booking.', canonical: SITE_URL + '/book/manage', type: 'website', jsonLd: [], robots: 'noindex, nofollow' };
+
+  if (path === '/book') return { title: 'Free 20-Minute Introductory Call | Sweetwater Technology', description: 'Book a free 20-minute call to talk through how your business works, connected tools, and practical next steps with Sweetwater Technology.', canonical: SITE_URL + '/book', type: 'website', jsonLd: [organization] };
 
   if (path === '/portfolio') {
     return {
@@ -116,7 +118,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
   if (path === '/about') {
     const canonical = `${SITE_URL}/about`;
     return {
-      title: 'About Sweetwater Technology | Atlanta Software Studio',
+      title: 'Meet Clint and Sheree | Sweetwater Technology',
       description: ABOUT_DESCRIPTION,
       canonical,
       type: 'website',
@@ -307,7 +309,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
 
   if (path === '/work') {
     return {
-      title: 'Product Work & Case Studies | Sweetwater Technology',
+      title: 'Our Work | Sweetwater Technology',
       description: 'Explore Sweetwater Technology product profiles spanning AI-native consumer software, logistics automation, and specialized e-commerce.',
       canonical: `${SITE_URL}/work`,
       type: 'website',
@@ -400,6 +402,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
 
 export const PRERENDER_ROUTES = [
   '/portfolio',
+  '/book/manage',
   '/book',
   '/terms',
   '/privacy',

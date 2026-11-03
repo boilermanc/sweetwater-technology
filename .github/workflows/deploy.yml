@@ -19,6 +19,9 @@ jobs:
     timeout-minutes: 15
     env:
       LIVE_URL: https://sweetwater.technology
+      VITE_HOME_CONTACT_ENABLED: "true"
+      VITE_BOOKING_ENABLED: ${{ vars.VITE_BOOKING_ENABLED }}
+      VITE_BOOKING_TURNSTILE_SITE_KEY: ${{ vars.VITE_BOOKING_TURNSTILE_SITE_KEY }}
       VITE_PORTAL_SUPABASE_URL: ${{ vars.VITE_PORTAL_SUPABASE_URL }}
       VITE_PORTAL_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_PORTAL_SUPABASE_PUBLISHABLE_KEY }}
       VITE_PORTAL_AUTH_READY: ${{ vars.VITE_PORTAL_AUTH_READY }}
@@ -70,9 +73,12 @@ jobs:
           test "$VITE_PORTAL_AUTH_READY" = "true"
           test -n "$VITE_PORTAL_SUPABASE_URL"
           test -n "$VITE_PORTAL_SUPABASE_PUBLISHABLE_KEY"
+          if [ "$VITE_BOOKING_ENABLED" = "true" ]; then
+            test -n "$VITE_BOOKING_TURNSTILE_SITE_KEY"
+          fi
           npm run build
           npm run lint
-          node --test scripts/portal.test.mjs scripts/guided-portal.test.mjs scripts/signalscout.test.mjs
+          node --test scripts/*.test.mjs
           npm run audit:html
           echo "commit=${GITHUB_SHA}" > dist/build-info.txt
           date -u +"built_utc=%Y-%m-%dT%H:%M:%SZ" >> dist/build-info.txt
