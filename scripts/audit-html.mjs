@@ -89,7 +89,26 @@ for (const route of routes) await check(route, async () => inspect(await read(ro
 await check('robots.txt', async () => {
   const robots = await read('/robots.txt');
   assert(robots.includes(`Sitemap: ${origin}/sitemap.xml`), 'Sitemap declaration missing');
-  assert(!/^Disallow:\s*\/\s*$/m.test(robots), 'Site-wide crawl disallow');
+  let agents = [];
+  let hasRules = false;
+  for (const rawLine of robots.split(/\r?\n/)) {
+    const line = rawLine.split('#', 1)[0].trim();
+    const directive = /^([\w-]+)\s*:\s*(.*)$/.exec(line);
+    if (!directive) continue;
+    const [, name, value] = directive;
+    switch (name.toLowerCase()) {
+      case 'user-agent':
+        if (hasRules) agents = [];
+        agents.push(value);
+        hasRules = false;
+        break;
+      case 'allow':
+      case 'disallow':
+        hasRules = true;
+        assert(!(name.toLowerCase() === 'disallow' && value === '/' && agents.includes('*')), 'Site-wide crawl disallow');
+        break;
+    }
+  }
 });
 
 if (liveUrl) {
