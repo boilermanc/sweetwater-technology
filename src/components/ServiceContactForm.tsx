@@ -58,7 +58,7 @@ export function ContactForm({ booking = false }: { booking?: boolean }) {
       <button disabled={!hydrated || !enabled || pending || (!isMock && !token)} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"><Send size={18} aria-hidden="true" />{pending ? 'Sending…' : 'Send to Sweetwater'}</button>
     </fieldset>
     <noscript><p className="mt-4 text-sm">JavaScript is needed for online sending. Please email team@sweetwater.technology instead.</p></noscript>
-    <a href={homeContactEmail(details)} className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-blue-700 underline">Email team@sweetwater.technology <ArrowUpRight size={16} aria-hidden="true" /></a>
+    <a href={homeContactEmail(booking ? { ...details, message: ["I would like a free 20-minute introductory call.", details.message].filter(Boolean).join("\n\n") } : details)} className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-blue-700 underline">Email team@sweetwater.technology <ArrowUpRight size={16} aria-hidden="true" /></a>
   </form>;
 }
 
