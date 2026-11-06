@@ -9,6 +9,7 @@ export interface NewsArticle {
   imageAlt: string;
   imageWidth: number;
   imageHeight: number;
+  coverage?: { publication: string; title: string; url: string; publishedOn: string };
   body: Array<{
     heading?: string;
     paragraphs?: string[];
@@ -26,7 +27,47 @@ export interface NewsArticle {
 
 // Add verified company announcements here. Each entry automatically receives a
 // prerendered route, metadata, NewsArticle JSON-LD, breadcrumbs, and a sitemap URL.
+export const CHATGPT_FEATURE = {
+  slug: 'clint-crowe-featured-in-chatgpt-for-pros',
+  publication: 'ChatGPT for Pros',
+  title: 'A Georgia farmer shares his chats',
+  url: 'https://chatgptpro.substack.com/p/clint-crowe',
+  publishedOn: 'November 4, 2026',
+};
+
 export const NEWS_ARTICLES: NewsArticle[] = [
+  {
+    slug: CHATGPT_FEATURE.slug,
+    title: 'Clint and Sheree Crowe Featured in ChatGPT for Pros',
+    description: 'A new feature explores how Clint and Sheree connect farming, software, and practical AI at Sweetwater Urban Farms.',
+    publishedAt: '2026-11-06T09:00:00-05:00',
+    updatedAt: '2026-11-06T09:00:00-05:00',
+    author: 'Sweetwater Technology',
+    image: '/images/openai-greenhouse-visit.jpg',
+    imageAlt: 'Clint and Sheree Crowe with OpenAI team members during an earlier visit to Sweetwater Urban Farms',
+    imageWidth: 575,
+    imageHeight: 587,
+    coverage: CHATGPT_FEATURE,
+    body: [
+      {
+        paragraphs: [
+          'On November 4, 2026, ChatGPT Pro Community published “A Georgia farmer shares his chats” in ChatGPT for Pros. The feature follows Clint and Sheree Crowe’s work at Sweetwater Urban Farms and ATL Urban Farms, and explores how ChatGPT and Codex support their growing operation.',
+          'The story connects everyday farm needs with Sproutify, restaurant-order automation, greenhouse systems, and hardware development. It also shares examples of using AI to organize technical decisions and design systems that can keep working through internet interruptions.',
+        ],
+      },
+      {
+        heading: 'From the greenhouse to practical software',
+        paragraphs: [
+          'At Sweetwater Technology, that connection to daily operations shapes how we approach applications, connected devices, and business workflows. The greenhouse gives us a place to understand the work a system needs to support.',
+          'Read the original feature for the Crowes’ story and six examples of ChatGPT and Codex in use. The photograph above is from the earlier OpenAI team visit covered in our newsroom.',
+        ],
+      },
+    ],
+    links: [
+      { label: 'Read the feature in ChatGPT for Pros', url: CHATGPT_FEATURE.url },
+      { label: 'Our earlier greenhouse visit story', url: '/news/openai-team-visits-sweetwater-urban-farms' },
+    ],
+  },
   {
     slug: 'openai-team-visits-sweetwater-urban-farms',
     title: 'Sweetwater Technology Welcomes OpenAI Team Members to Sweetwater Urban Farms',

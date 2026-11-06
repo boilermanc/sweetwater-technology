@@ -72,6 +72,14 @@ export const NewsDetail: React.FC<{ article: NewsArticle }> = ({ article }) => (
           )}
         </div>
       </header>
+      {article.coverage && (
+        <aside aria-label="Original coverage" className="mt-8 rounded-2xl border border-blue-200 bg-blue-50 p-6">
+          <p className="text-sm font-semibold text-blue-800">{article.coverage.publication} · {article.coverage.publishedOn}</p>
+          <a href={article.coverage.url} className="mt-3 inline-flex min-h-11 items-center gap-2 font-bold text-blue-700 underline decoration-blue-300 underline-offset-4 hover:text-blue-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-600">
+            Read the original feature: {article.coverage.title} <ArrowRight aria-hidden="true" className="h-4 w-4 shrink-0" />
+          </a>
+        </aside>
+      )}
       <img
         src={article.image}
         alt={article.imageAlt}

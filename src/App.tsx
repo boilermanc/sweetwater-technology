@@ -2,6 +2,7 @@ import React, { lazy, Suspense, useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
+import { PressFeature } from './components/PressFeature';
 import { FloatingAiGuide } from './components/FloatingAiGuide';
 import { HomeSections } from './components/HomeSections';
 import { Contact } from './components/Contact';
@@ -98,6 +99,7 @@ const App: React.FC<AppProps> = ({ path }) => {
       {currentPath === '/' ? (
         <main className="relative z-10">
           <Hero />
+          <PressFeature />
           <HomeSections onSelectApp={setSelectedApp} />
           <Contact />
           <FloatingAiGuide />
