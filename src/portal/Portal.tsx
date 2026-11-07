@@ -10,12 +10,15 @@ import SavedDiscovery from './SavedDiscovery';
 import EmailLogin from './EmailLogin';
 
 const SignalScout = lazy(() => import('./signalscout/SignalScout'));
+const ClientWorkspace = lazy(() => import('./ClientWorkspace'));
+const ClientAccess = lazy(() => import('./ClientAccess'));
 
 const money = (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
 type Draft = Omit<Engagement, 'id' | 'updated_at'>;
 
 export default function Portal() {
-  const [access, setAccess] = useState<'loading' | 'login' | 'denied' | 'mfa' | 'member'>(portalClient ? 'loading' : 'login');
+  const [access, setAccess] = useState<'loading' | 'login' | 'denied' | 'mfa' | 'member' | 'client'>(portalClient ? 'loading' : 'login');
+  const [showClients, setShowClients] = useState(false);
   const [identity, setIdentity] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
@@ -41,6 +44,7 @@ export default function Portal() {
       if (!active || current !== generation) return;
       setItems([]); setEditing(null);
       if (error || !user) { setAccess('login'); return; }
+      if (user.role === 'sw_portal_client') { setAccess('client'); return; }
       const membership = await client.from('sw_portal_members').select('user_id, display_name, mfa_required').eq('user_id', user.id).eq('active', true).maybeSingle();
       if (!active || current !== generation) return;
       if (membership.error || !membership.data) { setAccess('denied'); return; }
@@ -96,7 +100,9 @@ export default function Portal() {
 
   if (access === 'member' && showScout) return <Suspense fallback={<main role="status">Loading SignalScout…</main>}><SignalScout onBack={() => setShowScout(false)} onSignOut={() => void signOut()} /></Suspense>;
 
-  if (access === 'member' && !showRecords) return <SavedDiscovery onScout={() => setShowScout(true)} onSignOut={() => void signOut()} onRecords={() => setShowRecords(true)} onChanged={item => setItems(current => [item, ...current.filter(other => other.id !== item.id)])} />;
+  if (access === 'client') return <Suspense fallback={<main role="status">Loading your projects…</main>}><ClientWorkspace onSignOut={() => void signOut()} /></Suspense>;
+  if (access === 'member' && showClients) return <Suspense fallback={<main role="status">Loading client access…</main>}><ClientAccess onBack={() => setShowClients(false)} /></Suspense>;
+  if (access === 'member' && !showRecords) return <SavedDiscovery onClients={() => setShowClients(true)} onScout={() => setShowScout(true)} onSignOut={() => void signOut()} onRecords={() => setShowRecords(true)} onChanged={item => setItems(current => [item, ...current.filter(other => other.id !== item.id)])} />;
 
   return <div className="sw-portal">
     {access !== 'member' ? <>
