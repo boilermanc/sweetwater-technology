@@ -62,7 +62,7 @@ export default function EmailLogin({ auth, ready }: { auth: Auth | null; ready: 
       {!sentTo && <button type="button" className="quiet-link" disabled={!ready || busy} onClick={event => { if (event.currentTarget.form?.reportValidity()) { setSentTo(email.trim()); setMessage('Enter the code from your newest Sweetwater email.'); } }}>I already have an email code</button>}
     </form>
     {sentTo && <form onSubmit={verify}>
-      <p className="small">Enter the email code for {sentTo}. Your authenticator check comes next.</p>
+      <p className="small">Enter the email code for {sentTo}.</p>
       <label htmlFor="portal-email-code">Email sign-in code</label>
       <input id="portal-email-code" type="text" inputMode="numeric" autoComplete="one-time-code" maxLength={12} required value={code} onChange={event => setCode(event.target.value)} disabled={busy} />
       <button className="primary" disabled={busy || !ready}>{busy ? 'Please wait…' : 'Verify email code'}</button>

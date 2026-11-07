@@ -41,14 +41,16 @@ export default function Portal() {
       if (!active || current !== generation) return;
       setItems([]); setEditing(null);
       if (error || !user) { setAccess('login'); return; }
-      const membership = await client.from('sw_portal_members').select('user_id, display_name').eq('user_id', user.id).eq('active', true).maybeSingle();
+      const membership = await client.from('sw_portal_members').select('user_id, display_name, mfa_required').eq('user_id', user.id).eq('active', true).maybeSingle();
       if (!active || current !== generation) return;
       if (membership.error || !membership.data) { setAccess('denied'); return; }
       setIdentity(membership.data.display_name || user.email || 'Team member');
+      if (membership.data.mfa_required !== false) {
       const assurance = await client.auth.mfa.getAuthenticatorAssuranceLevel();
       if (!active || current !== generation) return;
       if (assurance.error) { setAccess('denied'); return; }
       if (assurance.data.currentLevel !== 'aal2') { setAccess('mfa'); return; }
+      }
       const result = await client.from('sw_portal_engagements').select('*').order('updated_at', { ascending: false });
       if (!active || current !== generation) return;
       if (result.error) { setAccess('denied'); setMessage('The workspace could not be loaded. Please check access and try again.'); return; }
