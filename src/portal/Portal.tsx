@@ -7,6 +7,7 @@ import { deliveryEconomics, editableEngagement, newEngagement, stages, validateE
 import type { Engagement } from './model';
 import './portal.css';
 import SavedDiscovery from './SavedDiscovery';
+import EmailLogin from './EmailLogin';
 
 const SignalScout = lazy(() => import('./signalscout/SignalScout'));
 
@@ -16,7 +17,6 @@ type Draft = Omit<Engagement, 'id' | 'updated_at'>;
 export default function Portal() {
   const [access, setAccess] = useState<'loading' | 'login' | 'denied' | 'mfa' | 'member'>(portalClient ? 'loading' : 'login');
   const [identity, setIdentity] = useState('');
-  const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
   const [items, setItems] = useState<Engagement[]>([]);
@@ -59,17 +59,6 @@ export default function Portal() {
     const { data: { subscription } } = client.auth.onAuthStateChange((event) => { if (event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') return; window.setTimeout(() => { if (active) verify(); }, 0); });
     return () => { active = false; generation++; subscription.unsubscribe(); };
   }, []);
-
-  async function signIn(event: FormEvent) {
-    event.preventDefault();
-    if (!portalClient || !portalSignInReady || busy) return;
-    setBusy(true); setMessage('');
-    try {
-      const { error } = await portalClient.auth.signInWithOtp({ email: email.trim(), options: { shouldCreateUser: false, emailRedirectTo: `${window.location.origin}/portal` } });
-      setMessage(error ? 'Unable to send a sign-in link. Check the address or try again later.' : 'If this address has access, a sign-in link is on its way. Open it in this browser.');
-    } catch { setMessage('Unable to connect. Please try again.'); }
-    finally { setBusy(false); }
-  }
 
   async function signOut() {
     setItems([]); setEditing(null); setAccess('login'); setMessage('');
@@ -117,8 +106,8 @@ export default function Portal() {
   'We build it: you watch progress here',
   'It’s yours: we hand it over and show your team how it works',
 ].map((text, index) => <div key={text}><span>0{index + 1}</span>{text}<ChevronRight size={18} /></div>)}</div></section>
-        <section className="login-card" aria-labelledby="login-title"><div className="icon-tile"><LockKeyhole size={24} /></div><p className="eyebrow">SECURE WORKSPACE ACCESS</p><h2 id="login-title">Client Login.</h2><p>Sweetwater sets up your workspace access first. Once we confirm your access, enter your approved email address and we’ll send a sign-in link to your inbox.</p>
-          {access === 'loading' ? <p role="status">Checking your access…</p> : access === 'mfa' ? <MfaGate onSignOut={signOut} /> : access === 'denied' ? <><div className="notice">This account does not have workspace access, or access could not be verified.</div><button className="primary" onClick={signOut}>Use another account</button></> : <form onSubmit={signIn}><label htmlFor="portal-email">Email address</label><input id="portal-email" type="email" autoComplete="email" placeholder="you@yourcompany.com" required value={email} onChange={event => setEmail(event.target.value)} disabled={!portalSignInReady || busy} /><button className="primary" disabled={!portalSignInReady || busy}>{busy ? 'Sending…' : 'Email me a sign-in link'}<ArrowUpRight size={18} /></button><p className="small">Use the email address Sweetwater approved for your workspace.</p></form>}
+        <section className="login-card" aria-labelledby="login-title"><div className="icon-tile"><LockKeyhole size={24} /></div><p className="eyebrow">SECURE WORKSPACE ACCESS</p><h2 id="login-title">Client Login.</h2><p>Sign in to your Sweetwater workspace.</p>
+          {access === 'loading' ? <p role="status">Checking your access…</p> : access === 'mfa' ? <MfaGate onSignOut={signOut} /> : access === 'denied' ? <><div className="notice">This account does not have workspace access, or access could not be verified.</div><button className="primary" onClick={signOut}>Use another account</button></> : <EmailLogin auth={portalClient?.auth ?? null} ready={portalSignInReady} />}
           {!portalSignInReady && <div className="notice">Team sign-in is being configured. This workspace is not open yet.</div>}
           {message && <p className="notice" role="status">{message}</p>}<div className="secure-note"><ShieldCheck size={17} /> Workspace access is by invitation.</div>
         </section>
