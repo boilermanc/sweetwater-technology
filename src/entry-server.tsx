@@ -21,6 +21,7 @@ export const sitemapEntries = [
   ...WORK_PROFILES.map((profile) => ({ path: `/work/${profile.slug}`, priority: '0.8' })),
   { path: '/news', priority: '0.8' },
   { path: '/resources', priority: '0.8' },
+  { path: '/ai-visibility-checker', priority: '0.8' },
   ...RESOURCES.map((resource) => ({ path: `/resources/${resource.slug}`, priority: '0.7' })),
   ...NEWS_ARTICLES.map((article) => ({
     path: `/news/${article.slug}`,

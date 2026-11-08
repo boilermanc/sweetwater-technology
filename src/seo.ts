@@ -210,6 +210,21 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
     };
   }
 
+  if (path === '/ai-visibility-checker') {
+    const canonical = `${SITE_URL}/ai-visibility-checker`;
+    return {
+      title: 'Free AI Visibility Checker | Sweetwater Technology',
+      description: 'Compare how Gemini, ChatGPT, and Claude mention your business or website when answering three buyer questions.',
+      canonical,
+      type: 'website',
+      jsonLd: [breadcrumbJsonLd([
+        { name: 'Home', url: SITE_URL },
+        { name: 'Resources', url: `${SITE_URL}/resources` },
+        { name: 'AI Visibility Checker', url: canonical },
+      ])],
+    };
+  }
+
   if (path === '/resources') {
     return {
       title: 'Free Resources | Sweetwater Technology',
@@ -422,6 +437,7 @@ export const PRERENDER_ROUTES = [
   ...WORK_PROFILES.map((profile) => `/work/${profile.slug}`),
   '/news',
   '/resources',
+  '/ai-visibility-checker',
   ...RESOURCES.flatMap((resource) => resource.file ? [`/resources/${resource.slug}`, `/resources/${resource.slug}/download`] : [`/resources/${resource.slug}`]),
   ...NEWS_ARTICLES.map((article) => `/news/${article.slug}`),
   '/404',

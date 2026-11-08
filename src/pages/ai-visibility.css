@@ -1,0 +1,184 @@
+.visibility-page {
+  color: #f1f5f9;
+  background: radial-gradient(ellipse at 84% 16%, #10334b 0%, transparent 42%), #07101b;
+  padding: 7.5rem 1rem 5rem;
+  overflow: clip;
+}
+
+.visibility-shell { max-width: 72rem; margin: auto; }
+.visibility-back { display: inline-block; margin-bottom: 2rem; color: #b5d2de; font-size: .85rem; }
+.visibility-back:hover, .visibility-example:hover { color: white; }
+.visibility-hero { display: grid; gap: 1.5rem; align-items: stretch; }
+.visibility-intro, .visibility-console, .visibility-report, .visibility-panels article {
+  border: 1px solid #244259;
+  border-radius: 1.35rem;
+  background-color: #0b1827;
+}
+
+.visibility-intro {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 26rem;
+  padding: clamp(1.3rem, 5vw, 3.6rem);
+  background: radial-gradient(ellipse at 96% 0%, #13374f, transparent 70%), #0b1827;
+}
+
+.visibility-intro::before, .visibility-intro::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.visibility-intro::before {
+  background: radial-gradient(circle, #60d9ed 1px, transparent 1.7px) 0 0 / 11px 11px;
+  mask-image: radial-gradient(ellipse at 92% 16%, #000 0%, transparent 48%);
+  opacity: .35;
+}
+
+.visibility-intro::after {
+  inset: 0 -100%;
+  background: linear-gradient(110deg, transparent 42%, #59e0f82b 50%, transparent 58%);
+  animation: visibility-sweep 4.8s ease-in-out both;
+}
+
+.visibility-intro h1 {
+  margin: 1.2rem 0;
+  max-width: 11ch;
+  font-size: clamp(2.8rem, 7vw, 5.6rem);
+  font-weight: 900;
+  line-height: .99;
+  letter-spacing: -.065em;
+}
+
+.visibility-intro em { color: #81edee; font-style: normal; }
+.visibility-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  color: #9beaf2;
+  font: 700 .72rem/1.5 ui-monospace, Consolas, monospace;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.visibility-beacon {
+  width: .5rem;
+  height: .5rem;
+  border-radius: 50%;
+  background: #78e9ee;
+  box-shadow: 0 0 1rem #60e5ea;
+  animation: visibility-beacon 2.8s ease-in-out;
+}
+
+.visibility-example {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  min-height: 44px;
+  margin-top: .75rem;
+  color: #9beaf2;
+  text-underline-offset: .25rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.visibility-example:disabled { opacity: .55; cursor: default; }
+.visibility-console { overflow: hidden; box-shadow: 0 20px 65px #02081380; min-width: 0; }
+.visibility-console-bar { display: flex; align-items: center; flex-wrap: wrap; gap: .65rem; padding: 1rem; border-bottom: 1px solid #244259; background: #101f31; }
+.visibility-console-bar h2 { margin: 0; font-weight: 750; font-size: .9rem; }
+.visibility-console-tag { margin-left: auto; color: #a0bbd0; font: 700 .66rem ui-monospace, Consolas, monospace; }
+.visibility-lights { display: flex; gap: .23rem; }
+.visibility-lights i { width: .45rem; height: .45rem; border-radius: 50%; background: #f29292; }
+.visibility-lights i:nth-child(2) { background: #f5c578; }
+.visibility-lights i:nth-child(3) { background: #6fe2c1; }
+.visibility-console-body { padding: clamp(1rem, 3vw, 1.65rem); }
+.visibility-label { display: grid; gap: .4rem; font-size: .8rem; font-weight: 650; color: #c1d4e5; }
+.visibility-label input { width: 100%; min-width: 0; min-height: 44px; border: 1px solid #35556c; border-radius: .55rem; background: #07121f; color: #fff; padding: .6rem .75rem; font-size: 1rem; font-weight: 400; }
+.visibility-label input::placeholder { color: #8ba3b7; }
+.visibility-label input:disabled { opacity: .6; }
+.visibility-submit { display: flex; align-items: center; justify-content: center; gap: .6rem; min-height: 48px; border-radius: .55rem; background: #80ebee; color: #05202b; font-weight: 800; cursor: pointer; }
+.visibility-submit:hover { background: #a4fcff; }
+.visibility-submit:disabled { background: #1b3549; color: #b2c6d6; cursor: default; }
+.visibility-page :focus-visible { outline: 2px solid #83eff5; outline-offset: 4px; }
+.visibility-report { padding: clamp(1rem, 4vw, 2.5rem); margin-top: 1.5rem; scroll-margin-top: 6rem; animation: visibility-arrive .4s ease-out both; }
+.visibility-report-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .65rem; }
+.visibility-report-brand { display: none; }
+.visibility-print { display: inline-flex; align-items: center; gap: .5rem; padding: .5rem .75rem; min-height: 44px; border: 1px solid #35556c; border-radius: .55rem; color: #9beaf2; cursor: pointer; }
+.visibility-print:hover { background: #173044; color: white; }
+.visibility-interpretation { max-width: 58rem; }
+.visibility-interpretation h3 { margin: 1rem 0 .3rem; font-size: 1rem; font-weight: 800; }
+.visibility-interpretation p { color: #bccfdf; line-height: 1.65; }
+.visibility-metrics, .visibility-panels { display: grid; gap: .8rem; }
+.visibility-metrics div { display: grid; align-content: start; gap: .4rem; border: 1px solid #35556c; border-radius: .85rem; padding: 1rem; background: #0d2031; }
+.visibility-metrics strong { color: #82e9ee; font: 800 clamp(2.6rem, 7vw, 4rem)/1 ui-monospace, Consolas, monospace; }
+.visibility-metrics small { color: #b7cddf; font-size: .5em; }
+.visibility-readout { display: grid; grid-auto-columns: 1fr; grid-auto-flow: column; gap: .35rem; margin-top: .35rem; }
+.visibility-readout i { height: .45rem; border-radius: .25rem; background: #29465a; }
+.visibility-readout i[data-hit='true'] { background: #82e9ee; box-shadow: 0 0 .75rem #43d6ed69; animation: visibility-arrive .55s .15s ease-out both; }
+.visibility-detail { border: 1px solid #35556c; border-radius: .85rem; }
+.visibility-detail summary { padding: 1rem; cursor: pointer; font-weight: 700; }
+.visibility-detail summary span { margin-right: .35rem; }
+.visibility-signal { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: .3rem; max-width: 37rem; margin-top: 1.5rem; }
+.visibility-signal span { height: clamp(.65rem, 2vw, 1.5rem); border-radius: .2rem; background: #296582; }
+.visibility-signal.is-scanning span { animation: visibility-pixel 2.2s ease-in-out; }
+.visibility-panels { margin-top: 1.5rem; }
+.visibility-panels article { padding: 1.25rem; }
+.visibility-panels svg { color: #82e9ee; }
+.visibility-panels h2 { margin: .7rem 0 .4rem; font-size: 1.1rem; font-weight: 800; }
+.visibility-panels p { color: #bccfdf; font-size: .92rem; line-height: 1.6; }
+
+@media (min-width: 42rem) {
+  .visibility-metrics { grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); }
+  .visibility-panels { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 58rem) {
+  .visibility-hero { grid-template-columns: 1.22fr 1fr; }
+}
+
+@keyframes visibility-sweep {
+  0%, 15% { transform: translateX(-27%); }
+  70%, 100% { transform: translateX(32%); }
+}
+
+@keyframes visibility-beacon {
+  50% { opacity: .42; box-shadow: 0 0 .35rem #60e5ea; }
+}
+
+@keyframes visibility-pixel {
+  35% { background: #7aebf0; box-shadow: 0 0 1rem #45e3f3a3; }
+}
+
+@keyframes visibility-arrive {
+  from { opacity: 0; transform: translateY(.6rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .visibility-intro::after, .visibility-beacon, .visibility-report, .visibility-readout i[data-hit='true'], .visibility-signal.is-scanning span { animation: none; }
+}
+
+@media print {
+  body:has(.visibility-report[aria-label]) #root > div > :not(.visibility-page),
+  .visibility-shell:has(.visibility-report[aria-label]) > :not(.visibility-report[aria-label]),
+  .visibility-report .visibility-print,
+  .visibility-report .visibility-readout { display: none !important; }
+
+  .visibility-page { background: white; color: #172837; overflow: visible; padding: 0; }
+  .visibility-report { background: white; border: 0; margin: 0; padding: 0; animation: none; outline: none; }
+  .visibility-report-brand { display: block; font-size: .85rem; font-weight: 800; }
+  .visibility-report h2 { font-size: 1.65rem; }
+  .visibility-report p, .visibility-report .visibility-kicker, .visibility-report strong, .visibility-report small { color: #172837; }
+  .visibility-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .visibility-metrics div { background: white; border-color: #b7c3cd; }
+  .visibility-metrics strong { font-size: 2rem; }
+  .visibility-detail { border-color: #b7c3cd; break-inside: avoid; }
+  .visibility-detail::details-content { content-visibility: visible; display: block; }
+}

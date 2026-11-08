@@ -1,7 +1,7 @@
 import { CrowesNestSetup } from './CrowesNestSetup';
 import { TryAiGuide } from './TryAiGuide';
 import { useState, type FormEvent } from 'react';
-import { ArrowRight, Bot, Download, FileArchive, Github, Monitor, Send } from 'lucide-react';
+import { ArrowRight, Bot, Download, FileArchive, Github, Monitor, ScanLine, Send } from 'lucide-react';
 import { RESOURCES, type Resource } from '../resources';
 
 const WEBHOOK_URL = 'https://n8n.sproutify.app/webhook/4a7ce38b-f497-424f-9936-f636f5b68514';
@@ -12,6 +12,13 @@ export function ResourcesIndex() {
     <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900 sm:text-6xl">Documents and tools you can put to work</h1>
     <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">Practical resources from Sweetwater Technology. Browse the catalog and choose what fits your project.</p>
     <div className="mt-12 grid gap-6 sm:grid-cols-2">
+      <article className="rounded-3xl border border-slate-200 bg-white/85 p-7 shadow-sm">
+        <ScanLine className="h-8 w-8 text-blue-600" aria-hidden="true" />
+        <p className="mt-5 text-xs font-bold uppercase tracking-widest text-blue-600">Free tool</p>
+        <h2 className="mt-2 text-2xl font-black text-slate-900">AI Visibility Checker</h2>
+        <p className="mt-3 leading-7 text-slate-600">Compare how Gemini, ChatGPT, and Claude mention your business in answers to three buyer questions.</p>
+        <a className="mt-6 inline-flex items-center gap-2 font-bold text-blue-600 hover:text-blue-700" href="/ai-visibility-checker">Open the checker <ArrowRight size={18} aria-hidden="true" /></a>
+      </article>
       {RESOURCES.map((resource) => <article key={resource.slug} className="rounded-3xl border border-slate-200 bg-white/85 p-7 shadow-sm">
         {resource.repository ? <Monitor className="h-8 w-8 text-blue-600" aria-hidden="true" /> : <FileArchive className="h-8 w-8 text-blue-600" aria-hidden="true" />}
         <p className="mt-5 text-xs font-bold uppercase tracking-widest text-blue-600">{resource.kind}</p>

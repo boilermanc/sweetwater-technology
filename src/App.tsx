@@ -24,6 +24,7 @@ import { CardTestPage } from './pages/CardTestPage';
 import { SageEmailPreview } from './pages/SageEmailPreview';
 import { ResourcesIndex, ResourceDetail, ResourceDownload } from './pages/Resources';
 import { findResource } from './resources';
+import { AiVisibility } from './pages/AiVisibility';
 import { About } from './pages/About';
 import { Portfolio } from './pages/Portfolio';
 import { SweetwaterLogo } from './components/SweetwaterLogo';
@@ -128,6 +129,8 @@ const App: React.FC<AppProps> = ({ path }) => {
         <WorkDetail profile={workProfile} />
       ) : currentPath === '/news' ? (
         <NewsIndex />
+      ) : currentPath === '/ai-visibility-checker' ? (
+        <AiVisibility />
       ) : currentPath === '/resources' ? (
         <ResourcesIndex />
       ) : resource && currentPath.endsWith('/download') ? (
