@@ -35,9 +35,16 @@ try {
     await page.route(`${origin}/test-visibility`, async (route) => {
       const payload = route.request().postDataJSON();
       assert.match(payload.receipt, /^[a-f0-9-]{36}$/);
+      if (payload.operation === 'email') {
+        assert.deepEqual(payload, { operation: 'email', receipt });
+        emailRequests++;
+        return route.fulfill(emailRequests === 1
+          ? { status: 503, json: { emailDelivery: 'unavailable' } }
+          : { json: { emailDelivery: 'accepted' } });
+      }
       if (payload.operation === 'recover') {
         assert.equal(payload.receipt, receipt);
-        return route.fulfill({ json: { report: { business: report.business, domain: report.domain, model: 'gemini-3.5-flash-lite', answers } } });
+        return route.fulfill({ json: { report: { business: report.business, domain: report.domain, model: 'gemini-3.5-flash-lite', answers }, emailAvailable: true } });
       }
       receipt = payload.receipt;
       assert.equal(payload.token, 'test-token');
@@ -47,13 +54,14 @@ try {
         return route.fulfill({ status: 401, json: { error: 'Sign in to the Sweetwater portal.' } });
       }
       assert.equal(payload.email, 'audit@example.com');
-      assert.equal(payload.emailReport, width === 1280);
+      assert.equal(payload.emailReport, undefined);
       await auditDisplayed;
       if (width === 320) return route.fulfill({ status: 409, json: { error: 'duplicate' } });
       if (width === 375) return route.abort();
-      return route.fulfill({ json: { report, emailDelivery: 'accepted' } });
+      return route.fulfill({ json: { report, emailAvailable: true } });
     });
     let receipt;
+    let emailRequests = 0;
     const answer = {
       text: 'Alder Studio (https://alder-studio.example) is an option. See https://alder-studio.example/portfolio.',
       mentioned: true,
@@ -115,7 +123,7 @@ try {
     await verificationButton.click();
     await page.getByRole('status').filter({ hasText: 'Verified. You can enter your email.' }).waitFor();
     await page.getByLabel('Email', { exact: true }).fill('audit@example.com');
-    if (width === 1280) await page.getByLabel('Email me a copy of my report').check();
+    assert.equal(await page.getByRole('button', { name: 'Email me the report' }).count(), 0);
     await page.getByRole('button', { name: 'Run my free audit' }).click();
     await page.getByText('Audit running', { exact: true }).waitFor();
     await page.getByRole('heading', { name: 'Asking AI about alder-studio.example' }).waitFor();
@@ -165,19 +173,28 @@ try {
       await page.getByText(answer.text, { exact: true }).first().waitFor();
       assert.equal(await page.getByRole('table', { name: 'Visibility by model and buyer question' }).isVisible(), true);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true);
+      const emailButton = page.getByRole('button', { name: 'Email me the report' });
+      await emailButton.waitFor();
+      assert.equal(emailRequests, 0);
       if (width === 1280) {
         assert.equal(await page.locator('#audit-sources li').count(), 1);
         assert.match(await page.locator('#audit-sources li').first().innerText(), /9 answers/);
         await page.getByText('Results unavailable for this run.').waitFor();
+        await emailButton.click();
+        await page.getByRole('status').filter({ hasText: 'We couldn’t confirm delivery' }).waitFor();
+        await emailButton.click();
         await page.getByText('Your email copy is on its way.').waitFor();
+        assert.equal(await page.getByRole('button', { name: 'Email requested' }).isDisabled(), true);
+        assert.equal(emailRequests, 2);
         await page.emulateMedia({ media: 'print' });
-        assert.equal(await page.getByRole('heading', { level: 1 }).isVisible(), true);
+        const document = page.getByRole('article', { name: 'Printable AI visibility report' });
+        await document.getByRole('heading', { level: 1, name: 'AI Visibility Report' }).waitFor();
+        await document.getByRole('heading', { name: 'Executive summary' }).waitFor();
+        await document.getByRole('heading', { name: 'Model answers' }).waitFor();
+        await document.getByText(answer.text, { exact: true }).first().waitFor();
         await page.locator('.visibility-chapters').waitFor({ state: 'hidden' });
         await page.locator('.visibility-print').first().waitFor({ state: 'hidden' });
-        await page.locator('.visibility-next-actions').waitFor({ state: 'hidden' });
-        assert.equal(await page.locator('#audit-plan blockquote').isVisible(), true);
-        assert.equal(await page.locator('.visibility-detail').last().evaluate((element) =>
-          getComputedStyle(element, '::details-content').contentVisibility), 'visible');
+        await page.getByText('Your email copy is on its way.').waitFor({ state: 'hidden' });
       }
     }
     assert.deepEqual(errors, []);

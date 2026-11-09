@@ -52,7 +52,8 @@ export function AiVisibility() {
   const [auditDomain, setAuditDomain] = useState('');
   const [error, setError] = useState('');
   const [report, setReport] = useState<AuditReport>();
-  const [emailDelivery, setEmailDelivery] = useState<'accepted' | 'unavailable'>();
+  const [canEmailReport, setCanEmailReport] = useState(false);
+  const [emailDelivery, setEmailDelivery] = useState<'sending' | 'accepted' | 'unavailable' | 'expired'>();
   const [showSample, setShowSample] = useState(false);
   const [recoverable, setRecoverable] = useState(false);
   const running = useRef(false);
@@ -138,6 +139,7 @@ export function AiVisibility() {
         return;
       }
       setReport(body.report);
+      setCanEmailReport(body.emailAvailable === true);
       setEmailDelivery(body.emailDelivery);
       setPhase('complete');
     } catch {
@@ -157,15 +159,38 @@ export function AiVisibility() {
     }
   }
 
+  async function emailReport() {
+    if (!endpoint || !receipt.current || emailDelivery === 'sending' || emailDelivery === 'accepted') return;
+    const controller = new AbortController();
+    request.current = controller;
+    setEmailDelivery('sending');
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operation: 'email', receipt: receipt.current }),
+        signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15000)]),
+      });
+      if (response.status === 404) {
+        setEmailDelivery('expired');
+        return;
+      }
+      const body = await response.json();
+      setEmailDelivery(response.ok && body.emailDelivery === 'accepted' ? 'accepted' : 'unavailable');
+    } catch {
+      if (!controller.signal.aborted) setEmailDelivery('unavailable');
+    }
+  }
+
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!token || recoverable || running.current) return;
     receipt.current = crypto.randomUUID();
     setRecoverable(false);
-    const { domain, business, category, email, emailReport } = Object.fromEntries(new FormData(event.currentTarget));
+    const { domain, business, category, email } = Object.fromEntries(new FormData(event.currentTarget));
     setAuditDomain(typeof domain === 'string' ? domain.trim() : '');
     setOwnerAudit(typeof email === 'string' && email.trim().toLowerCase() === ownerEmail);
-    void runAudit({ domain, business, category, email, token, emailReport: emailReport === 'on' });
+    void runAudit({ domain, business, category, email, token });
   }
 
   return <main className="visibility-page relative z-10">
@@ -209,9 +234,6 @@ export function AiVisibility() {
                 }}>Retry verification</button>}
               </div>}
               <label className="visibility-label">Email<input name="email" type="email" autoComplete="email" placeholder="you@yourbusiness.com" defaultValue={ownerAudit ? ownerEmail : undefined} disabled={!token} maxLength={254} required /></label>
-              {emailAvailable && <label className="flex min-h-11 items-center gap-2 text-sm text-slate-200">
-                <input type="checkbox" name="emailReport" className="size-4 accent-cyan-200" disabled={!token} /> Email me a copy of my report
-              </label>}
               <button type="submit" className="visibility-submit" disabled={!token || !available || recoverable || busy}>{phase === 'checking' ? 'Checking your email…' : phase === 'running' ? 'Running your audit…' : 'Run my free audit'} <ArrowRight size={18} aria-hidden="true" /></button>
             </fieldset>
             <p className="mt-3 text-xs leading-5 text-slate-300">Run one free audit per email without an account. Your report appears here. Sweetwater stores your submission and audit result.</p>
@@ -241,16 +263,30 @@ export function AiVisibility() {
         </ol>}
       </section>}
       {(report || showSample) && <section className="visibility-report" tabIndex={-1} ref={resultPanel} aria-label="Visibility report">
-        {report && (emailDelivery || ownerAudit) && <div className="visibility-report-actions">
-          {emailDelivery === 'accepted' && <p className="text-sm text-cyan-200">Your email copy is on its way.</p>}
-          {emailDelivery === 'unavailable' && <p className="text-sm text-amber-200">We couldn’t confirm email delivery. You can save a copy below.</p>}
-          {ownerAudit && <button type="button" className="visibility-example" onClick={() => {
+        {report && ownerAudit && <div className="visibility-report-actions">
+          <button type="button" className="visibility-example" disabled={emailDelivery === 'sending'} onClick={() => {
             setReport(undefined);
+            setCanEmailReport(false);
             setEmailDelivery(undefined);
+            setRecoverable(false);
             setPhase('ready');
-          }}>Run another test</button>}
+          }}>Run another test</button>
         </div>}
-        <VisibilityAuditReport report={report ?? sample} example={!report} />
+        <VisibilityAuditReport report={report ?? sample} example={!report} emailAction={report && emailAvailable && canEmailReport ? <>
+          <p>Want a copy in your inbox? We’ll use the email you entered for this audit.</p>
+          <div className="visibility-next-actions">
+            <button type="button" className="visibility-print"
+              disabled={emailDelivery === 'sending' || emailDelivery === 'accepted' || emailDelivery === 'expired'}
+              onClick={() => void emailReport()}>
+              {emailDelivery === 'sending' ? 'Sending…' : emailDelivery === 'accepted' ? 'Email requested' : 'Email me the report'}
+            </button>
+          </div>
+          <p role="status" className="text-sm text-cyan-200">
+            {emailDelivery === 'accepted' && 'Your email copy is on its way.'}
+            {emailDelivery === 'unavailable' && 'We couldn’t confirm delivery. Try again or save the report as a PDF.'}
+            {emailDelivery === 'expired' && 'The email request has expired. You can still save the report as a PDF.'}
+          </p>
+        </> : undefined} />
       </section>}
 
       <section className="visibility-panels" aria-label="How the checker works">

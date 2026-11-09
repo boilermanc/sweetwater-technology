@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { ArrowUpRight, BarChart3, FileText, Flag, Link2, MessageSquare, Printer } from 'lucide-react';
 
 export type AuditAnswer = {
@@ -50,7 +50,11 @@ function getLinkedSites(answers: AuditAnswer[]) {
     .sort((left, right) => right.answers - left.answers || left.host.localeCompare(right.host));
 }
 
-export function VisibilityAuditReport({ report, example }: { report: AuditReport; example: boolean }) {
+export function VisibilityAuditReport({ report, example, emailAction }: {
+  report: AuditReport;
+  example: boolean;
+  emailAction?: ReactNode;
+}) {
   const reportBody = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!reportBody.current || !('IntersectionObserver' in window)) return;
@@ -79,6 +83,11 @@ export function VisibilityAuditReport({ report, example }: { report: AuditReport
   const nextQuestion = missedQuestion ?? questions[0];
   const questionAnswers = answers.filter(({ question }) => question === nextQuestion);
   const questionMentions = questionAnswers.filter(({ mentioned }) => mentioned).length;
+  const modelResults = engines.map((engine) => ({
+    ...engine,
+    named: engine.answers.filter(({ mentioned }) => mentioned).length,
+    referenced: engine.answers.filter(({ domainReferenced }) => domainReferenced).length,
+  }));
   const ReportTitle = example ? 'h2' : 'h1';
   const date = report.generatedAt && new Intl.DateTimeFormat('en-US', {
     dateStyle: 'long', timeZone: 'America/New_York',
@@ -91,7 +100,6 @@ export function VisibilityAuditReport({ report, example }: { report: AuditReport
         <Printer size={17} aria-hidden="true" /> Print or save as PDF
       </button>
     </div>
-    <p className="visibility-report-brand">Sweetwater Technology · AI Visibility Report</p>
     <nav className="visibility-chapters" aria-label="Report sections">
       {sections.map(([id, label, Icon], index) => <a href={'#audit-' + id} key={id}>
         <Icon size={16} aria-hidden="true" /><span className="visibility-kicker" aria-hidden="true">0{index + 1}</span>{label}
@@ -146,18 +154,15 @@ export function VisibilityAuditReport({ report, example }: { report: AuditReport
         </ul>
       </div>}
       <div className="visibility-metrics mt-5">
-        {engines.map(({ name, model, answers }) => {
-          const modelNamed = answers.filter(({ mentioned }) => mentioned).length;
-          const modelReferenced = answers.filter(({ domainReferenced }) => domainReferenced).length;
-          return <div key={name}>
+        {modelResults.map(({ name, model, answers, named: modelNamed, referenced: modelReferenced }) =>
+          <div key={name}>
             <h3 className="font-bold">{name}</h3>
             <p className="break-words text-sm text-slate-300">{model}</p>
             {answers.length ? <>
               <p><strong className="visibility-outcome" data-tone={modelNamed ? 'named' : 'missed'}>{modelNamed}<small>/{answers.length}</small></strong> named your business</p>
               <p><strong className="visibility-outcome" data-tone={modelReferenced ? 'linked' : 'missed'}>{modelReferenced}<small>/{answers.length}</small></strong> referenced your domain</p>
             </> : <p>Results unavailable for this run.</p>}
-          </div>;
-        })}
+          </div>)}
       </div>
       <div className="visibility-interpretation mt-5">
         <h3>How to read your results</h3>
@@ -223,13 +228,64 @@ export function VisibilityAuditReport({ report, example }: { report: AuditReport
         </div>}
         <div className="visibility-next-actions">
           <button type="button" className="visibility-print" onClick={() => window.print()}>
-            <Printer size={17} aria-hidden="true" /> Save this report
+            <Printer size={17} aria-hidden="true" /> Save report as PDF
           </button>
           <a href="/book" className="visibility-next-book">
             Book a free 20-minute call <ArrowUpRight size={17} aria-hidden="true" />
           </a>
         </div>
+        {emailAction && <section className="visibility-email-offer" aria-label="Email a copy">{emailAction}</section>}
       </div>
     </section>
+    <article className="visibility-print-document" aria-label="Printable AI visibility report">
+      <header>
+        <p className="visibility-print-eyebrow">Sweetwater Technology{example ? ' / Example report' : ''}</p>
+        <h1>AI Visibility Report</h1>
+        <p className="visibility-print-business">{report.business}</p>
+        <p>{report.domain}{date && <> · {date}</>}</p>
+      </header>
+      <section>
+        <h2>Executive summary</h2>
+        {answers.length > 0
+          ? <p><strong>{named} of {answers.length}</strong> answers named your business and <strong>{referenced} of {answers.length}</strong> referenced your domain. The audit compared {completed.length} {completed.length === 1 ? 'model' : 'models'} across {questions.length} buyer {questions.length === 1 ? 'question' : 'questions'}.</p>
+          : <p>There were no model answers to compare.</p>}
+        <p>These findings reflect the sampled API answers. Consumer apps may respond differently.</p>
+      </section>
+      <section>
+        <h2>Results by model</h2>
+        <table>
+          <thead><tr><th scope="col">Model</th><th scope="col">Named your business</th><th scope="col">Referenced your domain</th></tr></thead>
+          <tbody>{modelResults.map(({ name, answers, named, referenced }) => <tr key={name}>
+            <th scope="row">{name}</th>
+            {answers.length ? <><td>{named} / {answers.length}</td><td>{referenced} / {answers.length}</td></>
+              : <td colSpan={2}>Results unavailable</td>}
+          </tr>)}</tbody>
+        </table>
+      </section>
+      {nextQuestion && <section className="visibility-print-priority">
+        <h2>{missedQuestion ? 'Priority visibility gap' : 'What to review next'}</h2>
+        <p><strong>{nextQuestion}</strong></p>
+        <p>{questionMentions} of {questionAnswers.length} answers named your business. {missedQuestion
+          ? 'Check whether your site answers this buyer question directly.'
+          : 'Compare how the models describe your business with the language on your site.'}</p>
+      </section>}
+      {sites.length > 0 && <section>
+        <h2>Links found in answers</h2>
+        <ul>{sites.map(({ host, url, answers }) => <li key={host}>
+          <a href={url}>{host}</a> · {answers} {answers === 1 ? 'answer' : 'answers'}
+        </li>)}</ul>
+      </section>}
+      {completed.length > 0 && <section className="visibility-print-appendix">
+        <h2>Model answers</h2>
+        {completed.map(({ name, answers }) => <section key={name}>
+          <h3>{name}</h3>
+          {answers.map(({ question, text, mentioned, domainReferenced }) => <div key={question}>
+            <h4>{question}</h4>
+            <p className="visibility-print-answer-status">{mentioned ? 'Business named' : 'Business name absent'} · {domainReferenced ? 'Domain referenced' : 'Domain reference absent'}</p>
+            <p className="visibility-print-answer-text">{text}</p>
+          </div>)}
+        </section>)}
+      </section>}
+    </article>
   </div>;
 }
