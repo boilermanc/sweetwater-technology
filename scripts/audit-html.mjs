@@ -18,16 +18,17 @@ const plainText = (html) => html
   .replace(/\s+/g, ' ').trim();
 const requiredCopy = new Map([
   ['/', 'Find better ways to use'],
-  ['/services/custom-web-applications', 'Custom Web Application Development'],
-  ['/services/ai-workflow-automation', 'AI consulting and workflow automation for small businesses'],
-  ['/services/mobile-app-development', 'Mobile App Development'],
-  ['/ai-visibility-checker', 'Does AI bring up'],
+  ['/services/custom-web-applications/', 'Custom Web Application Development'],
+  ['/services/ai-workflow-automation/', 'AI consulting and workflow automation for small businesses'],
+  ['/services/mobile-app-development/', 'Mobile App Development'],
+  ['/ai-visibility-checker/', 'Does AI bring up'],
 ]);
 
 async function read(route, userAgent, expectedStatus = 200) {
   if (liveUrl) {
     const response = await fetch(new URL(route, liveUrl), {
       headers: { 'User-Agent': userAgent ?? 'Sweetwater-HTML-Audit/1.0' },
+      redirect: 'manual',
       signal: AbortSignal.timeout(20000),
     });
     assert.equal(response.status, expectedStatus, `${route}: HTTP status`);
@@ -69,8 +70,8 @@ function inspect(html, route, uniqueTitle = true) {
   assert(schemas.length > 0, `${route}: structured data missing`);
   for (const [, json] of schemas) JSON.parse(json);
   if (requiredCopy.has(route)) assert(text.includes(requiredCopy.get(route)), `${route}: expected business copy missing`);
-  if (route.startsWith('/services/')) {
-    for (const phrase of route === '/services/ai-workflow-automation'
+  if (route !== '/services/' && route.startsWith('/services/')) {
+    for (const phrase of route === '/services/ai-workflow-automation/'
       ? ['Sound familiar?', 'What you get', 'How it works', 'Tell us what']
       : ['Who this service is for', 'What Sweetwater Technology delivers', 'How the engagement works']) {
       assert(text.includes(phrase), `${route}: missing service content: ${phrase}`);
@@ -83,9 +84,20 @@ const urls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => new UR
 assert(urls.length > 0, 'Sitemap has no URLs');
 assert(urls.every((url) => url.origin === origin), 'Sitemap contains an unexpected origin');
 const routes = urls.map((url) => url.pathname);
+assert(routes.every((route) => route.endsWith('/')), 'Sitemap page URLs must end in a slash');
 assert.equal(new Set(routes).size, routes.length, 'Duplicate sitemap URL');
 for (const route of requiredCopy.keys()) assert(routes.includes(route), `${route}: missing from sitemap`);
-for (const route of routes) await check(route, async () => inspect(await read(route), route));
+for (const route of routes) await check(route, async () => {
+  inspect(await read(route), route);
+  if (liveUrl && route !== '/') {
+    const alias = new URL(route.slice(0, -1), liveUrl);
+    const response = await fetch(alias, { redirect: 'manual', signal: AbortSignal.timeout(20000) });
+    assert.equal(response.status, 301, `${alias.pathname}: expected a permanent redirect`);
+    const location = response.headers.get('location');
+    assert(location, `${alias.pathname}: missing redirect target`);
+    assert.equal(new URL(location, alias).href, new URL(route, liveUrl).href, `${alias.pathname}: wrong redirect target`);
+  }
+});
 
 await check('robots.txt', async () => {
   const robots = await read('/robots.txt');
@@ -115,7 +127,7 @@ await check('robots.txt', async () => {
 if (liveUrl) {
   // These test responses to UA strings, not traffic from verified crawler IPs.
   for (const agent of ['Googlebot', 'OAI-SearchBot', 'PerplexityBot']) {
-    for (const route of ['/', '/services/custom-web-applications']) {
+    for (const route of ['/', '/services/custom-web-applications/']) {
       await check(`${agent} ${route}`, async () => inspect(await read(route, agent), route, false));
     }
   }

@@ -82,29 +82,32 @@ export const normalizePath = (path: string) => {
   return withoutQuery.replace(/\/+$/, '');
 };
 
+const directoryUrl = (path: string) => SITE_URL + (path.endsWith('/') ? path : path + '/');
+
 export const getPageSeo = (requestedPath: string): PageSeo => {
   const path = normalizePath(requestedPath);
+  const canonical = directoryUrl(path);
 
   if (path === '/terms' || path === '/privacy') {
-    return { title: (path === '/terms' ? 'Website Terms' : 'Privacy Notice') + ' | Sweetwater Technology', description: path === '/terms' ? 'Terms for the Sweetwater Technology website, free resources and introductory calls.' : 'How Sweetwater Technology handles inquiries, bookings, conversations and your privacy choices.', canonical: SITE_URL + path, type: 'website', jsonLd: [organization] };
+    return { title: (path === '/terms' ? 'Website Terms' : 'Privacy Notice') + ' | Sweetwater Technology', description: path === '/terms' ? 'Terms for the Sweetwater Technology website, free resources and introductory calls.' : 'How Sweetwater Technology handles inquiries, bookings, conversations and your privacy choices.', canonical, type: 'website', jsonLd: [organization] };
   }
 
   if (path === '/portal') {
-    return { title: 'Client Login | Sweetwater Technology', description: 'Private Sweetwater Technology workspace.', canonical: `${SITE_URL}/portal`, type: 'website', jsonLd: [], robots: 'noindex, nofollow' };
+    return { title: 'Client Login | Sweetwater Technology', description: 'Private Sweetwater Technology workspace.', canonical, type: 'website', jsonLd: [], robots: 'noindex, nofollow' };
   }
 
-  if (path === '/') return { title: 'Practical AI for Your Business | Sweetwater Technology', description: HOME_DESCRIPTION, canonical: SITE_URL + '/', type: 'website', jsonLd: [organization, faqPage] };
-  if (path === '/ai-help' || path === '/app-idea') return { title: (path === '/ai-help' ? 'Practical AI for your business' : 'Talk through your app idea') + ' | Sweetwater Technology', description: 'Start a conversation about your business or app idea. Explore a useful first step with Sweetwater Technology.', canonical: SITE_URL + path, type: 'website', jsonLd: [organization], robots: 'noindex, follow' };
+  if (path === '/') return { title: 'Practical AI for Your Business | Sweetwater Technology', description: HOME_DESCRIPTION, canonical, type: 'website', jsonLd: [organization, faqPage] };
+  if (path === '/ai-help' || path === '/app-idea') return { title: (path === '/ai-help' ? 'Practical AI for your business' : 'Talk through your app idea') + ' | Sweetwater Technology', description: 'Start a conversation about your business or app idea. Explore a useful first step with Sweetwater Technology.', canonical, type: 'website', jsonLd: [organization], robots: 'noindex, follow' };
 
-  if (path === '/book/manage') return { title: 'Manage Your Booking | Sweetwater Technology', description: 'Manage your private Sweetwater call booking.', canonical: SITE_URL + '/book/manage', type: 'website', jsonLd: [], robots: 'noindex, nofollow' };
+  if (path === '/book/manage') return { title: 'Manage Your Booking | Sweetwater Technology', description: 'Manage your private Sweetwater call booking.', canonical, type: 'website', jsonLd: [], robots: 'noindex, nofollow' };
 
-  if (path === '/book') return { title: 'Free 20-Minute Introductory Call | Sweetwater Technology', description: 'Book a free 20-minute call to talk through how your business works, connected tools, and practical next steps with Sweetwater Technology.', canonical: SITE_URL + '/book', type: 'website', jsonLd: [organization] };
+  if (path === '/book') return { title: 'Free 20-Minute Introductory Call | Sweetwater Technology', description: 'Book a free 20-minute call to talk through how your business works, connected tools, and practical next steps with Sweetwater Technology.', canonical, type: 'website', jsonLd: [organization] };
 
   if (path === '/portfolio') {
     return {
       title: 'Our Work | Sweetwater Technology',
       description: 'Explore the Sweetwater Technology portfolio: apps, businesses, and everyday ideas brought to life, from growing and logistics to music and creative tools.',
-      canonical: `${SITE_URL}/portfolio`,
+      canonical,
       type: 'website',
       jsonLd: [organization],
       robots: 'noindex, follow',
@@ -112,7 +115,6 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
   }
 
   if (path === '/about') {
-    const canonical = `${SITE_URL}/about`;
     return {
       title: 'Meet Clint and Sheree | Sweetwater Technology',
       description: ABOUT_DESCRIPTION,
@@ -129,7 +131,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
     return {
       title: 'Meet Sweetwater Technology',
       description: 'Explore live software products and tell Sage what kind of business problem you are solving.',
-      canonical: `${SITE_URL}/card`,
+      canonical,
       type: 'website',
       jsonLd: [organization],
       robots: 'noindex, follow',
@@ -140,7 +142,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
     return {
       title: 'Card Landing Test Hub | Sweetwater Technology',
       description: 'Internal links for checking each Sweetwater card landing-page experience.',
-      canonical: `${SITE_URL}/card/test`,
+      canonical,
       type: 'website',
       jsonLd: [],
       robots: 'noindex, nofollow',
@@ -151,7 +153,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
     return {
       title: 'Sage Follow-up Email Mockup | Sweetwater Technology',
       description: 'Internal design preview of the personalized Sage follow-up email.',
-      canonical: `${SITE_URL}/card/email-preview`,
+      canonical,
       type: 'website',
       jsonLd: [],
       robots: 'noindex, nofollow',
@@ -162,14 +164,13 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
     return {
       title: 'Headwaters | Ideas on AI and Software | Sweetwater Technology',
       description: HEADWATERS_INTRO,
-      canonical: `${SITE_URL}/headwaters/`,
+      canonical,
       type: 'website',
       jsonLd: [organization],
     };
   }
 
   if (path === '/headwaters/continuum') {
-    const canonical = `${SITE_URL}/headwaters/continuum/`;
     return {
       title: 'Sweetwater Continuum | Headwaters | Sweetwater Technology',
       description: CONTINUUM_PAPER.summary,
@@ -200,14 +201,13 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
       title: 'Company & Product News | Sweetwater Technology',
       description:
         'Read verified company announcements, product releases, and development updates from Sweetwater Technology in Atlanta, Georgia.',
-      canonical: `${SITE_URL}/news`,
+      canonical,
       type: 'website',
       jsonLd: [organization],
     };
   }
 
   if (path === '/ai-visibility-checker') {
-    const canonical = `${SITE_URL}/ai-visibility-checker`;
     return {
       title: 'Free AI Visibility Checker | Sweetwater Technology',
       description: 'Compare how Gemini, ChatGPT, and Claude mention your business or website when answering three buyer questions.',
@@ -215,7 +215,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
       type: 'website',
       jsonLd: [breadcrumbJsonLd([
         { name: 'Home', url: SITE_URL },
-        { name: 'Resources', url: `${SITE_URL}/resources` },
+        { name: 'Resources', url: directoryUrl('/resources') },
         { name: 'AI Visibility Checker', url: canonical },
       ])],
     };
@@ -225,7 +225,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
     return {
       title: 'Free Resources | Sweetwater Technology',
       description: 'Browse free documents and reusable tools from Sweetwater Technology.',
-      canonical: `${SITE_URL}/resources`,
+      canonical,
       type: 'website',
       jsonLd: [organization],
     };
@@ -236,7 +236,6 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
     const slug = path.slice('/resources/'.length).replace(/\/download$/, '');
     const resource = findResource(slug);
     if (resource?.article && !isDownload) {
-      const canonical = SITE_URL + '/resources/' + resource.slug;
       return {
         title: 'Try AI This Week: A Starter Guide for Small Businesses | Sweetwater Technology',
         description: resource.description, canonical, type: 'article',
@@ -245,13 +244,13 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
           description: resource.description, author: { '@id': SITE_URL + '/#organization' },
           publisher: { '@id': SITE_URL + '/#organization' }, mainEntityOfPage: canonical,
         }, breadcrumbJsonLd([
-          { name: 'Home', url: SITE_URL + '/' }, { name: 'Resources', url: SITE_URL + '/resources' },
+          { name: 'Home', url: SITE_URL + '/' }, { name: 'Resources', url: directoryUrl('/resources') },
           { name: resource.title, url: canonical },
         ])],
       };
     }
     if (resource) {
-      const canonical = `${SITE_URL}/resources/${resource.slug}`;
+      const canonical = directoryUrl('/resources/' + resource.slug);
       return {
         title: `${resource.title} | Sweetwater Technology`,
         description: resource.description,
@@ -259,7 +258,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
         type: 'website',
         jsonLd: isDownload ? [] : [organization, breadcrumbJsonLd([
           { name: 'Home', url: `${SITE_URL}/` },
-          { name: 'Resources', url: `${SITE_URL}/resources` },
+          { name: 'Resources', url: directoryUrl('/resources') },
           { name: resource.title, url: canonical },
         ])],
         ...(isDownload ? { robots: 'noindex, follow' } : {}),
@@ -271,7 +270,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
     return {
       title: `${SERVICES_COPY.title} | Sweetwater Technology`,
       description: SERVICES_COPY.description,
-      canonical: `${SITE_URL}/services`,
+      canonical,
       type: 'website',
       jsonLd: [organization],
     };
@@ -280,7 +279,6 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
   if (path.startsWith('/services/')) {
     const service = findService(path.slice('/services/'.length));
     if (service) {
-      const canonical = `${SITE_URL}/services/${service.slug}`;
       const copy = service.slug === 'ai-workflow-automation' ? AI_SERVICES_COPY : service;
       return {
         title: `${copy.title} | Sweetwater Technology`,
@@ -309,7 +307,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
           },
           breadcrumbJsonLd([
             { name: 'Home', url: `${SITE_URL}/` },
-            { name: 'Services', url: `${SITE_URL}/services` },
+            { name: 'Services', url: directoryUrl('/services') },
             { name: service.shortTitle, url: canonical },
           ]),
         ],
@@ -321,7 +319,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
     return {
       title: 'Our Work | Sweetwater Technology',
       description: 'Explore Sweetwater Technology product profiles spanning AI-native consumer software, logistics automation, and specialized e-commerce.',
-      canonical: `${SITE_URL}/work`,
+      canonical,
       type: 'website',
       jsonLd: [organization],
     };
@@ -330,7 +328,6 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
   if (path.startsWith('/work/')) {
     const profile = findWorkProfile(path.slice('/work/'.length));
     if (profile) {
-      const canonical = `${SITE_URL}/work/${profile.slug}`;
       return {
         title: `${profile.title} Product Profile | Sweetwater Technology`,
         description: profile.description,
@@ -352,7 +349,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
           },
           breadcrumbJsonLd([
             { name: 'Home', url: `${SITE_URL}/` },
-            { name: 'Work', url: `${SITE_URL}/work` },
+            { name: 'Work', url: directoryUrl('/work') },
             { name: profile.title, url: canonical },
           ]),
         ],
@@ -363,7 +360,6 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
   if (path.startsWith('/news/')) {
     const article = findNewsArticle(path.slice('/news/'.length));
     if (article) {
-      const canonical = `${SITE_URL}/news/${article.slug}`;
       return {
         title: `${article.title} | Sweetwater Technology`,
         description: article.description,
@@ -391,7 +387,7 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
             '@type': 'BreadcrumbList',
             itemListElement: [
               { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
-              { '@type': 'ListItem', position: 2, name: 'News', item: `${SITE_URL}/news` },
+              { '@type': 'ListItem', position: 2, name: 'News', item: directoryUrl('/news') },
               { '@type': 'ListItem', position: 3, name: article.title, item: canonical },
             ],
           },
