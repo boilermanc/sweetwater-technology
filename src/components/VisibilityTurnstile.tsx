@@ -32,9 +32,10 @@ function loadWidget() {
   return loading;
 }
 
-export function VisibilityTurnstile({ siteKey, onToken, onError }: {
+export function VisibilityTurnstile({ siteKey, onToken, onInteractive, onError }: {
   siteKey: string;
   onToken: (token: string) => void;
+  onInteractive: () => void;
   onError: () => void;
 }) {
   const container = useRef<HTMLDivElement>(null);
@@ -52,8 +53,10 @@ export function VisibilityTurnstile({ siteKey, onToken, onError }: {
         theme: 'dark',
         size: 'flexible',
         callback: (token: string) => { if (active) onToken(token); },
+        'before-interactive-callback': () => { if (active) onInteractive(); },
         'expired-callback': () => { if (active) onToken(''); },
         'error-callback': () => { if (active) onError(); },
+        'unsupported-callback': () => { if (active) onError(); },
       });
       remove = () => widget.remove(id);
     }).catch(() => { if (active) onError(); });
@@ -61,7 +64,7 @@ export function VisibilityTurnstile({ siteKey, onToken, onError }: {
       active = false;
       remove?.();
     };
-  }, [onError, onToken, siteKey]);
+  }, [onError, onInteractive, onToken, siteKey]);
 
   return <div ref={container} className="min-h-[65px]" />;
 }

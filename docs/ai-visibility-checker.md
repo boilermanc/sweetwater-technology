@@ -4,7 +4,7 @@ The checker asks Gemini, ChatGPT, and Claude the same three buyer questions. Per
 
 The report shows answers and counts by model. The direct model calls omit web search tools. Manus runs a separate agent task that can consult public sources. Consumer apps may answer differently. Trellis stores successful reports and normalized emails in a service-role-only table. The form neither confirms mailbox ownership nor enrolls visitors in a mailing list.
 
-The web report explains both counts, shows one practical check, and offers a print layout for saving a PDF through the browser. When email delivery is enabled, visitors can request a copy before starting the audit. The email includes the formatted report in the body, plus a plain-text version, and invites a reply to Clint about the results.
+The web checker shows an animated status screen while the backend collects answers. The finished report has sections for the audit totals, visibility by model and question, full model answers, and links that appeared in those answers. Link counts are grouped by hostname and count each answer once per host. They describe the answer text rather than verified citations or pages visited by a model. The final section suggests a next step tied to a buyer question and offers PDF and booking actions. Report sections animate as they come into view and respect reduced motion settings. When email delivery is enabled, visitors can request a copy before starting the audit. The email includes the formatted report in the body, plus a plain-text version, and invites a reply to Clint about the results.
 
 ## Activation
 

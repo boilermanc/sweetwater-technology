@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
-import { ArrowDownRight, ArrowRight, AudioLines, Check, Globe2, Printer, Radar, ShieldCheck } from 'lucide-react';
+import { ArrowDownRight, ArrowRight, AudioLines, Check, FileText, Globe2, MessageSquare, Radar, ShieldCheck } from 'lucide-react';
 import { VisibilityTurnstile } from '../components/VisibilityTurnstile';
+import { VisibilityAuditReport, type AuditAnswer, type AuditReport } from '../components/VisibilityAuditReport';
 import './ai-visibility.css';
 
 const endpoint = import.meta.env.VITE_AI_VISIBILITY_URL?.trim();
@@ -8,24 +9,13 @@ const siteKey = import.meta.env.VITE_AI_VISIBILITY_TURNSTILE_SITE_KEY?.trim();
 const available = Boolean(endpoint && siteKey);
 const emailAvailable = import.meta.env.VITE_AI_VISIBILITY_EMAIL_ENABLED === 'true';
 
-type Answer = {
-  question: string;
-  text: string;
-  mentioned: boolean;
-  domainReferenced: boolean;
-};
-
-type Engine = { name: string; model: string; answers: Answer[] };
-type Report = { business: string; domain: string; generatedAt?: string } &
-  ({ engines: Engine[] } | { model: string; answers: Answer[] });
-
-const sampleAnswers: Answer[] = [
-  { question: 'Which providers should I consider for landscape design in Portland?', text: 'Alder Studio (alder-studio.example) is one option for residential landscape design. Ask about recent projects and whether they offer installation oversight.', mentioned: true, domainReferenced: true },
+const sampleAnswers: AuditAnswer[] = [
+  { question: 'Which providers should I consider for landscape design in Portland?', text: 'Alder Studio (https://alder-studio.example) is one option for residential landscape design. Ask about recent projects and whether they offer installation oversight.', mentioned: true, domainReferenced: true },
   { question: 'What are some alternatives for landscape design in Portland?', text: 'Compare independent landscape designers and design-build firms based on project scale, service area, and the scope of their installation services.', mentioned: false, domainReferenced: false },
   { question: 'Who specializes in landscape design in Portland, and why would I choose them?', text: 'Look for local teams with a portfolio of similar sites and experience with native planting, drainage, and seasonal maintenance.', mentioned: false, domainReferenced: false },
 ];
 
-const sample: Report = {
+const sample: AuditReport = {
   business: 'Alder Studio',
   domain: 'alder-studio.example',
   engines: [
@@ -39,7 +29,7 @@ const sample: Report = {
       ...sampleAnswers.slice(1),
     ] },
     { name: 'Manus', model: 'Lite agent', answers: [
-      { ...sampleAnswers[0], text: 'Alder Studio (alder-studio.example) is a candidate for residential landscape design. Check its service area and compare its portfolio with other local studios.' },
+      { ...sampleAnswers[0], text: 'Alder Studio (https://alder-studio.example/portfolio) is a candidate for residential landscape design. Check its service area and compare its portfolio with other local studios.' },
       ...sampleAnswers.slice(1),
     ] },
   ],
@@ -51,86 +41,40 @@ function SignalGrid({ scanning = false }: { scanning?: boolean }) {
   </div>;
 }
 
-function Results({ report, example = false }: { report: Report; example?: boolean }) {
-  const engines = 'engines' in report ? report.engines : [{ ...report, name: 'Gemini' }];
-  const date = report.generatedAt && new Intl.DateTimeFormat('en-US', {
-    dateStyle: 'long', timeZone: 'America/New_York',
-  }).format(new Date(report.generatedAt));
-  return <>
-    <div className="visibility-report-header">
-      <p className="visibility-kicker">{example ? 'Example report / Fictional data' : 'Audit complete / AI model snapshot'}</p>
-      <button type="button" className="visibility-print" onClick={() => window.print()}>
-        <Printer size={17} aria-hidden="true" /> Print or save as PDF
-      </button>
-    </div>
-    <p className="visibility-report-brand">Sweetwater Technology · AI Visibility Report</p>
-    <h2 className="mt-3 break-words text-3xl font-black tracking-tight sm:text-5xl">{report.business}, here’s what showed up.</h2>
-    <p className="mt-3 break-all text-slate-300">{report.domain}{date && <> <span aria-hidden="true">·</span> {date}</>}</p>
-    <div className="visibility-metrics mt-7">
-      {engines.map(({ name, model, answers }) => <div key={name}>
-        <h3 className="font-bold">{name}</h3>
-        <p className="break-words text-sm text-slate-300">{model}</p>
-        {answers.length ? <>
-          <p><strong>{answers.filter((answer) => answer.mentioned).length}<small>/{answers.length}</small></strong> named your business</p>
-          <span className="visibility-readout" aria-hidden="true">{answers.map((answer) => <i key={answer.question} data-hit={answer.mentioned} />)}</span>
-          <p><strong>{answers.filter((answer) => answer.domainReferenced).length}<small>/{answers.length}</small></strong> referenced your domain</p>
-          <span className="visibility-readout" aria-hidden="true">{answers.map((answer) => <i key={answer.question} data-hit={answer.domainReferenced} />)}</span>
-        </> : <p>Results unavailable for this run.</p>}
-      </div>)}
-    </div>
-    <div className="visibility-interpretation mt-6">
-      <h3>How to read your results</h3>
-      <p>A name mention means your business name appeared in an answer. A domain reference means your website address appeared in the answer text. The checker samples API responses. Consumer apps may answer differently.</p>
-      {engines.some(({ name }) => name === 'Manus') && <p className="mt-2">Manus answers all three questions in one agent task and can consult public sources.</p>}
-      <h3>One thing to check</h3>
-      <p>{engines.some(({ answers }) => answers.some((answer) => !answer.mentioned))
-        ? 'Pick a question where your business was absent. Check whether your website has a page that answers it and clearly says what you offer, who you serve, and where.'
-        : 'Pick the answer most relevant to your customers. Compare how Gemini described your business with how you describe it on your website.'}</p>
-    </div>
-    {engines.filter(({ answers }) => answers.length).map(({ name, answers }) => <div className="mt-6 space-y-3" key={name}>
-      <h3 className="text-lg font-bold">{name} answers</h3>
-      {answers.map((answer, index) => <details className="visibility-detail" key={answer.question} open={index === 0 ? true : undefined}>
-        <summary><span className="visibility-kicker">0{index + 1}</span> {answer.question}</summary>
-        <div className="px-4 pb-5 sm:px-6">
-          <p className="mb-3 text-sm font-semibold text-cyan-200">{answer.mentioned ? 'Business named' : 'Business name absent'} · {answer.domainReferenced ? 'Domain referenced' : 'Domain reference absent'}</p>
-          <p className="whitespace-pre-wrap break-words text-sm leading-7 text-slate-200">{answer.text}</p>
-        </div>
-      </details>)}
-    </div>)}
-  </>;
-}
-
 const ownerEmail = 'clint@sweetwater.technology';
-const ownerSignInMessage = 'Sign in with your Sweetwater account, then return here to run another test.';
 
 export function AiVisibility() {
   const [token, setToken] = useState('');
   const [widgetKey, setWidgetKey] = useState(0);
-  const [widgetError, setWidgetError] = useState(false);
+  const [verification, setVerification] = useState<'loading' | 'interactive' | 'error'>('loading');
   const [phase, setPhase] = useState<'ready' | 'running' | 'complete'>('ready');
+  const [auditDomain, setAuditDomain] = useState('');
   const [error, setError] = useState('');
-  const [report, setReport] = useState<Report>();
+  const [report, setReport] = useState<AuditReport>();
   const [emailDelivery, setEmailDelivery] = useState<'accepted' | 'unavailable'>();
   const [showSample, setShowSample] = useState(false);
   const [recoverable, setRecoverable] = useState(false);
   const running = useRef(false);
   const resultPanel = useRef<HTMLElement>(null);
+  const progressPanel = useRef<HTMLElement>(null);
   const request = useRef<AbortController>(null);
   const receipt = useRef('');
   const [ownerAudit, setOwnerAudit] = useState(false);
   const receiveToken = useCallback((value: string) => {
     setToken(value);
-    if (value) setWidgetError(false);
+    setVerification('loading');
   }, []);
+  const verificationInteractive = useCallback(() => setVerification('interactive'), []);
   const verificationError = useCallback(() => {
     setToken('');
-    setWidgetError(true);
+    setVerification('error');
   }, []);
 
   useEffect(() => () => request.current?.abort(), []);
 
   useEffect(() => {
-    if (phase === 'complete' || showSample) resultPanel.current?.focus();
+    if (phase === 'running') progressPanel.current?.focus();
+    else if (phase === 'complete' || showSample) resultPanel.current?.focus();
   }, [phase, showSample]);
 
   async function runAudit(payload: Record<string, unknown>) {
@@ -144,7 +88,8 @@ export function AiVisibility() {
 
     try {
       const requestHeaders = new Headers({ 'Content-Type': 'application/json' });
-      if (typeof payload.email === 'string' && payload.email.trim().toLowerCase() === ownerEmail) {
+      const isOwnerRequest = typeof payload.email === 'string' && payload.email.trim().toLowerCase() === ownerEmail;
+      if (isOwnerRequest) {
         const portalUrl = import.meta.env.VITE_PORTAL_SUPABASE_URL;
         if (typeof portalUrl === 'string' && new URL(endpoint).origin === new URL(portalUrl).origin) {
           const { portalClient } = await import('../portal/client');
@@ -165,7 +110,7 @@ export function AiVisibility() {
       if (!response.ok || !body.report) {
         setRecoverable(response.status === 202 || response.status === 503);
         const message = response.status === 202 ? 'Your audit is still running. Check again in a moment.'
-          : response.status === 401 ? ownerSignInMessage
+          : response.status === 401 && isOwnerRequest ? 'This email is reserved for repeat testing. Enter a different email to run a free audit.'
           : response.status === 404 ? 'There is no finished report for this attempt. You can try a new audit.'
           : response.status === 409 ? 'This email has already started or completed its free audit.'
           : response.status === 429 ? 'Today’s audit slots are full. Please try again tomorrow.'
@@ -188,6 +133,7 @@ export function AiVisibility() {
       if (!controller.signal.aborted) {
         running.current = false;
         setToken('');
+        setVerification('loading');
         setWidgetKey((value) => value + 1);
       }
     }
@@ -199,6 +145,7 @@ export function AiVisibility() {
     receipt.current = crypto.randomUUID();
     setRecoverable(false);
     const { domain, business, category, email, emailReport } = Object.fromEntries(new FormData(event.currentTarget));
+    setAuditDomain(typeof domain === 'string' ? domain.trim() : '');
     setOwnerAudit(typeof email === 'string' && email.trim().toLowerCase() === ownerEmail);
     void runAudit({ domain, business, category, email, token, emailReport: emailReport === 'on' });
   }
@@ -206,7 +153,7 @@ export function AiVisibility() {
   return <main className="visibility-page relative z-10">
     <div className="visibility-shell">
       <a className="visibility-back" href="/resources">← Sweetwater resources</a>
-      <div className="visibility-hero">
+      {phase !== 'complete' && <div className={phase === 'running' ? 'hidden' : 'visibility-hero'}>
         <div className="visibility-intro">
           <p className="visibility-kicker"><span className="visibility-beacon" /> SWEETWATER LABS <span aria-hidden="true">/</span> FREE TOOL</p>
           <h1>Does AI bring up <em>your business?</em></h1>
@@ -215,7 +162,7 @@ export function AiVisibility() {
           <button type="button" className="visibility-example" onClick={() => {
             if (showSample) resultPanel.current?.focus();
             else setShowSample(true);
-          }} disabled={phase === 'running' || phase === 'complete'}>
+          }}>
             See an example report <ArrowDownRight size={18} aria-hidden="true" />
           </button>
         </div>
@@ -225,26 +172,21 @@ export function AiVisibility() {
             <h2 id="visibility-console-title">Your visibility audit</h2>
             <span className="visibility-console-tag">MODEL COMPARISON</span>
           </header>
-          {phase === 'complete' ? <div className="visibility-console-body">
-            <p className="visibility-kicker"><Check size={17} aria-hidden="true" /> Report ready</p>
-            <p className="mt-3 text-slate-300">Your answers and visibility counts by model are below.</p>
-            {emailDelivery === 'accepted' && <p className="mt-3 text-sm text-cyan-200">Your email copy is on its way.</p>}
-            {emailDelivery === 'unavailable' && <p className="mt-3 text-sm text-amber-200">We couldn’t confirm email delivery. You can save a copy below.</p>}
-            {ownerAudit && <button type="button" className="visibility-example" onClick={() => {
-              setReport(undefined);
-              setEmailDelivery(undefined);
-              setPhase('ready');
-            }}>Run another test</button>}
-          </div> : <form onSubmit={submit} className="visibility-console-body" aria-busy={phase === 'running'}>
+          <form onSubmit={submit} className="visibility-console-body" aria-busy={phase === 'running'}>
             <fieldset disabled={!available || phase === 'running'} className="m-0 grid min-w-0 gap-3 border-0 p-0">
               <label className="visibility-label">Website<input name="domain" placeholder="yourbusiness.com" inputMode="url" autoComplete="url" maxLength={253} required /></label>
               <label className="visibility-label">Business name<input name="business" placeholder="Your Business" autoComplete="organization" minLength={2} maxLength={100} required /></label>
               <label className="visibility-label">What customers look for<input name="category" placeholder="e.g. landscape design in Portland" minLength={3} maxLength={100} required /></label>
               {available && siteKey && phase !== 'running' && <div className="min-w-0">
-                <p className="visibility-kicker mb-2"><ShieldCheck size={15} aria-hidden="true" /> Verify before entering email</p>
-                <VisibilityTurnstile key={widgetKey} siteKey={siteKey} onToken={receiveToken} onError={verificationError} />
-                {widgetError && <button className="visibility-example" type="button" onClick={() => {
-                  setWidgetError(false);
+                <p className="visibility-kicker mb-2" role="status"><ShieldCheck size={15} aria-hidden="true" />
+                  {token ? 'Verified. You can enter your email.'
+                    : verification === 'error' ? 'Verification could not load.'
+                    : verification === 'interactive' ? 'Complete the verification below.'
+                    : 'Loading verification…'}
+                </p>
+                <VisibilityTurnstile key={widgetKey} siteKey={siteKey} onToken={receiveToken} onInteractive={verificationInteractive} onError={verificationError} />
+                {verification === 'error' && <button className="visibility-example" type="button" onClick={() => {
+                  setVerification('loading');
                   setWidgetKey((value) => value + 1);
                 }}>Retry verification</button>}
               </div>}
@@ -254,22 +196,43 @@ export function AiVisibility() {
               </label>}
               <button type="submit" className="visibility-submit" disabled={!token || !available || recoverable || phase === 'running'}>{phase === 'running' ? 'Running your audit…' : 'Run my free audit'} <ArrowRight size={18} aria-hidden="true" /></button>
             </fieldset>
-            <p className="mt-3 text-xs leading-5 text-slate-300">One free audit per email. Sweetwater stores your submission and audit result. Your report appears here.</p>
+            <p className="mt-3 text-xs leading-5 text-slate-300">Run one free audit per email without an account. Your report appears here. Sweetwater stores your submission and audit result.</p>
             {!available && <p className="mt-3 text-sm text-cyan-200">Live audits are offline. You can still explore the example report.</p>}
-            {error && <p className="mt-3 text-sm text-rose-200" role="alert">{error} {error === ownerSignInMessage && <a href="/portal/" className="underline">Open the Sweetwater portal</a>}</p>}
+            {error && <p className="mt-3 text-sm text-rose-200" role="alert">{error}</p>}
             {recoverable && <button type="button" className="visibility-example" disabled={phase === 'running'} onClick={() => void runAudit({ operation: 'recover' })}>Check for my report</button>}
-          </form>}
+          </form>
         </section>
-      </div>
+      </div>}
 
-      {phase === 'running' && <section className="visibility-report" role="status">
-        <p className="visibility-kicker">Audit running</p>
-        <h2 className="mt-3 text-3xl font-black">Asking the models your buyer questions.</h2>
-        <p className="mt-3 text-slate-300">Keep this tab open while we collect the answers.</p>
-        <SignalGrid scanning />
+      {phase === 'running' && <section className="visibility-report visibility-running" ref={progressPanel} tabIndex={-1} aria-labelledby="audit-running-title">
+        <div className="visibility-overview">
+          <div className="visibility-chapter-copy" role="status">
+            <p className="visibility-kicker"><span className="visibility-beacon" /> Audit running</p>
+            <h1 id="audit-running-title">{recoverable ? 'Looking up your report.' : <>Asking AI about <em>{auditDomain}</em></>}</h1>
+            <p>{recoverable ? 'We’ll show the report as soon as it’s available.' : 'Three buyer questions go to each model. Keep this tab open and your report will appear here when it’s ready.'}</p>
+          </div>
+          <div className="visibility-running-signal">
+            <p className="visibility-kicker">{recoverable ? 'Checking report status' : 'Model comparison in progress'}</p>
+            <SignalGrid scanning />
+          </div>
+        </div>
+        {!recoverable && <ol className="visibility-run-steps" aria-label="Audit stages">
+          <li><Check aria-hidden="true" size={20} /> <span>Questions ready</span></li>
+          <li aria-current="step"><MessageSquare aria-hidden="true" size={20} /> <span>Collecting answers</span></li>
+          <li><FileText aria-hidden="true" size={20} /> <span>Preparing report</span></li>
+        </ol>}
       </section>}
       {(report || showSample) && <section className="visibility-report" tabIndex={-1} ref={resultPanel} aria-label="Visibility report">
-        <Results report={report ?? sample} example={!report} />
+        {report && (emailDelivery || ownerAudit) && <div className="visibility-report-actions">
+          {emailDelivery === 'accepted' && <p className="text-sm text-cyan-200">Your email copy is on its way.</p>}
+          {emailDelivery === 'unavailable' && <p className="text-sm text-amber-200">We couldn’t confirm email delivery. You can save a copy below.</p>}
+          {ownerAudit && <button type="button" className="visibility-example" onClick={() => {
+            setReport(undefined);
+            setEmailDelivery(undefined);
+            setPhase('ready');
+          }}>Run another test</button>}
+        </div>}
+        <VisibilityAuditReport report={report ?? sample} example={!report} />
       </section>}
 
       <section className="visibility-panels" aria-label="How the checker works">
