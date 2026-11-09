@@ -23,6 +23,10 @@ To take the live form offline, unset either website variable and rebuild. Disabl
 
 ## Local checks
 
+For repeat owner tests, sign in to the Sweetwater portal as `clint@sweetwater.technology`, then open the checker in the same browser and use that address. Complete Turnstile for each run. The checker offers **Run another test** after a successful report. Trellis verifies the session and confirmed email before reserving a test, and those runs are counted separately from the public daily quota.
+
+Apply the owner-test migration before deploying the updated Edge Function. Deploy the updated website after the function is active. The five-argument reservation function continues to handle public submissions during rollout.
+
 - Run `npm run lint`, `npm run build`, and `npm run audit:html` in Sweetwater.
 - To exercise the form without external requests, run Vite at `http://127.0.0.1:4003` with `VITE_AI_VISIBILITY_URL=http://127.0.0.1:4003/test-visibility`, a placeholder value for `VITE_AI_VISIBILITY_TURNSTILE_SITE_KEY`, and `VITE_AI_VISIBILITY_EMAIL_ENABLED=true`. Run `node scripts/ai-visibility-browser.mjs` with Playwright available. The script intercepts the widget and endpoint.
 - Run `deno test --no-config --allow-env tests/sweetwater-ai-visibility.test.ts` in Trellis. Apply the migration and run `tests/sweetwater-ai-visibility.sql` in a disposable local database with the Supabase roles.

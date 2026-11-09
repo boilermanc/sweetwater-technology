@@ -100,6 +100,9 @@ function Results({ report, example = false }: { report: Report; example?: boolea
   </>;
 }
 
+const ownerEmail = 'clint@sweetwater.technology';
+const ownerSignInMessage = 'Sign in with your Sweetwater account, then return here to run another test.';
+
 export function AiVisibility() {
   const [token, setToken] = useState('');
   const [widgetKey, setWidgetKey] = useState(0);
@@ -114,6 +117,7 @@ export function AiVisibility() {
   const resultPanel = useRef<HTMLElement>(null);
   const request = useRef<AbortController>(null);
   const receipt = useRef('');
+  const [ownerAudit, setOwnerAudit] = useState(false);
   const receiveToken = useCallback((value: string) => {
     setToken(value);
     if (value) setWidgetError(false);
@@ -139,9 +143,20 @@ export function AiVisibility() {
     setPhase('running');
 
     try {
+      const requestHeaders = new Headers({ 'Content-Type': 'application/json' });
+      if (typeof payload.email === 'string' && payload.email.trim().toLowerCase() === ownerEmail) {
+        const portalUrl = import.meta.env.VITE_PORTAL_SUPABASE_URL;
+        if (typeof portalUrl === 'string' && new URL(endpoint).origin === new URL(portalUrl).origin) {
+          const { portalClient } = await import('../portal/client');
+          const session = await portalClient?.auth.getSession();
+          if (session?.data.session?.user.email?.toLowerCase() === ownerEmail) {
+            requestHeaders.set('Authorization', `Bearer ${session.data.session.access_token}`);
+          }
+        }
+      }
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: requestHeaders,
         body: JSON.stringify({ ...payload, receipt: receipt.current }),
         signal: AbortSignal.any([controller.signal, AbortSignal.timeout(65000)]),
       });
@@ -150,6 +165,7 @@ export function AiVisibility() {
       if (!response.ok || !body.report) {
         setRecoverable(response.status === 202 || response.status === 503);
         const message = response.status === 202 ? 'Your audit is still running. Check again in a moment.'
+          : response.status === 401 ? ownerSignInMessage
           : response.status === 404 ? 'There is no finished report for this attempt. You can try a new audit.'
           : response.status === 409 ? 'This email has already started or completed its free audit.'
           : response.status === 429 ? 'Today’s audit slots are full. Please try again tomorrow.'
@@ -183,6 +199,7 @@ export function AiVisibility() {
     receipt.current = crypto.randomUUID();
     setRecoverable(false);
     const { domain, business, category, email, emailReport } = Object.fromEntries(new FormData(event.currentTarget));
+    setOwnerAudit(typeof email === 'string' && email.trim().toLowerCase() === ownerEmail);
     void runAudit({ domain, business, category, email, token, emailReport: emailReport === 'on' });
   }
 
@@ -213,6 +230,11 @@ export function AiVisibility() {
             <p className="mt-3 text-slate-300">Your answers and visibility counts by model are below.</p>
             {emailDelivery === 'accepted' && <p className="mt-3 text-sm text-cyan-200">Your email copy is on its way.</p>}
             {emailDelivery === 'unavailable' && <p className="mt-3 text-sm text-amber-200">We couldn’t confirm email delivery. You can save a copy below.</p>}
+            {ownerAudit && <button type="button" className="visibility-example" onClick={() => {
+              setReport(undefined);
+              setEmailDelivery(undefined);
+              setPhase('ready');
+            }}>Run another test</button>}
           </div> : <form onSubmit={submit} className="visibility-console-body" aria-busy={phase === 'running'}>
             <fieldset disabled={!available || phase === 'running'} className="m-0 grid min-w-0 gap-3 border-0 p-0">
               <label className="visibility-label">Website<input name="domain" placeholder="yourbusiness.com" inputMode="url" autoComplete="url" maxLength={253} required /></label>
@@ -226,7 +248,7 @@ export function AiVisibility() {
                   setWidgetKey((value) => value + 1);
                 }}>Retry verification</button>}
               </div>}
-              <label className="visibility-label">Email<input name="email" type="email" autoComplete="email" placeholder="you@yourbusiness.com" disabled={!token} maxLength={254} required /></label>
+              <label className="visibility-label">Email<input name="email" type="email" autoComplete="email" placeholder="you@yourbusiness.com" defaultValue={ownerAudit ? ownerEmail : undefined} disabled={!token} maxLength={254} required /></label>
               {emailAvailable && <label className="flex min-h-11 items-center gap-2 text-sm text-slate-200">
                 <input type="checkbox" name="emailReport" className="size-4 accent-cyan-200" disabled={!token} /> Email me a copy of my report
               </label>}
@@ -234,7 +256,7 @@ export function AiVisibility() {
             </fieldset>
             <p className="mt-3 text-xs leading-5 text-slate-300">One free audit per email. Sweetwater stores your submission and audit result. Your report appears here.</p>
             {!available && <p className="mt-3 text-sm text-cyan-200">Live audits are offline. You can still explore the example report.</p>}
-            {error && <p className="mt-3 text-sm text-rose-200" role="alert">{error}</p>}
+            {error && <p className="mt-3 text-sm text-rose-200" role="alert">{error} {error === ownerSignInMessage && <a href="/portal/" className="underline">Open the Sweetwater portal</a>}</p>}
             {recoverable && <button type="button" className="visibility-example" disabled={phase === 'running'} onClick={() => void runAudit({ operation: 'recover' })}>Check for my report</button>}
           </form>}
         </section>
