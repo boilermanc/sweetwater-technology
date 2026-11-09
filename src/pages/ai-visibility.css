@@ -1,3 +1,7 @@
+#root > div:has(> .visibility-page) > header {
+  background-color: #fff;
+}
+
 .visibility-page {
   color: #f1f5f9;
   background: radial-gradient(ellipse at 84% 16%, #10334b 0%, transparent 42%), #07101b;
