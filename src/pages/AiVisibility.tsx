@@ -42,12 +42,13 @@ function SignalGrid({ scanning = false }: { scanning?: boolean }) {
 }
 
 const ownerEmail = 'clint@sweetwater.technology';
+const reservedEmailMessage = 'This email is reserved for repeat testing. Enter a different email to run a free audit.';
 
 export function AiVisibility() {
   const [token, setToken] = useState('');
   const [widgetKey, setWidgetKey] = useState(0);
   const [verification, setVerification] = useState<'loading' | 'interactive' | 'error'>('loading');
-  const [phase, setPhase] = useState<'ready' | 'running' | 'complete'>('ready');
+  const [phase, setPhase] = useState<'ready' | 'checking' | 'running' | 'complete'>('ready');
   const [auditDomain, setAuditDomain] = useState('');
   const [error, setError] = useState('');
   const [report, setReport] = useState<AuditReport>();
@@ -57,9 +58,11 @@ export function AiVisibility() {
   const running = useRef(false);
   const resultPanel = useRef<HTMLElement>(null);
   const progressPanel = useRef<HTMLElement>(null);
+  const errorNotice = useRef<HTMLParagraphElement>(null);
   const request = useRef<AbortController>(null);
   const receipt = useRef('');
   const [ownerAudit, setOwnerAudit] = useState(false);
+  const busy = phase === 'checking' || phase === 'running';
   const receiveToken = useCallback((value: string) => {
     setToken(value);
     setVerification('loading');
@@ -77,6 +80,10 @@ export function AiVisibility() {
     else if (phase === 'complete' || showSample) resultPanel.current?.focus();
   }, [phase, showSample]);
 
+  useEffect(() => {
+    if (error) errorNotice.current?.focus();
+  }, [error]);
+
   async function runAudit(payload: Record<string, unknown>) {
     if (!endpoint || running.current) return;
     const controller = new AbortController();
@@ -84,12 +91,13 @@ export function AiVisibility() {
     running.current = true;
     setError('');
     setShowSample(false);
-    setPhase('running');
+    let submitted = false;
 
     try {
       const requestHeaders = new Headers({ 'Content-Type': 'application/json' });
       const isOwnerRequest = typeof payload.email === 'string' && payload.email.trim().toLowerCase() === ownerEmail;
       if (isOwnerRequest) {
+        setPhase('checking');
         const portalUrl = import.meta.env.VITE_PORTAL_SUPABASE_URL;
         if (typeof portalUrl === 'string' && new URL(endpoint).origin === new URL(portalUrl).origin) {
           const { portalClient } = await import('../portal/client');
@@ -98,7 +106,15 @@ export function AiVisibility() {
             requestHeaders.set('Authorization', `Bearer ${session.data.session.access_token}`);
           }
         }
+        if (!requestHeaders.has('Authorization')) {
+          setError(reservedEmailMessage);
+          setPhase('ready');
+          return;
+        }
       }
+      if (controller.signal.aborted) return;
+      setPhase('running');
+      submitted = true;
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: requestHeaders,
@@ -110,7 +126,7 @@ export function AiVisibility() {
       if (!response.ok || !body.report) {
         setRecoverable(response.status === 202 || response.status === 503);
         const message = response.status === 202 ? 'Your audit is still running. Check again in a moment.'
-          : response.status === 401 && isOwnerRequest ? 'This email is reserved for repeat testing. Enter a different email to run a free audit.'
+          : response.status === 401 && isOwnerRequest ? reservedEmailMessage
           : response.status === 404 ? 'There is no finished report for this attempt. You can try a new audit.'
           : response.status === 409 ? 'This email has already started or completed its free audit.'
           : response.status === 429 ? 'Today’s audit slots are full. Please try again tomorrow.'
@@ -126,15 +142,17 @@ export function AiVisibility() {
       setPhase('complete');
     } catch {
       if (controller.signal.aborted) return;
-      setRecoverable(true);
-      setError('The connection was interrupted. Check for your report in a moment.');
+      setRecoverable(submitted);
+      setError(submitted ? 'The connection was interrupted. Check for your report in a moment.' : 'We couldn’t check this email. Please try again.');
       setPhase('ready');
     } finally {
       if (!controller.signal.aborted) {
         running.current = false;
-        setToken('');
-        setVerification('loading');
-        setWidgetKey((value) => value + 1);
+        if (submitted) {
+          setToken('');
+          setVerification('loading');
+          setWidgetKey((value) => value + 1);
+        }
       }
     }
   }
@@ -172,8 +190,8 @@ export function AiVisibility() {
             <h2 id="visibility-console-title">Your visibility audit</h2>
             <span className="visibility-console-tag">MODEL COMPARISON</span>
           </header>
-          <form onSubmit={submit} className="visibility-console-body" aria-busy={phase === 'running'}>
-            <fieldset disabled={!available || phase === 'running'} className="m-0 grid min-w-0 gap-3 border-0 p-0">
+          <form onSubmit={submit} className="visibility-console-body" aria-busy={busy}>
+            <fieldset disabled={!available || busy} className="m-0 grid min-w-0 gap-3 border-0 p-0">
               <label className="visibility-label">Website<input name="domain" placeholder="yourbusiness.com" inputMode="url" autoComplete="url" maxLength={253} required /></label>
               <label className="visibility-label">Business name<input name="business" placeholder="Your Business" autoComplete="organization" minLength={2} maxLength={100} required /></label>
               <label className="visibility-label">What customers look for<input name="category" placeholder="e.g. landscape design in Portland" minLength={3} maxLength={100} required /></label>
@@ -194,12 +212,12 @@ export function AiVisibility() {
               {emailAvailable && <label className="flex min-h-11 items-center gap-2 text-sm text-slate-200">
                 <input type="checkbox" name="emailReport" className="size-4 accent-cyan-200" disabled={!token} /> Email me a copy of my report
               </label>}
-              <button type="submit" className="visibility-submit" disabled={!token || !available || recoverable || phase === 'running'}>{phase === 'running' ? 'Running your audit…' : 'Run my free audit'} <ArrowRight size={18} aria-hidden="true" /></button>
+              <button type="submit" className="visibility-submit" disabled={!token || !available || recoverable || busy}>{phase === 'checking' ? 'Checking your email…' : phase === 'running' ? 'Running your audit…' : 'Run my free audit'} <ArrowRight size={18} aria-hidden="true" /></button>
             </fieldset>
             <p className="mt-3 text-xs leading-5 text-slate-300">Run one free audit per email without an account. Your report appears here. Sweetwater stores your submission and audit result.</p>
             {!available && <p className="mt-3 text-sm text-cyan-200">Live audits are offline. You can still explore the example report.</p>}
-            {error && <p className="mt-3 text-sm text-rose-200" role="alert">{error}</p>}
-            {recoverable && <button type="button" className="visibility-example" disabled={phase === 'running'} onClick={() => void runAudit({ operation: 'recover' })}>Check for my report</button>}
+            {error && <p className="mt-3 text-sm text-rose-200" ref={errorNotice} tabIndex={-1} role="alert">{error}</p>}
+            {recoverable && <button type="button" className="visibility-example" disabled={busy} onClick={() => void runAudit({ operation: 'recover' })}>Check for my report</button>}
           </form>
         </section>
       </div>}

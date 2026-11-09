@@ -11,6 +11,7 @@ try {
   for (const width of [1280, 375, 320]) {
     const page = await browser.newPage({ viewport: { width, height: 900 }, reducedMotion: width === 320 ? 'reduce' : 'no-preference' });
     const errors = [];
+    let ownerRequests = 0;
     let finishAudit;
     const auditDisplayed = new Promise((resolve) => { finishAudit = resolve; });
     page.on('pageerror', (error) => errors.push(error.message));
@@ -41,6 +42,7 @@ try {
       receipt = payload.receipt;
       assert.equal(payload.token, 'test-token');
       if (payload.email === 'clint@sweetwater.technology') {
+        ownerRequests++;
         assert.equal(width, 320);
         return route.fulfill({ status: 401, json: { error: 'Sign in to the Sweetwater portal.' } });
       }
@@ -133,11 +135,27 @@ try {
       await verificationButton.click();
       await page.getByRole('status').filter({ hasText: 'Verified. You can enter your email.' }).waitFor();
       await page.getByLabel('Email', { exact: true }).fill('clint@sweetwater.technology');
+      await page.evaluate(() => {
+        const observer = new MutationObserver((records) => {
+          for (const { addedNodes } of records) {
+            if ([...addedNodes].some((node) => node instanceof Element &&
+              (node.matches('.visibility-running') || node.querySelector('.visibility-running')))) {
+              document.body.dataset.auditProgressSeen = 'true';
+              observer.disconnect();
+            }
+          }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+      });
       await page.getByRole('button', { name: 'Run my free audit' }).click();
       const error = page.getByRole('alert').filter({ hasText: 'Enter a different email to run a free audit.' });
       await error.waitFor();
       assert.doesNotMatch(await error.innerText(), /portal/i);
       assert.equal(await error.getByRole('link').count(), 0);
+      assert.equal(ownerRequests, 0);
+      assert.equal(await page.locator('body').getAttribute('data-audit-progress-seen'), null);
+      assert.equal(await page.getByLabel('Email', { exact: true }).isEnabled(), true);
+      assert.equal(await page.getByText('Audit running', { exact: true }).isVisible(), false);
     } else {
       if (width === 375) {
         await page.getByRole('button', { name: 'Check for my report' }).click();
