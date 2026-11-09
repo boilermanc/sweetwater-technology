@@ -49,7 +49,7 @@ test('footer destinations, published legal pages and the printable guide are ava
     assert.ok(!draft.includes('Draft for review')); assert.ok(!draft.includes('noindex, follow'));
     assert.ok(draft.includes('2026-10-18'));
     assert.ok(draft.includes('1295 Smithdale Heights Drive'));
-    assert.ok(html('sitemap.xml').includes('/' + route + '</loc>'));
+    assert.ok(html('sitemap.xml').includes('/' + route + '/</loc>'));
   }
 });
 
@@ -67,7 +67,7 @@ test('booking page is discoverable and renders the configured booking experience
     assert.ok(book.includes('only booked once we confirm'));
     assert.ok(book.includes('Online sending is not connected yet'));
   }
-  assert.ok(html('sitemap.xml').includes('/book</loc>'));
+  assert.ok(html('sitemap.xml').includes('/book/</loc>'));
   assert.ok(html('index.html').includes('href="/book"'));
   const href = book.match(/href="(mailto:[^"]+)"/)[1].replaceAll('&amp;', '&');
   if (!enabled) assert.ok(new URL(href).searchParams.get('body').includes('free 20-minute introductory call'));

@@ -2,7 +2,7 @@
 
 Portfolio and marketing site for Sweetwater Technology, built with React, TypeScript, Vite, Tailwind CSS, and Framer Motion.
 
-Production builds prerender the homepage, newsroom, and every published news article to crawler-readable static HTML. Route metadata, JSON-LD, and `sitemap.xml` are generated from the same source data.
+Production builds prerender the homepage, newsroom, and every published news article to crawler-readable static HTML. Route metadata, JSON-LD, and `sitemap.xml` use the directory URLs served by Apache, including trailing slashes.
 
 ## Local development
 

@@ -28,7 +28,7 @@ export const sitemapEntries = [
     lastmod: article.updatedAt.slice(0, 10),
     priority: '0.7',
   })),
-];
+].map((entry) => ({ ...entry, url: getPageSeo(entry.path).canonical }));
 
 export const render = (path: string) => ({
   appHtml: renderToString(
