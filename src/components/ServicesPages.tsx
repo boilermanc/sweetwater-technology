@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { ServiceContactForm } from './ServiceContactForm';
-import { AI_SERVICES_COPY, SERVICES_COPY } from '../servicesContent';
+import { LANEWISE_DESCRIPTION } from '../marketing';
+import { AI_SERVICES_COPY, SERVICE_ENGAGEMENT_STEPS, SERVICES_COPY } from '../servicesContent';
 
 const card = 'rounded-3xl border border-slate-200 bg-white/85 p-7 shadow-sm';
 const heading = 'text-3xl font-black tracking-tight text-slate-900 sm:text-4xl';
@@ -28,7 +29,7 @@ export function ServicesPage() {
       <div className="mt-8 grid gap-6 lg:grid-cols-3">
         {[
           ['Custom web apps', 'Keep jobs, customers and paperwork in one place.', 'custom-web-applications'],
-          ['AI helpers', 'Get quotes and replies ready faster. You approve what goes out.', 'ai-workflow-automation'],
+          ['AI consulting and workflow automation', 'Get quotes and replies ready faster. You approve what goes out.', 'ai-workflow-automation'],
           ['Mobile apps', 'Help customers request work and your crew update jobs on the go.', 'mobile-app-development'],
         ].map(([title, detail, slug]) => <article key={slug} className={`${card} flex flex-col`}><h3 className="text-2xl font-black text-slate-900">{title}</h3><p className="mt-4 flex-1 leading-7 text-slate-600">{detail}</p><a href={`/services/${slug}`} className="mt-6 inline-flex items-center gap-2 font-bold text-blue-600 hover:text-blue-700">Learn more<span className="sr-only"> about {title}</span><ArrowRight aria-hidden="true" size={18} /></a></article>)}
       </div>
@@ -37,7 +38,7 @@ export function ServicesPage() {
       <h2 id="ai-worries" className="text-3xl font-black tracking-tight sm:text-4xl">Worried about AI?</h2>
       <dl className="mt-8 grid gap-8 md:grid-cols-3">
         {[
-          ['Too expensive?', 'We start small. You know the cost before we begin.'],
+          ['Too expensive?', 'Start with a free fit call. Assessment and implementation are priced separately.'],
           ['Replace my people?', 'We focus on helping your team with repetitive work. You decide what changes.'],
           ['Not a tech person?', "You don't need to be. Just tell us the problem."],
         ].map(([question, answer]) => <div key={question}><dt className="text-lg font-bold">{question}</dt><dd className="mt-3 leading-7 text-slate-300">{answer}</dd></div>)}
@@ -48,7 +49,7 @@ export function ServicesPage() {
 
 export function AiServicesPage() {
   return <Page>
-    <nav aria-label="Breadcrumb" className="mb-8 text-sm font-semibold text-slate-600"><a href="/services" className="hover:text-blue-600">Services</a><span aria-hidden="true"> / </span><span aria-current="page">AI helpers</span></nav>
+    <nav aria-label="Breadcrumb" className="mb-8 text-sm font-semibold text-slate-600"><a href="/services" className="hover:text-blue-600">Services</a><span aria-hidden="true"> / </span><span aria-current="page">AI workflow automation</span></nav>
     <Intro title={AI_SERVICES_COPY.title} description={AI_SERVICES_COPY.description} />
     <section className="mt-20" aria-labelledby="sound-familiar">
       <h2 id="sound-familiar" className={heading}>Sound familiar?</h2>
@@ -68,11 +69,19 @@ export function AiServicesPage() {
     </section>
     <section className="mt-20" aria-labelledby="how-it-works">
       <h2 id="how-it-works" className={heading}>How it works</h2>
-      <ol className="mt-8 grid gap-5 md:grid-cols-3">{['Tell us the problem.', 'We talk it through.', 'You get a clear plan and price before anything starts.'].map((step, index) => <li key={step} className="rounded-3xl bg-slate-900 p-7 text-white"><span aria-hidden="true" className="text-sm font-black text-blue-300">0{index + 1}</span><p className="mt-4 text-xl font-bold leading-8">{step}</p></li>)}</ol>
+      <ol className="mt-8 grid gap-5 md:grid-cols-3">
+        {SERVICE_ENGAGEMENT_STEPS.map((step, index) => (
+          <li key={step.title} className="rounded-3xl bg-slate-900 p-7 text-white">
+            <span aria-hidden="true" className="text-sm font-black text-blue-300">0{index + 1}</span>
+            <h3 className="mt-4 text-xl font-bold">{step.title}</h3>
+            <p className="mt-3 leading-7 text-slate-300">{step.description}</p>
+          </li>
+        ))}
+      </ol>
     </section>
     <section className="mt-20" aria-labelledby="see-example">
       <h2 id="see-example" className={heading}>See it in practice</h2>
-      <article className={`${card} mt-8 max-w-2xl`}><h3 className="text-2xl font-black text-slate-900">LaneWise</h3><p className="mt-3 leading-7 text-slate-600">Freight quote emails become ready-to-review drafts.</p><a href="/work/lanewise" className="mt-6 inline-flex items-center gap-2 font-bold text-blue-600 hover:text-blue-700">See how LaneWise works <ArrowRight aria-hidden="true" size={18} /></a></article>
+      <article className={`${card} mt-8 max-w-2xl`}><h3 className="text-2xl font-black text-slate-900">LaneWise</h3><p className="mt-3 leading-7 text-slate-600">{LANEWISE_DESCRIPTION}</p><a href="/work/lanewise" className="mt-6 inline-flex items-center gap-2 font-bold text-blue-600 hover:text-blue-700">See how LaneWise works <ArrowRight aria-hidden="true" size={18} /></a></article>
     </section>
     <section className="mt-20 max-w-4xl" aria-labelledby="common-questions">
       <h2 id="common-questions" className={heading}>A few common questions</h2>

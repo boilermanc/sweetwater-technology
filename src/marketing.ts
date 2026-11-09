@@ -1,3 +1,7 @@
+import { SERVICE_AREA_COPY, SERVICE_ENGAGEMENT_STEPS, SERVICE_PRICING } from './servicesContent';
+
+export const LANEWISE_DESCRIPTION = 'Turns inbound freight quote requests into drafts that brokers review and decide whether to send.';
+
 export interface ServicePage {
   slug: string;
   title: string;
@@ -36,7 +40,7 @@ export const SERVICES: ServicePage[] = [
     "slug": "custom-web-applications",
     "title": "Custom Web Application Development",
     "shortTitle": "Custom web apps",
-    "description": "Keep jobs, customers and paperwork in one place with software built around your business.",
+    "description": `Bring jobs, customers, and paperwork together with a custom web app. ${SERVICE_AREA_COPY}`,
     "intro": "When spreadsheets and separate tools stop fitting the job, a custom app can bring the important details together. We start with the work your team needs to do.",
     "audience": [
       "Teams copying details between emails and spreadsheets",
@@ -62,27 +66,20 @@ export const SERVICES: ServicePage[] = [
       }
     ],
     "process": [
+      ...SERVICE_ENGAGEMENT_STEPS,
       {
-        "title": "Understand the job",
-        "description": "Show us where time gets lost."
-      },
-      {
-        "title": "Agree the first step",
-        "description": "Choose a useful starting point and a clear price."
-      },
-      {
-        "title": "Try working software",
-        "description": "Review it as we build and tell us what needs changing."
-      },
-      {
-        "title": "Put it to work",
-        "description": "Test the important tasks and help your team get started."
+        "title": "Try it with your team",
+        "description": "Review working software as we build, test important tasks, and help your team get started."
       }
     ],
     "faqs": [
       {
+        "question": "When do I need a custom web app?",
+        "answer": "A website builder is often enough for a marketing site or standard online store. A freelancer can be a good fit for a clearly defined change to an existing site. A custom app makes sense when your tools need to work together around a process unique to your business."
+      },
+      {
         "question": "What does it cost?",
-        "answer": "The first conversation is free. We agree the scope and price before paid work begins."
+        "answer": SERVICE_PRICING
       },
       {
         "question": "Can you improve an app we already use?",
@@ -97,7 +94,7 @@ export const SERVICES: ServicePage[] = [
   {
     "slug": "ai-workflow-automation",
     "title": "AI helpers for everyday work",
-    "shortTitle": "AI helpers",
+    "shortTitle": "AI workflow automation",
     "description": "Prepare replies, organize incoming information and cut repeated typing with practical AI your team can review.",
     "intro": "Start with one repeated task and test whether AI can help.",
     "audience": [
@@ -212,7 +209,7 @@ export const WORK_PROFILES: WorkProfile[] = [
     slug: 'lanewise',
     title: 'LaneWise',
     category: 'Logistics quoting copilot',
-    description: 'LaneWise turns inbound freight spot-quote emails into transparent, review-ready drafts with market-rate context.',
+    description: LANEWISE_DESCRIPTION,
     externalUrl: 'https://lanewise.io',
     image: '/images/optimized/lanewise.webp',
     imageAlt: 'LaneWise logistics quoting application icon',
@@ -231,7 +228,7 @@ export const WORK_PROFILES: WorkProfile[] = [
     slug: 'atl-urban-farms',
     title: 'ATL Urban Farms',
     category: 'Live-plant e-commerce platform',
-    description: 'ATL Urban Farms combines a live-seedling storefront with weekly fulfillment, plant recommendations, shipping coordination, and operational administration.',
+    description: 'Sweetwater Technology built the ATL Urban Farms live-seedling storefront for its own farm business.',
     externalUrl: 'https://atlurbanfarms.com',
     image: '/images/optimized/atl-urban-farms.webp',
     imageAlt: 'Live seedlings grown for ATL Urban Farms customers',
@@ -239,11 +236,11 @@ export const WORK_PROFILES: WorkProfile[] = [
     imageHeight: 922,
     operatingSystem: 'Web',
     applicationCategory: 'ShoppingApplication',
-    overview: 'ATL Urban Farms is a full-stack commerce platform designed around the operational constraints of selling and shipping live seedlings. The product serves home gardeners, schools, and urban farms.',
-    challenge: 'Live plants are perishable inventory. Product availability, weekly growing batches, safe shipping days, customer guidance, and order administration must work together in ways a generic catalog does not model well.',
-    solution: 'Sweetwater Technology built a specialized storefront and administrative system with plant discovery, AI-assisted recommendations, Stripe payments, ShipEngine integration, and fulfillment tools aligned to weekly harvesting and early-week shipping.',
-    capabilities: ['Live-seedling product catalog', 'Weekly batch fulfillment', 'AI-assisted plant recommendations', 'Online payments', 'Shipping tools', 'Tools for managing orders and stock'],
-    stack: ['React', 'TypeScript', 'Supabase', 'Stripe', 'ShipEngine', 'Gemini AI', 'Tailwind CSS'],
+    overview: 'ATL Urban Farms is the online store for live seedlings from Sweetwater’s farm business.',
+    challenge: 'The farm needed a storefront where customers could browse and buy live seedlings online.',
+    solution: 'Sweetwater Technology built a storefront focused on browsing and buying live seedlings.',
+    capabilities: ['Live-seedling product catalog', 'Online shopping'],
+    stack: ['React', 'TypeScript', 'Supabase', 'Stripe', 'Tailwind CSS'],
     relatedServices: ['custom-web-applications', 'ai-workflow-automation'],
   },
 ];
