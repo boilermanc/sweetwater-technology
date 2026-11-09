@@ -234,9 +234,12 @@ export function VisibilityAuditReport({ report, example, emailAction }: {
             Book a free 20-minute call <ArrowUpRight size={17} aria-hidden="true" />
           </a>
         </div>
-        {emailAction && <section className="visibility-email-offer" aria-label="Email a copy">{emailAction}</section>}
       </div>
     </section>
+    {emailAction && <section className="visibility-chapter visibility-email-offer" aria-labelledby="audit-email-title">
+      <h2 id="audit-email-title">Want a copy in your inbox?</h2>
+      {emailAction}
+    </section>}
     <article className="visibility-print-document" aria-label="Printable AI visibility report">
       <header>
         <p className="visibility-print-eyebrow">Sweetwater Technology{example ? ' / Example report' : ''}</p>

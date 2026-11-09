@@ -254,8 +254,9 @@
   .visibility-intro::after, .visibility-beacon, .visibility-report, .visibility-signal.is-scanning span { animation: none; }
 }
 
-.visibility-email-offer { display: grid; gap: .65rem; padding-top: 1rem; border-top: 1px solid #35556c; }
-.visibility-email-offer > p { line-height: 1.55; }
+.visibility-email-offer { display: grid; gap: .65rem; }
+.visibility-email-offer h2 { font-size: clamp(1.2rem, 3vw, 1.65rem); font-weight: 800; }
+.visibility-email-offer > p { max-width: 42rem; line-height: 1.55; }
 .visibility-print:disabled { opacity: .65; cursor: default; }
 
 @media print {

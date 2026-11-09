@@ -175,6 +175,10 @@ try {
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true);
       const emailButton = page.getByRole('button', { name: 'Email me the report' });
       await emailButton.waitFor();
+      const finalSection = page.getByRole('region', { name: 'Want a copy in your inbox?' });
+      assert.equal(await finalSection.getByRole('button', { name: 'Email me the report' }).count(), 1);
+      assert.equal(await finalSection.evaluate((section) => section === section.parentElement.querySelector(':scope > section:last-of-type')), true);
+      assert.match(await finalSection.locator('#audit-email-consent').innerText(), /you agree that Sweetwater Technology can send this report/);
       assert.equal(emailRequests, 0);
       if (width === 1280) {
         assert.equal(await page.locator('#audit-sources li').count(), 1);

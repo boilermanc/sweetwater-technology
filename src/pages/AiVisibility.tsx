@@ -273,9 +273,10 @@ export function AiVisibility() {
           }}>Run another test</button>
         </div>}
         <VisibilityAuditReport report={report ?? sample} example={!report} emailAction={report && emailAvailable && canEmailReport ? <>
-          <p>Want a copy in your inbox? We’ll use the email you entered for this audit.</p>
+          <p id="audit-email-consent">By clicking “Email me the report,” you agree that Sweetwater Technology can send this report to the email address you entered.</p>
           <div className="visibility-next-actions">
             <button type="button" className="visibility-print"
+              aria-describedby="audit-email-consent"
               disabled={emailDelivery === 'sending' || emailDelivery === 'accepted' || emailDelivery === 'expired'}
               onClick={() => void emailReport()}>
               {emailDelivery === 'sending' ? 'Sending…' : emailDelivery === 'accepted' ? 'Email requested' : 'Email me the report'}
