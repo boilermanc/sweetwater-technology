@@ -121,7 +121,7 @@
 .visibility-interpretation p { color: #bccfdf; line-height: 1.65; }
 .visibility-metrics, .visibility-panels { display: grid; gap: .8rem; }
 .visibility-metrics div { display: grid; align-content: start; gap: .4rem; border: 1px solid #35556c; border-radius: .85rem; padding: 1rem; background: #0d2031; }
-.visibility-metrics strong { color: #82e9ee; font: 800 clamp(2.6rem, 7vw, 4rem)/1 ui-monospace, Consolas, monospace; }
+.visibility-metrics strong { font: 800 clamp(2.6rem, 7vw, 4rem)/1 ui-monospace, Consolas, monospace; }
 .visibility-metrics small { color: #b7cddf; font-size: .5em; }
 .visibility-report-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .6rem 1rem; margin-bottom: 1rem; }
 .visibility-report-actions .visibility-example { margin-top: 0; }
@@ -145,11 +145,21 @@
 .visibility-answer-grid caption { padding: .25rem .3rem .6rem; color: #bccfdf; font-size: .88rem; text-align: left; }
 .visibility-answer-grid th { padding: .3rem; font-size: .8rem; overflow-wrap: anywhere; }
 .visibility-answer-grid th:first-child { width: 35%; text-align: left; }
-.visibility-answer-grid td { height: 2rem; border-radius: .3rem; background: #21384a; text-align: center; }
-.visibility-answer-grid td[data-result='Business named'] { background: #235669; }
-.visibility-answer-grid td[data-result='Domain referenced'] { background: #82e9ee; color: #08202a; }
-.visibility-answer-grid td[data-result='Unavailable'] { background: transparent; border: 1px solid #35556c; color: #bccfdf; }
+.visibility-report [data-tone='linked'] { --outcome-ink: #a2f2be; --outcome-fill: #173a2c; --outcome-border: #40835c; }
+.visibility-report [data-tone='named'] { --outcome-ink: #9beaf2; --outcome-fill: #153c49; --outcome-border: #367b8b; }
+.visibility-report [data-tone='missed'] { --outcome-ink: #ffd18d; --outcome-fill: #412b1c; --outcome-border: #a46e38; }
+.visibility-report [data-tone='unavailable'] { --outcome-ink: #bccfdf; --outcome-fill: #141e2b; --outcome-border: #4b5e70; }
+.visibility-report .visibility-outcome { color: var(--outcome-ink); }
+.visibility-answer-grid td, .visibility-grid-key .visibility-outcome, .visibility-answer-status .visibility-outcome {
+  border: 1px solid var(--outcome-border);
+  background: var(--outcome-fill);
+}
+.visibility-answer-grid td { height: 2rem; border-radius: .3rem; text-align: center; font-weight: 800; }
 .visibility-grid-key { display: flex; flex-wrap: wrap; gap: .25rem 1rem; padding: .4rem .3rem; color: #bccfdf; font-size: .78rem; }
+.visibility-grid-key li { display: inline-flex; align-items: center; gap: .35rem; }
+.visibility-grid-key .visibility-outcome { display: inline-grid; place-items: center; width: 1.2rem; height: 1.2rem; border-radius: .25rem; font-weight: 800; }
+.visibility-answer-status { display: flex; flex-wrap: wrap; gap: .4rem; }
+.visibility-answer-status .visibility-outcome { padding: .15rem .5rem; border-radius: .35rem; }
 .visibility-featured-answer { display: grid; gap: .85rem; margin-top: 1rem; padding: clamp(.85rem, 3vw, 1.5rem); border: 1px solid #35556c; border-radius: .85rem; background: #0d2031; }
 .visibility-featured-answer .visibility-answer-question { justify-self: end; max-width: 100%; border-radius: .6rem; padding: .55rem .8rem; background: #1b3549; font-weight: 650; overflow-wrap: anywhere; }
 .visibility-featured-answer blockquote { margin: 0; border-left: 2px solid #82e9ee; padding-left: .8rem; color: #d3e5ef; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
@@ -166,7 +176,7 @@
   border-radius: .95rem;
   background: radial-gradient(ellipse at 100% 0%, #173b50, transparent 65%), #0d2031;
 }
-.visibility-next-question { padding: .85rem 1rem; border-left: 2px solid #82e9ee; border-radius: .25rem; background: #07121f; }
+.visibility-next-question { padding: .85rem 1rem; border-left: 2px solid var(--outcome-border); border-radius: .25rem; background: var(--outcome-fill); }
 .visibility-next-question blockquote { margin: .35rem 0; color: #f1f5f9; font-weight: 700; overflow-wrap: anywhere; }
 .visibility-next-question > p:not(.visibility-kicker) { color: #bccfdf; font-size: .88rem; }
 .visibility-next-actions { display: flex; flex-wrap: wrap; gap: .6rem; }
@@ -261,7 +271,11 @@
   .visibility-summary-stats > div, .visibility-grid-panel, .visibility-featured-answer,
   .visibility-featured-answer .visibility-answer-question, .visibility-source-list li,
   .visibility-next-move, .visibility-next-question { background: white; border-color: #b7c3cd; }
-  .visibility-answer-grid td[data-result] { background: white; color: #172837; border: 1px solid #b7c3cd; }
+  .visibility-report .visibility-outcome { color: #172837; }
+  .visibility-answer-grid td.visibility-outcome, .visibility-grid-key .visibility-outcome, .visibility-answer-status .visibility-outcome {
+    background: white;
+    border-color: #b7c3cd;
+  }
   .visibility-summary-stats > div, .visibility-grid-panel, .visibility-featured-answer { break-inside: avoid; }
   .visibility-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .visibility-metrics div { background: white; border-color: #b7c3cd; }

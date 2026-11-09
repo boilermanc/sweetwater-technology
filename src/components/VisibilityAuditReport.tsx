@@ -20,6 +20,13 @@ const sections = [
   ['plan', 'Your next move', Flag],
 ] as const;
 
+const visibilityStates = {
+  linked: { label: 'Domain referenced', symbol: '↗' },
+  named: { label: 'Business named', symbol: '●' },
+  missed: { label: 'Name and domain absent', symbol: '×' },
+  unavailable: { label: 'Unavailable', symbol: '–' },
+} as const;
+
 function getLinkedSites(answers: AuditAnswer[]) {
   const sites = new Map<string, { answers: number; url: string }>();
   for (const answer of answers) {
@@ -110,7 +117,10 @@ export function VisibilityAuditReport({ report, example }: { report: AuditReport
       <div className="visibility-chapter-copy">
         <p className="visibility-kicker">02 / Visibility</p>
         <h2 id="audit-visibility-title">Where you showed up.</h2>
-        <p><strong>{named} of {answers.length}</strong> answers named your business. <strong>{referenced}</strong> included your domain.</p>
+        {answers.length ? <p>
+          <strong className="visibility-outcome" data-tone={named ? 'named' : 'missed'}>{named} of {answers.length}</strong> answers named your business.{' '}
+          <strong className="visibility-outcome" data-tone={referenced ? 'linked' : 'missed'}>{referenced}</strong> included your domain.
+        </p> : <p>There were no model answers to compare.</p>}
       </div>
       {questions.length > 0 && <div className="visibility-grid-panel">
         <table className="visibility-answer-grid">
@@ -120,26 +130,34 @@ export function VisibilityAuditReport({ report, example }: { report: AuditReport
           <tbody>{engines.map(({ name, answers }) => <tr key={name}><th scope="row">{name}</th>
             {questions.map((question) => {
               const answer = answers.find((item) => item.question === question);
-              const state = !answer ? 'Unavailable' : answer.domainReferenced ? 'Domain referenced' : answer.mentioned ? 'Business named' : 'Neither';
-              return <td key={question} data-result={state}>
-                <span aria-hidden="true">{state === 'Domain referenced' ? '↗' : state === 'Business named' ? '●' : state === 'Neither' ? '·' : '–'}</span>
-                <span className="sr-only">{state}</span>
+              const tone = !answer ? 'unavailable' : answer.domainReferenced ? 'linked' : answer.mentioned ? 'named' : 'missed';
+              const { label, symbol } = visibilityStates[tone];
+              return <td key={question} className="visibility-outcome" data-tone={tone}>
+                <span aria-hidden="true">{symbol}</span>
+                <span className="sr-only">{label}</span>
               </td>;
             })}</tr>)}</tbody>
         </table>
         <ul className="visibility-grid-key" aria-label="Visibility grid key">
-          <li>↗ Domain referenced</li><li>● Business named</li><li>· Neither</li><li>– Unavailable</li>
+          {Object.entries(visibilityStates).map(([tone, { label, symbol }]) => <li key={tone}>
+            <span className="visibility-outcome" data-tone={tone} aria-hidden="true">{symbol}</span>
+            {label}
+          </li>)}
         </ul>
       </div>}
       <div className="visibility-metrics mt-5">
-        {engines.map(({ name, model, answers }) => <div key={name}>
-          <h3 className="font-bold">{name}</h3>
-          <p className="break-words text-sm text-slate-300">{model}</p>
-          {answers.length ? <>
-            <p><strong>{answers.filter(({ mentioned }) => mentioned).length}<small>/{answers.length}</small></strong> named your business</p>
-            <p><strong>{answers.filter(({ domainReferenced }) => domainReferenced).length}<small>/{answers.length}</small></strong> referenced your domain</p>
-          </> : <p>Results unavailable for this run.</p>}
-        </div>)}
+        {engines.map(({ name, model, answers }) => {
+          const modelNamed = answers.filter(({ mentioned }) => mentioned).length;
+          const modelReferenced = answers.filter(({ domainReferenced }) => domainReferenced).length;
+          return <div key={name}>
+            <h3 className="font-bold">{name}</h3>
+            <p className="break-words text-sm text-slate-300">{model}</p>
+            {answers.length ? <>
+              <p><strong className="visibility-outcome" data-tone={modelNamed ? 'named' : 'missed'}>{modelNamed}<small>/{answers.length}</small></strong> named your business</p>
+              <p><strong className="visibility-outcome" data-tone={modelReferenced ? 'linked' : 'missed'}>{modelReferenced}<small>/{answers.length}</small></strong> referenced your domain</p>
+            </> : <p>Results unavailable for this run.</p>}
+          </div>;
+        })}
       </div>
       <div className="visibility-interpretation mt-5">
         <h3>How to read your results</h3>
@@ -163,7 +181,10 @@ export function VisibilityAuditReport({ report, example }: { report: AuditReport
         {answers.map((answer, index) => <details className="visibility-detail" key={answer.question} open={index === 0 ? true : undefined}>
           <summary><span className="visibility-kicker">0{index + 1}</span> {answer.question}</summary>
           <div className="px-4 pb-5 sm:px-6">
-            <p className="mb-3 text-sm font-semibold text-cyan-200">{answer.mentioned ? 'Business named' : 'Business name absent'} · {answer.domainReferenced ? 'Domain referenced' : 'Domain reference absent'}</p>
+            <p className="visibility-answer-status mb-3 text-sm font-semibold">
+              <span className="visibility-outcome" data-tone={answer.mentioned ? 'named' : 'missed'}>{answer.mentioned ? 'Business named' : 'Business name absent'}</span>
+              <span className="visibility-outcome" data-tone={answer.domainReferenced ? 'linked' : 'missed'}>{answer.domainReferenced ? 'Domain referenced' : 'Domain reference absent'}</span>
+            </p>
             <p className="whitespace-pre-wrap break-words text-sm leading-7 text-slate-200">{answer.text}</p>
           </div>
         </details>)}
@@ -195,8 +216,8 @@ export function VisibilityAuditReport({ report, example }: { report: AuditReport
               ? 'Compare how the models describe your business with the language on your website. Start with the question below.'
               : 'Open a new audit when the models are available to see which buyer questions to focus on.'}</p>
         </div>
-        {nextQuestion && <div className="visibility-next-question">
-          <p className="visibility-kicker">Start with this question</p>
+        {nextQuestion && <div className="visibility-next-question" data-tone={missedQuestion ? 'missed' : 'named'}>
+          <p className="visibility-kicker visibility-outcome">{missedQuestion ? 'Visibility gap / Start here' : 'Start with this question'}</p>
           <blockquote>{nextQuestion}</blockquote>
           <p>{questionMentions} of {questionAnswers.length} answers named your business.</p>
         </div>}
