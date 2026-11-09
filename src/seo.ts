@@ -42,10 +42,6 @@ const organization = {
     addressRegion: 'GA',
     addressCountry: 'US',
   },
-  areaServed: {
-    '@type': 'State',
-    name: 'Georgia',
-  },
   telephone: '+1-678-521-1798',
   email: 'team@sweetwater.technology',
   knowsAbout: [
@@ -301,7 +297,6 @@ export const getPageSeo = (requestedPath: string): PageSeo => {
             description: copy.description,
             url: canonical,
             provider: { '@id': `${SITE_URL}/#organization` },
-            areaServed: { '@type': 'Country', name: 'United States' },
           },
           {
             '@context': 'https://schema.org',

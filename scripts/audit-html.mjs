@@ -19,7 +19,7 @@ const plainText = (html) => html
 const requiredCopy = new Map([
   ['/', 'Find better ways to use'],
   ['/services/custom-web-applications', 'Custom Web Application Development'],
-  ['/services/ai-workflow-automation', 'AI does the busywork. You make the calls.'],
+  ['/services/ai-workflow-automation', 'AI consulting and workflow automation for small businesses'],
   ['/services/mobile-app-development', 'Mobile App Development'],
   ['/ai-visibility-checker', 'Does AI bring up'],
 ]);
