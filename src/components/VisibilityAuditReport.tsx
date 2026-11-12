@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { ArrowUpRight, BarChart3, FileText, Flag, Link2, MessageSquare, Printer } from 'lucide-react';
+import { VisibilityEngineScreens } from './VisibilityEngineScreens';
 
 export type AuditAnswer = {
   question: string;
@@ -8,7 +9,7 @@ export type AuditAnswer = {
   domainReferenced: boolean;
 };
 
-type Engine = { name: string; model: string; answers: AuditAnswer[] };
+export type Engine = { name: string; model: string; answers: AuditAnswer[]; pending?: boolean };
 export type AuditReport = { business: string; domain: string; generatedAt?: string } &
   ({ engines: Engine[] } | { model: string; answers: AuditAnswer[] });
 
@@ -25,6 +26,7 @@ const visibilityStates = {
   named: { label: 'Business named', symbol: '●' },
   missed: { label: 'Name and domain absent', symbol: '×' },
   unavailable: { label: 'Unavailable', symbol: '–' },
+  pending: { label: 'Still searching', symbol: '…' },
 } as const;
 
 function getLinkedSites(answers: AuditAnswer[]) {
@@ -77,8 +79,6 @@ export function VisibilityAuditReport({ report, example, emailAction }: {
   const referenced = answers.filter(({ domainReferenced }) => domainReferenced).length;
   const words = answers.reduce((total, { text }) => total + (text.match(/\S+/g)?.length ?? 0), 0);
   const sites = getLinkedSites(answers);
-  const exampleEngine = completed.find((engine) => engine.answers.some(({ mentioned }) => mentioned)) ?? completed[0];
-  const exampleAnswer = exampleEngine?.answers.find(({ mentioned }) => mentioned) ?? exampleEngine?.answers[0];
   const missedQuestion = answers.find(({ mentioned }) => !mentioned)?.question;
   const nextQuestion = missedQuestion ?? questions[0];
   const questionAnswers = answers.filter(({ question }) => question === nextQuestion);
@@ -95,7 +95,9 @@ export function VisibilityAuditReport({ report, example, emailAction }: {
 
   return <div ref={reportBody}>
     <div className="visibility-report-header">
-      <p className="visibility-kicker">{example ? 'Example report / Fictional data' : 'Audit complete / AI model snapshot'}</p>
+      <p className="visibility-kicker">{example ? 'Example report / Fictional data'
+        : engines.some((engine) => engine.pending) ? 'Core results ready / Manus searching'
+        : 'Audit complete / AI model snapshot'}</p>
       <button type="button" className="visibility-print" onClick={() => window.print()}>
         <Printer size={17} aria-hidden="true" /> Print or save as PDF
       </button>
@@ -135,10 +137,10 @@ export function VisibilityAuditReport({ report, example, emailAction }: {
           <caption>Visibility by model and buyer question</caption>
           <thead><tr><th scope="col">Model</th>{questions.map((question, index) =>
             <th scope="col" key={question}><span aria-hidden="true">Q{index + 1}</span><span className="sr-only">{question}</span></th>)}</tr></thead>
-          <tbody>{engines.map(({ name, answers }) => <tr key={name}><th scope="row">{name}</th>
+          <tbody>{engines.map(({ name, answers, pending }) => <tr key={name}><th scope="row">{name}</th>
             {questions.map((question) => {
               const answer = answers.find((item) => item.question === question);
-              const tone = !answer ? 'unavailable' : answer.domainReferenced ? 'linked' : answer.mentioned ? 'named' : 'missed';
+              const tone = !answer ? pending ? 'pending' : 'unavailable' : answer.domainReferenced ? 'linked' : answer.mentioned ? 'named' : 'missed';
               const { label, symbol } = visibilityStates[tone];
               return <td key={question} className="visibility-outcome" data-tone={tone}>
                 <span aria-hidden="true">{symbol}</span>
@@ -147,21 +149,21 @@ export function VisibilityAuditReport({ report, example, emailAction }: {
             })}</tr>)}</tbody>
         </table>
         <ul className="visibility-grid-key" aria-label="Visibility grid key">
-          {Object.entries(visibilityStates).map(([tone, { label, symbol }]) => <li key={tone}>
+          {Object.entries(visibilityStates).filter(([tone]) => tone !== 'pending' || engines.some((engine) => engine.pending)).map(([tone, { label, symbol }]) => <li key={tone}>
             <span className="visibility-outcome" data-tone={tone} aria-hidden="true">{symbol}</span>
             {label}
           </li>)}
         </ul>
       </div>}
       <div className="visibility-metrics mt-5">
-        {modelResults.map(({ name, model, answers, named: modelNamed, referenced: modelReferenced }) =>
+        {modelResults.map(({ name, model, answers, pending, named: modelNamed, referenced: modelReferenced }) =>
           <div key={name}>
             <h3 className="font-bold">{name}</h3>
             <p className="break-words text-sm text-slate-300">{model}</p>
             {answers.length ? <>
               <p><strong className="visibility-outcome" data-tone={modelNamed ? 'named' : 'missed'}>{modelNamed}<small>/{answers.length}</small></strong> named your business</p>
               <p><strong className="visibility-outcome" data-tone={modelReferenced ? 'linked' : 'missed'}>{modelReferenced}<small>/{answers.length}</small></strong> referenced your domain</p>
-            </> : <p>Results unavailable for this run.</p>}
+            </> : <p>{pending ? 'Still searching. This result will update automatically.' : 'Results unavailable for this run.'}</p>}
           </div>)}
       </div>
       <div className="visibility-interpretation mt-5">
@@ -176,24 +178,7 @@ export function VisibilityAuditReport({ report, example, emailAction }: {
         <p className="visibility-kicker">03 / Model answers</p>
         <h2 id="audit-answers-title">Read what the models said.</h2>
       </div>
-      {exampleEngine && exampleAnswer && <div className="visibility-featured-answer">
-        <p className="visibility-kicker"><MessageSquare size={16} aria-hidden="true" /> {example ? 'Example answer' : 'One answer from this run'} · {exampleEngine.name}</p>
-        <p className="visibility-answer-question">{exampleAnswer.question}</p>
-        <blockquote>{exampleAnswer.text}</blockquote>
-      </div>}
-      {completed.map(({ name, answers }) => <div className="mt-6 space-y-3" key={name}>
-        <h3 className="text-lg font-bold">{name} answers</h3>
-        {answers.map((answer, index) => <details className="visibility-detail" key={answer.question} open={index === 0 ? true : undefined}>
-          <summary><span className="visibility-kicker">0{index + 1}</span> {answer.question}</summary>
-          <div className="px-4 pb-5 sm:px-6">
-            <p className="visibility-answer-status mb-3 text-sm font-semibold">
-              <span className="visibility-outcome" data-tone={answer.mentioned ? 'named' : 'missed'}>{answer.mentioned ? 'Business named' : 'Business name absent'}</span>
-              <span className="visibility-outcome" data-tone={answer.domainReferenced ? 'linked' : 'missed'}>{answer.domainReferenced ? 'Domain referenced' : 'Domain reference absent'}</span>
-            </p>
-            <p className="whitespace-pre-wrap break-words text-sm leading-7 text-slate-200">{answer.text}</p>
-          </div>
-        </details>)}
-      </div>)}
+      <VisibilityEngineScreens engines={engines} business={report.business} />
     </section>
 
     <section id="audit-sources" className="visibility-chapter" aria-labelledby="audit-sources-title">
@@ -258,10 +243,10 @@ export function VisibilityAuditReport({ report, example, emailAction }: {
         <h2>Results by model</h2>
         <table>
           <thead><tr><th scope="col">Model</th><th scope="col">Named your business</th><th scope="col">Referenced your domain</th></tr></thead>
-          <tbody>{modelResults.map(({ name, answers, named, referenced }) => <tr key={name}>
+          <tbody>{modelResults.map(({ name, answers, pending, named, referenced }) => <tr key={name}>
             <th scope="row">{name}</th>
             {answers.length ? <><td>{named} / {answers.length}</td><td>{referenced} / {answers.length}</td></>
-              : <td colSpan={2}>Results unavailable</td>}
+              : <td colSpan={2}>{pending ? 'Search in progress' : 'Results unavailable'}</td>}
           </tr>)}</tbody>
         </table>
       </section>

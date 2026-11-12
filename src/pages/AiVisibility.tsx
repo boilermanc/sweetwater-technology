@@ -53,7 +53,7 @@ export function AiVisibility() {
   const [error, setError] = useState('');
   const [report, setReport] = useState<AuditReport>();
   const [canEmailReport, setCanEmailReport] = useState(false);
-  const [emailDelivery, setEmailDelivery] = useState<'sending' | 'accepted' | 'unavailable' | 'expired'>();
+  const [emailDelivery, setEmailDelivery] = useState<'sending' | 'pending' | 'accepted' | 'unavailable' | 'expired'>();
   const [showSample, setShowSample] = useState(false);
   const [recoverable, setRecoverable] = useState(false);
   const running = useRef(false);
@@ -64,6 +64,8 @@ export function AiVisibility() {
   const receipt = useRef('');
   const [ownerAudit, setOwnerAudit] = useState(false);
   const busy = phase === 'checking' || phase === 'running';
+  const searchPending = Boolean(report && 'engines' in report && report.engines.some((engine) => engine.pending));
+  const reportGeneratedAt = report?.generatedAt;
   const receiveToken = useCallback((value: string) => {
     setToken(value);
     setVerification('loading');
@@ -84,6 +86,44 @@ export function AiVisibility() {
   useEffect(() => {
     if (error) errorNotice.current?.focus();
   }, [error]);
+
+  useEffect(() => {
+    if (!searchPending || !endpoint) return;
+    const controller = new AbortController();
+    const expiry = (Date.parse(reportGeneratedAt ?? '') || Date.now()) + 125000;
+    let timer: number;
+    async function refreshSearch() {
+      try {
+        const response = await fetch(endpoint!, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ operation: 'recover', receipt: receipt.current }),
+          signal: AbortSignal.any([controller.signal, AbortSignal.timeout(10000)]),
+        });
+        const body = await response.json();
+        if (controller.signal.aborted) return;
+        if (response.ok && body.report && !body.report.engines?.some((engine: { pending?: boolean }) => engine.pending)) {
+          setReport(body.report);
+          setCanEmailReport(body.emailAvailable === true);
+          return;
+        }
+      } catch {
+        if (controller.signal.aborted) return;
+      }
+      if (Date.now() >= expiry) {
+        setReport((current) => current && 'engines' in current
+          ? { ...current, engines: current.engines.map((engine) => ({ ...engine, pending: false })) }
+          : current);
+        return;
+      }
+      timer = window.setTimeout(() => void refreshSearch(), 4000);
+    }
+    timer = window.setTimeout(() => void refreshSearch(), 4000);
+    return () => {
+      controller.abort();
+      window.clearTimeout(timer);
+    };
+  }, [searchPending, reportGeneratedAt]);
 
   async function runAudit(payload: Record<string, unknown>) {
     if (!endpoint || running.current) return;
@@ -176,6 +216,10 @@ export function AiVisibility() {
         return;
       }
       const body = await response.json();
+      if (body.emailDelivery === 'pending') {
+        setEmailDelivery('pending');
+        return;
+      }
       setEmailDelivery(response.ok && body.emailDelivery === 'accepted' ? 'accepted' : 'unavailable');
     } catch {
       if (!controller.signal.aborted) setEmailDelivery('unavailable');
@@ -263,6 +307,7 @@ export function AiVisibility() {
         </ol>}
       </section>}
       {(report || showSample) && <section className="visibility-report" tabIndex={-1} ref={resultPanel} aria-label="Visibility report">
+        {searchPending && <p className="visibility-search-notice" role="status">Your core results are ready. Manus is still searching and will appear on the last engine screen.</p>}
         {report && ownerAudit && <div className="visibility-report-actions">
           <button type="button" className="visibility-example" disabled={emailDelivery === 'sending'} onClick={() => {
             setReport(undefined);
@@ -277,12 +322,14 @@ export function AiVisibility() {
           <div className="visibility-next-actions">
             <button type="button" className="visibility-print"
               aria-describedby="audit-email-consent"
-              disabled={emailDelivery === 'sending' || emailDelivery === 'accepted' || emailDelivery === 'expired'}
+              disabled={searchPending || emailDelivery === 'sending' || emailDelivery === 'accepted' || emailDelivery === 'expired'}
               onClick={() => void emailReport()}>
               {emailDelivery === 'sending' ? 'Sending…' : emailDelivery === 'accepted' ? 'Email requested' : 'Email me the report'}
             </button>
           </div>
           <p role="status" className="text-sm text-cyan-200">
+            {searchPending && 'Manus is finishing its search. Email delivery becomes available when the full report is ready.'}
+            {!searchPending && emailDelivery === 'pending' && 'The full report is ready. You can now request your email copy.'}
             {emailDelivery === 'accepted' && 'Your email copy is on its way.'}
             {emailDelivery === 'unavailable' && 'We couldn’t confirm delivery. Try again or save the report as a PDF.'}
             {emailDelivery === 'expired' && 'The email request has expired. You can still save the report as a PDF.'}
