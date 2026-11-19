@@ -281,6 +281,7 @@ test('document evidence accepts known extensions with an empty browser MIME type
     revision: view.revision,
   })
   assert.equal(unsupported.status, 400)
+  assert.equal(unsupported.data.error, 'Choose a PDF or plain text (.txt) document.')
 })
 
 test('Trellis adapter pins the host, scopes updates by client and revision, and seeds only on request', async () => {

@@ -79,10 +79,10 @@ function saveEvidence(study: Study, body: Record<string, unknown>) {
     bad('Choose a valid evidence date.')
   if (kind === 'Document' || kind === 'Photo') {
     item.fileName = field(body, 'fileName', true, 180)
-    const mime = choice(
-      body.mime === '' ? attachmentTypes[extname(item.fileName).toLowerCase()] : body.mime,
-      kind === 'Photo' ? ['image/png', 'image/jpeg'] : ['application/pdf', 'text/plain'],
-    )
+    const mime = body.mime === '' ? attachmentTypes[extname(item.fileName).toLowerCase()] : body.mime
+    const allowed = kind === 'Photo' ? ['image/png', 'image/jpeg'] : ['application/pdf', 'text/plain']
+    if (typeof mime !== 'string' || !allowed.includes(mime))
+      bad(kind === 'Photo' ? 'Choose a JPEG or PNG photo.' : 'Choose a PDF or plain text (.txt) document.')
     const bytes = field(body, 'bytes', true, 1400000)
     const decoded = Buffer.from(bytes, 'base64')
     if (decoded.length > 1024 * 1024 || decoded.toString('base64') !== bytes) bad('Choose a file up to 1 MB.')
