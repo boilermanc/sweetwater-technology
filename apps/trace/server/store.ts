@@ -1,4 +1,5 @@
-import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
+import { readFile, rename, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { createClient } from '@supabase/supabase-js'
 import type { ClientData } from '../model.ts'
@@ -14,26 +15,31 @@ export function conflict(): never {
   throw new RequestError(409, 'Another edit was saved. Reload this study before saving again.')
 }
 
-// Only one local server owns this fixture store. Synchronous compare-and-rename keeps competing requests atomic.
+// One server owns the offline store. Queue the entire compare-and-replace operation.
 export function fileStore(directory: string): Store {
   mkdirSync(directory, { recursive: true })
   const path = join(directory, 'fictional-studies.json')
   if (!existsSync(path)) writeFileSync(path, JSON.stringify(fixtures()), { flag: 'wx', mode: 0o600 })
-  const read = () => JSON.parse(readFileSync(path, 'utf8')) as ClientData[]
+  const read = async () => JSON.parse(await readFile(path, 'utf8')) as ClientData[]
+  let pendingWrite = Promise.resolve()
   return {
     async listIds() {
-      return read().map((row) => row.client.id)
+      return (await read()).map((row) => row.client.id)
     },
     async read(id) {
-      return read().find((row) => row.client.id === id)
+      return (await read()).find((row) => row.client.id === id)
     },
-    async save(data, expected) {
-      const rows = read()
-      const index = rows.findIndex((row) => row.client.id === data.client.id)
-      if (rows[index]?.revision !== expected) conflict()
-      rows[index] = { ...data, revision: expected + 1 }
-      writeFileSync(path + '.new', JSON.stringify(rows), { mode: 0o600 })
-      renameSync(path + '.new', path)
+    save(data, expected) {
+      const write = pendingWrite.then(async () => {
+        const rows = await read()
+        const index = rows.findIndex((row) => row.client.id === data.client.id)
+        if (rows[index]?.revision !== expected) conflict()
+        rows[index] = { ...data, revision: expected + 1 }
+        await writeFile(path + '.new', JSON.stringify(rows), { mode: 0o600 })
+        await rename(path + '.new', path)
+      })
+      pendingWrite = write.catch(() => {})
+      return write
     },
   }
 }

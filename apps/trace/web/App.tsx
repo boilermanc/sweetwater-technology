@@ -34,6 +34,7 @@ export function App() {
   const [loadError, setLoadError] = useState('')
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [saving, setSaving] = useState(false)
   const [review, setReview] = useState<{ access: string; reviewer: string }>()
   const busy = useRef(false)
   const staff = workspace?.session.role === 'facilitator'
@@ -60,8 +61,13 @@ export function App() {
     }
   }, [])
   const save: Save = async (action, fields) => {
-    if (!view || busy.current) return false
+    if (!view) return false
+    if (busy.current) {
+      setError('A save is in progress. Try your last change again when it finishes.')
+      return false
+    }
     busy.current = true
+    setSaving(true)
     setError('')
     setNotice('')
     try {
@@ -77,6 +83,7 @@ export function App() {
       return false
     } finally {
       busy.current = false
+      setSaving(false)
     }
   }
   const props = view ? { view, staff, save } : undefined
@@ -190,14 +197,21 @@ export function App() {
               </p>
             )}
             <div className="save-status" aria-live="polite">
-              {notice}
+              {saving ? 'Saving…' : notice}
             </div>
-            {tab === 'setup' && (
-              <StudySetup workspace={workspace} data={view.study} client={clientId} save={save} />
-            )}
-            {tab === 'evidence' && <EvidenceScreen {...props} />}
-            {tab === 'map' && <ProcessMap {...props} />}
-            {tab === 'plan' && <PlanScreen {...props} />}
+            <fieldset
+              className="study-controls"
+              disabled={saving}
+              aria-busy={saving}
+              aria-label="Study workspace"
+            >
+              {tab === 'setup' && (
+                <StudySetup workspace={workspace} data={view.study} client={clientId} save={save} />
+              )}
+              {tab === 'evidence' && <EvidenceScreen {...props} />}
+              {tab === 'map' && <ProcessMap {...props} />}
+              {tab === 'plan' && <PlanScreen {...props} />}
+            </fieldset>
             <a className="back" href="/studies">
               <ArrowLeft size={15} /> All studies
             </a>

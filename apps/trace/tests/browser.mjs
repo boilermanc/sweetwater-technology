@@ -18,6 +18,24 @@ await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve))
 const origin = 'http://127.0.0.1:' + server.address().port
 let browser
 const errors = []
+async function checkPendingSave(page, action, button, controls) {
+  const hold = Promise.withResolvers()
+  await page.route(
+    '**/actions/' + action,
+    async (route) => {
+      await hold.promise
+      await route.continue()
+    },
+    { times: 1 },
+  )
+  try {
+    await button.click()
+    await page.getByText('Saving…', { exact: true }).waitFor()
+    for (const control of controls) assert.ok(await control.isDisabled())
+  } finally {
+    hold.resolve()
+  }
+}
 try {
   browser = await chromium.launch({ headless: true })
   const context = await browser.newContext({ viewport: { width: 1280, height: 850 } })
@@ -65,14 +83,20 @@ try {
     await page.getByLabel('Title', { exact: true }).fill('Field note')
     await page.getByLabel('Source person').fill('Fictional owner')
     await page.getByLabel('Notes', { exact: true }).fill('The owner reads a request.')
-    await page.getByRole('button', { name: 'Save evidence' }).click()
+    await checkPendingSave(page, 'evidence', page.getByRole('button', { name: 'Save evidence' }), [
+      page.getByRole('button', { name: 'Cancel' }),
+      page.getByLabel('Notes', { exact: true }),
+    ])
     await page.getByRole('button', { name: /Field note/ }).click()
     await page.getByText('The owner reads a request.', { exact: true }).waitFor()
     await page.getByRole('link', { name: 'Process map', exact: true }).click()
     await page.getByRole('button', { name: 'Add step', exact: true }).click()
     await page.getByLabel('Step name').fill('Read request')
     await page.getByLabel('Field note', { exact: true }).check()
-    await page.getByRole('button', { name: 'Save step' }).click()
+    await checkPendingSave(page, 'step', page.getByRole('button', { name: 'Save step' }), [
+      page.getByRole('button', { name: 'Proposed', exact: true }),
+      page.getByRole('button', { name: 'Cancel' }),
+    ])
     await page.getByRole('button', { name: /Read request/ }).click()
     await page.locator('.citation').getByText('Field note').waitFor()
     await page.getByRole('button', { name: 'Proposed', exact: true }).click()
@@ -98,7 +122,10 @@ try {
     await reviewer.getByRole('link', { name: 'Plan', exact: true }).click()
     assert.equal(await reviewer.getByRole('link', { name: 'Evidence', exact: true }).count(), 0)
     await reviewer.getByLabel('Your comment').fill('Matches our process.')
-    await reviewer.getByRole('button', { name: 'Post comment' }).click()
+    await checkPendingSave(reviewer, 'comment', reviewer.getByRole('button', { name: 'Post comment' }), [
+      reviewer.getByLabel('Your comment'),
+      reviewer.getByRole('button', { name: 'Post comment' }),
+    ])
     await reviewer.getByText('Matches our process.', { exact: true }).waitFor()
     await reviewer.getByRole('button', { name: 'Approve version 2' }).click()
     await reviewer.getByText('Approved', { exact: true }).waitFor()

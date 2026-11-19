@@ -1,6 +1,16 @@
 import { evidenceTypes, modes, planFields, setupFields, sources, statuses } from '../model.ts'
 import type { ClientData, Evidence, Session, Setup, Step, Study } from '../model.ts'
 import { blankStudy, copyMap, newId } from './fixtures.ts'
+import { extname } from 'node:path'
+
+const textLimit = 5000
+const attachmentTypes: Record<string, string> = {
+  '.pdf': 'application/pdf',
+  '.txt': 'text/plain',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+}
 
 export class RequestError extends Error {
   status: number
@@ -27,7 +37,7 @@ function sanitizePII(text: string) {
     .replace(/\b[A-Za-z0-9_-]{32,}\b/g, '[REDACTED_TOKEN]')
     .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, '[REDACTED_EMAIL]')
 }
-function field(body: Record<string, unknown>, key: string, required = false, max = 5000): string {
+function field(body: Record<string, unknown>, key: string, required = false, max = textLimit): string {
   const value = body[key]
   if (typeof value !== 'string' || value.length > max || (required && !value.trim()))
     bad('Check the ' + key + ' field.')
@@ -68,14 +78,14 @@ function saveEvidence(study: Study, body: Record<string, unknown>) {
   )
     bad('Choose a valid evidence date.')
   if (kind === 'Document' || kind === 'Photo') {
+    item.fileName = field(body, 'fileName', true, 180)
     const mime = choice(
-      body.mime,
+      body.mime === '' ? attachmentTypes[extname(item.fileName).toLowerCase()] : body.mime,
       kind === 'Photo' ? ['image/png', 'image/jpeg'] : ['application/pdf', 'text/plain'],
     )
     const bytes = field(body, 'bytes', true, 1400000)
     const decoded = Buffer.from(bytes, 'base64')
     if (decoded.length > 1024 * 1024 || decoded.toString('base64') !== bytes) bad('Choose a file up to 1 MB.')
-    item.fileName = field(body, 'fileName', true, 180)
     item.mime = mime
     item.bytes = bytes
   }
@@ -192,12 +202,23 @@ export function changeStudy(study: Study, session: Session, action: string, inpu
         .slice(0, index)
         .findLast((s) => s.branchFrom === step.branchFrom && s.condition === step.condition)
       if (!previous) bad('There is no earlier step on this path to merge into.')
-      previous.description = [previous.description, step.name + ' (' + step.source + '). ' + step.description]
+      const description = [previous.description, step.name + ' (' + step.source + '). ' + step.description]
         .filter(Boolean)
         .join('\n')
+      const why =
+        kind === 'proposed'
+          ? previous.why + '\n' + step.name + ' (' + step.mode + '). ' + step.why
+          : previous.why
+      if (description.length > textLimit || why.length > textLimit)
+        bad(
+          'Shorten the descriptions or rationales before merging these steps. Each merged field can contain up to ' +
+            textLimit +
+            ' characters.',
+        )
+      previous.description = description
+      previous.why = why
       previous.evidenceIds = [...new Set([...previous.evidenceIds, ...step.evidenceIds])]
       previous.uncertain ||= step.uncertain
-      if (kind === 'proposed') previous.why += '\n' + step.name + ' (' + step.mode + '). ' + step.why
       steps.forEach((s) => {
         if (s.branchFrom === step.id) s.branchFrom = previous.id
       })

@@ -219,6 +219,70 @@ test('map validation, edits, evidence deletion and concurrent updates preserve i
   )
 })
 
+test('merge preserves both steps when the combined description or rationale would exceed the edit limit', async (t) => {
+  const { call, work, studyPath, facilitator } = await demo(t)
+  const url = studyPath(work.studies[0])
+  let view = (await call(url)).data
+  for (const key of ['description', 'why']) {
+    for (const step of view.study.proposed.steps.slice(0, 2)) {
+      const data = {
+        ...step,
+        description: 'Short description',
+        why: 'Short rationale',
+        [key]: 'A handoff. '.repeat(300),
+      }
+      const edited = await call(url + '/actions/step', facilitator, {
+        ...data,
+        revision: view.revision,
+        map: 'proposed',
+      })
+      assert.equal(edited.status, 200)
+      view = edited.data
+    }
+    const merged = await call(url + '/actions/merge', facilitator, {
+      map: 'proposed',
+      revision: view.revision,
+      id: view.study.proposed.steps[1].id,
+    })
+    assert.equal(merged.status, 400)
+    assert.deepEqual((await call(url)).data, view)
+  }
+})
+
+test('document evidence accepts known extensions with an empty browser MIME type', async (t) => {
+  const { call, work, studyPath, facilitator } = await demo(t)
+  const url = studyPath(work.studies[0])
+  let view = (await call(url)).data
+  const file = {
+    kind: 'Document',
+    title: 'Checklist',
+    text: '',
+    person: 'Owner',
+    date: '2026-11-19',
+    mime: '',
+    bytes: Buffer.from('fictional').toString('base64'),
+  }
+  for (const [fileName, mime] of [
+    ['checklist.TXT', 'text/plain'],
+    ['checklist.PDF', 'application/pdf'],
+  ]) {
+    const added = await call(url + '/actions/evidence', facilitator, {
+      ...file,
+      fileName,
+      revision: view.revision,
+    })
+    assert.equal(added.status, 200)
+    view = added.data
+    assert.equal(view.study.evidence.at(-1).mime, mime)
+  }
+  const unsupported = await call(url + '/actions/evidence', facilitator, {
+    ...file,
+    fileName: 'checklist.bin',
+    revision: view.revision,
+  })
+  assert.equal(unsupported.status, 400)
+})
+
 test('Trellis adapter pins the host, scopes updates by client and revision, and seeds only on request', async () => {
   assert.throws(() => trellisStore(''), /server-only/)
   const rows = new Map()

@@ -53,52 +53,59 @@ export function EvidenceScreen({ view, save }: ScreenProps) {
       {adding && (
         <form onSubmit={add} className="inset">
           <h3>Add evidence</h3>
-          <div className="fields">
-            <label>
-              Type
-              <select value={kind} onChange={(e) => setKind(e.target.value as EvidenceType)}>
-                {evidenceTypes.map((k) => (
-                  <option key={k}>{k}</option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Date
-              <input required type="date" name="date" defaultValue={new Date().toLocaleDateString('en-CA')} />
-            </label>
-            <label>
-              Title
-              <input required name="title" maxLength={200} />
-            </label>
-            <label>
-              Source person
-              <input required name="person" maxLength={150} />
-            </label>
-            <label className="wide">
-              Notes
-              <textarea required={!attached} name="text" maxLength={5000} />
-            </label>
-            {attached && (
-              <label className="wide">
-                Cleaned fictional file (up to 1 MB)
+          <fieldset className="study-controls" disabled={pending} aria-label="Evidence draft">
+            <div className="fields">
+              <label>
+                Type
+                <select value={kind} onChange={(e) => setKind(e.target.value as EvidenceType)}>
+                  {evidenceTypes.map((k) => (
+                    <option key={k}>{k}</option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Date
                 <input
                   required
-                  key={kind}
-                  type="file"
-                  name="attachment"
-                  accept={kind === 'Photo' ? 'image/jpeg,image/png' : '.pdf,.txt'}
+                  type="date"
+                  name="date"
+                  defaultValue={new Date().toLocaleDateString('en-CA')}
                 />
               </label>
-            )}
-          </div>
-          <div className="actions">
-            <button className="primary" disabled={pending}>
-              Save evidence
-            </button>
-            <button type="button" onClick={() => setAdding(false)}>
-              Cancel
-            </button>
-          </div>
+              <label>
+                Title
+                <input required name="title" maxLength={200} />
+              </label>
+              <label>
+                Source person
+                <input required name="person" maxLength={150} />
+              </label>
+              <label className="wide">
+                Notes
+                <textarea required={!attached} name="text" maxLength={5000} />
+              </label>
+              {attached && (
+                <label className="wide">
+                  Cleaned fictional file (up to 1 MB)
+                  <input
+                    required
+                    key={kind}
+                    type="file"
+                    name="attachment"
+                    accept={kind === 'Photo' ? 'image/jpeg,image/png' : '.pdf,.txt'}
+                  />
+                </label>
+              )}
+            </div>
+            <div className="actions">
+              <button className="primary" disabled={pending}>
+                Save evidence
+              </button>
+              <button type="button" onClick={() => setAdding(false)}>
+                Cancel
+              </button>
+            </div>
+          </fieldset>
         </form>
       )}
       {error && <p role="alert">{error}</p>}

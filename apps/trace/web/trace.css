@@ -804,3 +804,9 @@ h3:has(svg) {
     transition: none !important;
   }
 }
+.study-controls {
+  border: 0;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+}
