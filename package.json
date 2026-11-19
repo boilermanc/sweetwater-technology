@@ -4,6 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "dev:trace": "npm run build:trace && node --experimental-strip-types apps/trace/server/start.ts --demo",
+    "start:trace": "node --experimental-strip-types apps/trace/server/start.ts",
+    "seed:trace": "node --experimental-strip-types apps/trace/server/seed.ts",
+    "build:trace": "tsc -p apps/trace/tsconfig.json && vite build --config apps/trace/vite.config.ts",
+    "test:trace": "node --experimental-strip-types --test apps/trace/tests/*.test.mjs",
     "dev": "vite",
     "build": "tsc -b && vite build && vite build --ssr src/entry-server.tsx --outDir node_modules/.tmp/sweetwater-prerender --emptyOutDir && node scripts/prerender.mjs",
     "lint": "eslint .",

@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.app.json",
+  "compilerOptions": {
+    "types": ["vite/client", "node"],
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "tsBuildInfoFile": "../../node_modules/.tmp/trace.tsbuildinfo"
+  },
+  "include": ["./**/*.ts", "./**/*.tsx"]
+}
