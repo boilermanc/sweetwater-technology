@@ -1,16 +1,21 @@
+@layer theme, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+@source "../../../src/components/SweetwaterLogo.tsx";
+
 * {
   box-sizing: border-box;
 }
 :root {
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 15px;
-  color: #1d332e;
-  background: #f6f6ef;
+  color: #0f172a;
+  background: #f7f9fc;
   line-height: 1.5;
-  --green: #164d41;
-  --line: #d5dcd2;
-  --muted: #51645e;
-  --paper: #fffefa;
+  --blue: #2563eb;
+  --line: #dbe3ef;
+  --muted: #475569;
+  --paper: #fff;
 }
 body {
   margin: 0;
@@ -39,8 +44,8 @@ button,
   justify-content: center;
   width: fit-content;
   background: var(--paper);
-  color: var(--green);
-  border: 1px solid #b9c7bc;
+  color: var(--blue);
+  border: 1px solid #cbd5e1;
   border-radius: 7px;
   padding: 0.59rem 0.91rem;
   font-weight: 600;
@@ -51,7 +56,7 @@ button,
 }
 button:hover,
 .button:hover {
-  background: #eaf0e7;
+  background: #eff6ff;
 }
 button:disabled {
   opacity: 0.5;
@@ -59,15 +64,16 @@ button:disabled {
 }
 button.primary,
 .button.primary {
-  background: var(--green);
+  background: var(--blue);
   color: white;
-  border-color: var(--green);
+  border-color: var(--blue);
 }
-.primary:hover {
-  background: #0c3a30;
+button.primary:hover,
+.button.primary:hover {
+  background: #1d4ed8;
 }
 :focus-visible {
-  outline: 3px solid #b16b17;
+  outline: 3px solid #2563eb;
   outline-offset: 3px;
 }
 .shell {
@@ -80,8 +86,9 @@ button.primary,
   margin-inline: auto;
 }
 .topbar {
-  background: #113d35;
-  color: #f8fcf2;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+  color: #0f172a;
 }
 .top-inner {
   height: 78px;
@@ -90,29 +97,23 @@ button.primary,
   gap: 24px;
 }
 .brand {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 11px;
+  gap: 18px;
   text-decoration: none;
-  font-family: Georgia, serif;
-  font-size: 36px;
-  letter-spacing: -1.8px;
   line-height: 1;
 }
-.brand-mark {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: #d6ebaa;
-  color: #254837;
+.studio-mark {
+  width: 40px;
+  height: 40px;
 }
-.studio {
-  padding-left: 23px;
-  border-left: 1px solid #477268;
-  color: #ceddd5;
-  font-size: 0.85rem;
+.product-name {
+  border-left: 1px solid var(--line);
+  padding-left: 18px;
+  color: #1d4ed8;
+  font-size: 1.45rem;
+  font-weight: 750;
+  letter-spacing: -0.045em;
 }
 .identity {
   margin-left: auto;
@@ -129,12 +130,12 @@ button.primary,
 }
 .identity small {
   font-size: 0.73rem;
-  color: #d6e1d9;
+  color: #475569;
 }
 .avatar {
-  background: #34594c;
-  color: #e9f2d2;
-  border: 1px solid #63806e;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
   border-radius: 50%;
   width: 34px;
   height: 34px;
@@ -171,8 +172,7 @@ p {
 h1,
 h2,
 .study-card h3 {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-weight: normal;
+  font-weight: 800;
   letter-spacing: -0.045em;
   line-height: 1.15;
 }
@@ -224,8 +224,8 @@ p {
 }
 .count {
   font: 600 0.75rem system-ui;
-  background: #e5ebdf;
-  color: #405a40;
+  background: #dbeafe;
+  color: #1e40af;
   border-radius: 20px;
   padding: 2px 8px;
   letter-spacing: 0;
@@ -269,17 +269,17 @@ p {
   min-width: 0;
   text-decoration: none;
   background: var(--paper);
-  border: 1px solid #cbd4ca;
+  border: 1px solid #dbe3ef;
   border-radius: 13px;
   overflow: hidden;
-  box-shadow: 0 3px 8px #1a362b08;
+  box-shadow: 0 3px 8px #1e40af08;
   transition:
     border-color 0.15s,
     box-shadow 0.15s;
 }
 .study-card:hover {
-  border-color: #7c9b82;
-  box-shadow: 0 5px 15px #153a2d12;
+  border-color: #93b4eb;
+  box-shadow: 0 5px 15px #1e40af12;
 }
 .card-top {
   display: flex;
@@ -294,15 +294,15 @@ p {
   font-weight: 700;
   letter-spacing: 0.09em;
   text-transform: uppercase;
-  color: #48645a;
+  color: #1e40af;
 }
 .status,
 .tags span {
   font-size: 0.74rem;
   padding: 3px 9px;
   border-radius: 14px;
-  background: #e7efdf;
-  color: #3e5e36;
+  background: #e0edff;
+  color: #1e40af;
   font-weight: 600;
 }
 .status {
@@ -317,7 +317,7 @@ p {
   border-radius: 100%;
   width: 6px;
   height: 6px;
-  background: #5e8648;
+  background: #2563eb;
 }
 .study-card h3 {
   font-size: clamp(1.65rem, 3vw, 2.35rem);
@@ -332,13 +332,13 @@ p {
   margin: 0 22px 20px;
   padding: 17px 18px;
   border-radius: 7px;
-  background-color: #e9efe5;
-  background-image: radial-gradient(#b5c3b199 0.8px, transparent 0.8px);
+  background-color: #edf5ff;
+  background-image: radial-gradient(#9cb9dd99 0.8px, transparent 0.8px);
   background-size: 9px 9px;
 }
 .study-card:nth-child(even) .map-preview {
-  background-color: #f3eee1;
-  background-image: radial-gradient(#cbc1aa99 0.8px, transparent 0.8px);
+  background-color: #eef2ff;
+  background-image: radial-gradient(#a9b5df99 0.8px, transparent 0.8px);
 }
 .preview-label {
   display: flex;
@@ -368,8 +368,8 @@ p {
   display: block;
   width: 11px;
   height: 11px;
-  background: #f8fcf4;
-  border: 2px solid #53785c;
+  background: #fff;
+  border: 2px solid #2563eb;
   border-radius: 50%;
   margin-bottom: 6px;
   z-index: 1;
@@ -380,7 +380,7 @@ p {
   top: 5px;
   height: 1px;
   width: 100%;
-  background: #91a68e;
+  background: #93b5eb;
 }
 .mini-branch {
   display: flex;
@@ -388,9 +388,10 @@ p {
   gap: 6px;
   margin-top: 11px;
   font-size: 0.76rem;
-  color: #435b41;
+  color: #334155;
 }
 .card-bottom {
+  color: #1d4ed8;
   display: flex;
   gap: 8px;
   align-items: center;
@@ -446,7 +447,7 @@ label,
 legend {
   font-weight: 600;
   font-size: 0.86rem;
-  color: #334e44;
+  color: #334155;
 }
 label {
   display: grid;
@@ -456,10 +457,10 @@ input,
 select,
 textarea {
   min-width: 0;
-  border: 1px solid #bfcabf;
+  border: 1px solid #bdcadb;
   border-radius: 5px;
-  background: #fffefa;
-  color: #213f34;
+  background: #fff;
+  color: #0f172a;
   padding: 0.6rem 0.7rem;
   font-weight: 400;
   max-width: 100%;
@@ -480,7 +481,7 @@ label.check {
   padding: 3px 0;
 }
 .check input {
-  accent-color: var(--green);
+  accent-color: var(--blue);
 }
 .tabs {
   display: flex;
@@ -508,7 +509,8 @@ h3:has(svg) {
   padding: 10px;
 }
 .tabs a[aria-current] {
-  border-color: var(--green);
+  border-color: var(--blue);
+  color: #1d4ed8;
 }
 .back {
   margin-top: 18px;
@@ -517,7 +519,7 @@ h3:has(svg) {
 .questions,
 .review {
   padding: 18px;
-  background: #f0f3eb;
+  background: #f1f5f9;
   border: 1px solid var(--line);
   border-radius: 8px;
   margin: 15px 0;
@@ -563,10 +565,10 @@ h3:has(svg) {
   padding: 0 8px 12px;
 }
 .quiet {
-  color: #854430;
+  color: #9f3030;
 }
 .segment {
-  background: #eaf0e5;
+  background: #e8eef7;
   border-radius: 7px;
   padding: 3px;
   gap: 2px;
@@ -576,8 +578,8 @@ h3:has(svg) {
   background: transparent;
 }
 .segment button[aria-pressed='true'] {
-  background: #fffefa;
-  box-shadow: 0 1px 4px #12352328;
+  background: #fff;
+  box-shadow: 0 1px 4px #1e3a8a26;
 }
 .step {
   border-top: 1px solid var(--line);
@@ -586,7 +588,7 @@ h3:has(svg) {
   font:
     500 0.85rem ui-monospace,
     monospace;
-  background: #e7ede2;
+  background: #eaf2ff;
   border-radius: 6px;
   min-width: 34px;
   height: 34px;
@@ -625,8 +627,8 @@ h3:has(svg) {
   margin: 13px 0 6px;
 }
 .citation {
-  background: #f4f5ee;
-  border-left: 2px solid #93ad91;
+  background: #f8fafc;
+  border-left: 2px solid #93b5eb;
   padding: 8px 12px;
   margin: 6px 0;
 }
@@ -676,7 +678,7 @@ h3:has(svg) {
 }
 .save-status {
   font-size: 0.82rem;
-  color: var(--green);
+  color: var(--blue);
 }
 .save-status:not(:empty) {
   margin: 8px 0;
@@ -725,7 +727,18 @@ h3:has(svg) {
     height: 64px;
     gap: 12px;
   }
-  .studio {
+  .brand {
+    gap: 8px;
+  }
+  .studio-mark {
+    width: 30px;
+    height: 30px;
+  }
+  .product-name {
+    padding-left: 8px;
+    font-size: 1.1rem;
+  }
+  .avatar {
     display: none;
   }
   .frame {

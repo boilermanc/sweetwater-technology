@@ -10,8 +10,8 @@ import {
   GitFork,
   Layers2,
   LockKeyhole,
-  Route,
 } from 'lucide-react'
+import { SweetwaterLogo } from '../../../src/components/SweetwaterLogo'
 import { type StudyView, type Workspace } from '../model.ts'
 import { api, endpoint, type Save } from './api.ts'
 import { Studies } from './Studies.tsx'
@@ -94,13 +94,10 @@ export function App() {
       </a>
       <header className="topbar">
         <div className="frame top-inner">
-          <a href="/studies" aria-label="Trace studies" className="brand">
-            <span className="brand-mark">
-              <Route size={24} />
-            </span>
-            Trace
+          <a href="/studies" aria-label="Sweetwater Technology · Trace studies" className="brand">
+            <SweetwaterLogo markClassName="studio-mark" />
+            <span className="product-name">Trace</span>
           </a>
-          <span className="studio">Sweetwater Technology</span>
           {workspace && (
             <div className="identity">
               <span className="avatar">{workspace.session.name[0]}</span>
