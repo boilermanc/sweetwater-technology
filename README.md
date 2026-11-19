@@ -6,6 +6,8 @@ Production builds prerender the homepage, newsroom, and every published news art
 
 ## Local development
 
+The private [Trace discovery prototype](apps/trace/README.md) has its own application, server, and build for `trace.sweetwater.technology`. Its database is Sproutify Trellis. Run `npm run dev:trace` for an offline fictional-data preview.
+
 ```bash
 npm install
 npm run dev
